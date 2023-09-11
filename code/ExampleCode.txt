@@ -1,0 +1,59 @@
+
+move r1 to r2
+move 0x4948 to r2
+move 83 to r1 if zero
+
+load 0x4949 to r2
+
+subtract r1 and r2 to r3
+add r2 and r1 to r1
+multiply signed r1 and r2 to r3
+divide unsigned r3 and r2 to r2
+
+compare r1 and r2
+test r1 and r2
+
+jump to 0x49483 if greater
+jump to 0x4948
+
+push from r1
+pop to r2
+
+xor r2 and r1 to r1
+and 774 and r2 to r3
+not r1 to r1
+
+shift 8 left r1 to r2
+shift 2 right arithmetically 0x3848 to r1
+shift 0 right logically 94 to r2
+
+skip
+return
+
+
+
+mov r1, r2
+mov 0x4948, r2
+movz 83, r1
+
+ld 0x4949, r2
+
+sub r1, r2, r3
+add r2, r1
+muls r1, r2, r3
+divu r3, r2
+
+jmpg 0x49843
+jmp 0x4948
+
+push r1
+pop r2
+xor r2, r1
+and 774, r2, r3
+not r1
+sl 8, r1, r2
+sra 2, 0x3848, r1
+srl 0, 94, r2
+
+skp 
+ret
