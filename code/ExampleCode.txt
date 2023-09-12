@@ -8,11 +8,11 @@ multiply-signed r5 and r4 to r6
 multiply-unsigned r3 and r8 to r3
 divide-signed r8 and r8 to r1
 divide-unsigned r8 and r8 to r1
-or r4 and r2
-not-or r1 and r1
-exclusive-or r8 and r2
-and r1 and r2
-not r6
+bitwise-or r4 and r2
+bitwise-nor r1 and r1
+bitwise-xor r8 and r2
+bitwise-and r1 and r2
+bitwise-not r6
 increment r5
 decrement r8
 shift-left r4 and r2 by 8
