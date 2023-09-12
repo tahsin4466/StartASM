@@ -45,7 +45,7 @@ class Compiler {
     private:
         //Data types
         std::string m_pathname;
-        std::vector<std::string> m_codeLines;
+        std::vector<std::vector<std::string>> m_codeLines;
         std::string m_statusMessage;
         int m_lineIndex;
 

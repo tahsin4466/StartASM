@@ -32,28 +32,28 @@ return
 
 
 
-mov r1, r2
-mov 0x4948, r2
-movz 83, r1
+mov r1 r2
+mov 0x4948 r2
+movz 83 r1
 
-ld 0x4949, r2
+ld 0x4949 r2
 
-sub r1, r2, r3
-add r2, r1
-muls r1, r2, r3
-divu r3, r2
+sub r1, r2 r3
+add r2 r1
+muls r1 r2 r3
+divu r3 r2
 
 jmpg 0x49843
 jmp 0x4948
 
 push r1
 pop r2
-xor r2, r1
-and 774, r2, r3
+xor r2 r1
+and 774 r2 r3
 not r1
-sl 8, r1, r2
-sra 2, 0x3848, r1
-srl 0, 94, r2
+sl 8 r1 r2
+sra 2 0x3848 r1
+srl 0 94 r2
 
 skp 
 ret
