@@ -34,14 +34,7 @@ bool Compiler::loadCode() {
             }
         }
         codeFile.close();
-
-        for (int i = 0; i < m_codeLines.size(); i++) {
-            for (int j = 0; j < m_codeLines[i].size(); j++) {
-                cout << m_codeLines[i][j] << " ";
-            }
-            cout << endl;
-        }
-        
+    
         m_statusMessage = "Code loaded";
         return true;
     }
