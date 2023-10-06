@@ -2,8 +2,8 @@
 #define INSTRUCTIONS_H
 
 class InstructionSet;
-class Operand;
-class MemoryAddress;
+
+#include "Operands.h"
 
 #include <vector>
 #include <string>
@@ -38,7 +38,7 @@ class Instruction {
         int m_instructionID;
         //Number of Operands
         int m_numOperands;
-        //Template
+        //Template, to check the syntax structure for error checking. Validates the order and spelling of tokens for each unqiue instruction
         std::vector<std::string> m_template;
         
 };
@@ -47,7 +47,7 @@ class Instruction {
 
 //MID LEVEL OPERAND CLASS
 //Defines the parent class of each instruction based on number of operands
-//Contains protected pointers to each register to be accessed by most derived instruction classes
+//Contains protected pointers to each operand to be accessed by most derived instruction classes
 //Opernad classes are ABCS - execute() is defined only in most inhereited class
 class NoOperandInstruction: public Instruction {
     public:
@@ -60,47 +60,47 @@ class NoOperandInstruction: public Instruction {
 
 class OneOperandInstruction: public Instruction {
     public:
-        OneOperandInstruction(InstructionSet* set, int ID, Register* srcRegister):
+        OneOperandInstruction(InstructionSet* set, int ID, Operand* srcOperand):
             Instruction(set, ID, 1),
-            m_srcRegister(srcRegister) {};
+            m_srcOperand(srcOperand) {};
         virtual ~OneOperandInstruction() {};
 
         virtual void execute() = 0;
 
     protected:
-        Register* m_srcRegister;
+        Operand* m_srcOperand;
 };
 
 class TwoOperandInstruction: public Instruction {
     public:
-        TwoOperandInstruction(InstructionSet* set, int ID, Register* srcRegister, Register* destRegister):
+        TwoOperandInstruction(InstructionSet* set, int ID, Operand* srcOperand, Operand* destOperand):
             Instruction(set, ID, 2),
-            m_srcRegister(srcRegister),
-            m_destRegister(destRegister) {};
+            m_srcOperand(srcOperand),
+            m_destOperand(destOperand) {};
         virtual ~TwoOperandInstruction() {};
 
         virtual void execute() = 0;
 
     protected:
-        Register* m_srcRegister;
-        Register* m_destRegister;
+        Operand* m_srcOperand;
+        Operand* m_destOperand;
 };
 
 class ThreeOperandInstruction: public Instruction {
     public:
-        ThreeOperandInstruction(InstructionSet* set, int ID, Register* srcRegister1, Register* srcRegister2, Register* destRegister):
-            Instruction(set, ID, 2),
-            m_srcRegister1(srcRegister1),
-            m_srcRegister2(srcRegister2),
-            m_destRegister(destRegister) {};
+        ThreeOperandInstruction(InstructionSet* set, int ID, Operand* srcOperand1, Operand* srcOperand2, Operand* destOperand):
+            Instruction(set, ID, 3),
+            m_srcOperand1(srcOperand1),
+            m_srcOperand2(srcOperand2),
+            m_destOperand(destOperand) {};
         virtual ~ThreeOperandInstruction() {};
 
         virtual void execute() = 0;
 
     protected:
-        Register* m_srcRegister1;
-        Register* m_srcRegister2;
-        Register* m_destRegister;
+        Operand* m_srcOperand1;
+        Operand* m_srcOperand2;
+        Operand* m_destOperand;
 };
 
 
@@ -111,7 +111,7 @@ class ThreeOperandInstruction: public Instruction {
 //Are not ABCS - execute() is defined
 class MoveInstruction: public TwoOperandInstruction {
     public:
-        MoveInstruction(InstructionSet* set, Register* srcRegister, Register* destRegister):
+        MoveInstruction(InstructionSet* set, GeneralRegister* srcRegister, GeneralRegister* destRegister):
             TwoOperandInstruction(set, 0, srcRegister, destRegister) {};
         virtual ~MoveInstruction() {};
 
