@@ -60,47 +60,47 @@ class NoOperandInstruction: public Instruction {
 
 class OneOperandInstruction: public Instruction {
     public:
-        OneOperandInstruction(InstructionSet* set, int ID, Operand* srcOperand):
+        OneOperandInstruction(InstructionSet* set, int ID, Operand* operand1):
             Instruction(set, ID, 1),
-            m_srcOperand(srcOperand) {};
+            m_operand1(operand1) {};
         virtual ~OneOperandInstruction() {};
 
         virtual void execute() = 0;
 
     protected:
-        Operand* m_srcOperand;
+        Operand* m_operand1;
 };
 
 class TwoOperandInstruction: public Instruction {
     public:
-        TwoOperandInstruction(InstructionSet* set, int ID, Operand* srcOperand, Operand* destOperand):
+        TwoOperandInstruction(InstructionSet* set, int ID, Operand* operand1, Operand* operand2):
             Instruction(set, ID, 2),
-            m_srcOperand(srcOperand),
-            m_destOperand(destOperand) {};
+            m_operand1(operand1),
+            m_operand2(operand2) {};
         virtual ~TwoOperandInstruction() {};
 
         virtual void execute() = 0;
 
     protected:
-        Operand* m_srcOperand;
-        Operand* m_destOperand;
+        Operand* m_operand1;
+        Operand* m_operand2;
 };
 
 class ThreeOperandInstruction: public Instruction {
     public:
-        ThreeOperandInstruction(InstructionSet* set, int ID, Operand* srcOperand1, Operand* srcOperand2, Operand* destOperand):
+        ThreeOperandInstruction(InstructionSet* set, int ID, Operand* operand1, Operand* operand2, Operand* operand3):
             Instruction(set, ID, 3),
-            m_srcOperand1(srcOperand1),
-            m_srcOperand2(srcOperand2),
-            m_destOperand(destOperand) {};
+            m_operand1(operand1),
+            m_operand2(operand2),
+            m_operand3(operand) {};
         virtual ~ThreeOperandInstruction() {};
 
         virtual void execute() = 0;
 
     protected:
-        Operand* m_srcOperand1;
-        Operand* m_srcOperand2;
-        Operand* m_destOperand;
+        Operand* m_operand1;
+        Operand* m_operand2;
+        Operand* m_operand3;
 };
 
 
@@ -117,6 +117,52 @@ class MoveInstruction: public TwoOperandInstruction {
 
     virtual void execute();
 
+};
+
+class LoadValueInstruction: public OneOperandInstruction {
+    public:
+        LoadValueInstruction(InstructionSet* set, std::vector<uint8_t> srcValue, GeneralRegister* destRegister):
+            OneOperandInstruction(set, 1, destRegister) {};
+        virtual ~LoadValueInstruction() {};
+
+    virtual void execute();
+
+};
+
+class LoadMemoryInstruction: public TwoOperandInstruction {
+    public:
+        LoadMemoryInstruction(InstructionSet* set, HeapMemory* srcMemory, GeneralRegister* destRegister):
+            TwoOperandInstruction(set, 2, srcMemory, destRegister) {};
+    virtual ~LoadMemoryInstruction() {};
+
+    virtual void execute();
+};
+
+class StoreMemoryInstruction: public TwoOperandInstruction {
+    public:
+        StoreMemoryInstruction(InstructionSet* set, GeneralRegister* srcRegister, HeapMemory* destMemory):
+            TwoOperandInstruction(set, 3, srcRegister, destMemory) {};
+        virtual ~StoreMemoryInstruction() {};
+
+        virtual void execute();
+};
+
+class AdditionInstruction: public TwoOperandInstruction {
+    public:
+        AdditionInstruction(InstructionSet* set, GeneralRegister* srcRegister, GeneralRegister* destRegister):
+            TwoOperandInstruction(set, 4, srcRegister, destRegister) {};
+        virtual ~AdditionInstruction() {};
+
+    virtual void execute();
+};
+
+class SubtractionInstruction: public TwoOperandInstruction {
+    public:
+        SubtractionInstruction(InstructionSet* set, GeneralRegister* srcRegister, GeneralRegister* destRegister):
+            TwoOperandInstruction(set, 5, srcRegister, destRegister) {};
+        virtual ~SubtractionInstruction() {};
+
+    virtual void execute();
 };
 
 #endif
