@@ -92,7 +92,7 @@ class ThreeOperandInstruction: public Instruction {
             Instruction(set, ID, 3),
             m_operand1(operand1),
             m_operand2(operand2),
-            m_operand3(operand) {};
+            m_operand3(operand3) {};
         virtual ~ThreeOperandInstruction() {};
 
         virtual void execute() = 0;
@@ -147,20 +147,101 @@ class StoreMemoryInstruction: public TwoOperandInstruction {
         virtual void execute();
 };
 
-class AdditionInstruction: public TwoOperandInstruction {
+class AdditionInstruction: public ThreeOperandInstruction {
     public:
-        AdditionInstruction(InstructionSet* set, GeneralRegister* srcRegister, GeneralRegister* destRegister):
-            TwoOperandInstruction(set, 4, srcRegister, destRegister) {};
+        AdditionInstruction(InstructionSet* set, GeneralRegister* srcRegister1, GeneralRegister* srcRegister2, GeneralRegister* destRegister):
+            ThreeOperandInstruction(set, 4, srcRegister1, srcRegister2, destRegister) {};
         virtual ~AdditionInstruction() {};
 
     virtual void execute();
 };
 
-class SubtractionInstruction: public TwoOperandInstruction {
+class SubtractionInstruction: public ThreeOperandInstruction {
     public:
-        SubtractionInstruction(InstructionSet* set, GeneralRegister* srcRegister, GeneralRegister* destRegister):
-            TwoOperandInstruction(set, 5, srcRegister, destRegister) {};
+        SubtractionInstruction(InstructionSet* set, GeneralRegister* srcRegister1, GeneralRegister* srcRegister2, GeneralRegister* destRegister):
+            ThreeOperandInstruction(set, 5, srcRegister1, srcRegister2, destRegister) {};
         virtual ~SubtractionInstruction() {};
+
+    virtual void execute();
+};
+
+class MultiplyInstruction: public ThreeOperandInstruction {
+    public:
+        MultiplyInstruction(InstructionSet* set, GeneralRegister* srcRegister1, GeneralRegister* srcRegister2, GeneralRegister* destRegister):
+            ThreeOperandInstruction(set, 6, srcRegister1, srcRegister2, destRegister) {};
+        virtual ~MultiplyInstruction() {};
+    
+    virtual void execute();
+};
+
+class DivideInstruction: public ThreeOperandInstruction {
+    public:
+        DivideInstruction(InstructionSet* set, GeneralRegister* srcRegister1, GeneralRegister* srcRegister2, GeneralRegister* destRegister):
+            ThreeOperandInstruction(set, 7, srcRegister1, srcRegister2, destRegister) {};
+        virtual ~DivideInstruction() {};
+
+        virtual void execute();
+};
+
+class OrInstruction: public TwoOperandInstruction {
+    public:
+        OrInstruction(InstructionSet* set, GeneralRegister* srcRegister1, GeneralRegister* srcRegister2):
+            TwoOperandInstruction(set, 8, srcRegister1, srcRegister2) {};
+        virtual ~OrInstruction() {};
+        
+        virtual void execute();
+};
+
+class NorInstruction: public TwoOperandInstruction {
+    public:
+        NorInstruction(InstructionSet* set, GeneralRegister* srcRegister1, GeneralRegister* srcRegister2):
+            TwoOperandInstruction(set, 9, srcRegister1, srcRegister2) {};
+        virtual ~NorInstruction() {};
+
+        virtual void execute();
+};
+
+class XorInstruction: public TwoOperandInstruction {
+    public:
+        XorInstruction(InstructionSet* set, GeneralRegister* srcRegister1, GeneralRegister* srcRegister2):
+            TwoOperandInstruction(set, 10, srcRegister1, srcRegister2) {};
+        virtual ~XorInstruction() {};
+
+        virtual void execute();
+};
+
+class AndInstruction: public TwoOperandInstruction {
+    public:
+        AndInstruction(InstructionSet* set, GeneralRegister* srcRegister1, GeneralRegister* srcRegister2):
+            TwoOperandInstruction(set, 11, srcRegister1, srcRegister2) {};
+        virtual ~AndInstruction() {};
+
+        virtual void execute();
+};
+
+class NotInstruction: public OneOperandInstruction {
+    public:
+        NotInstruction(InstructionSet* set, GeneralRegister* srcRegister):
+            OneOperandInstruction(set, 12, srcRegister) {};
+        virtual ~NotInstruction() {};
+
+        virtual void execute();
+};
+
+class IncrementInstruction: public OneOperandInstruction {
+    public:
+        IncrementInstruction(InstructionSet* set, GeneralRegister* srcRegister):
+            OneOperandInstruction(set, 13, srcRegister) {};
+        virtual ~IncrementInstruction() {};
+
+        virtual void execute();
+};
+
+class DecrementInstruction: public OneOperandInstruction {
+    public:
+        DecrementInstruction(InstructionSet* set, GeneralRegister* srcRegister):
+            OneOperandInstruction(set, 14, srcRegister) {};
+        virtual ~DecrementInstruction() {};
 
     virtual void execute();
 };
