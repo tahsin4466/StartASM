@@ -246,4 +246,130 @@ class DecrementInstruction: public OneOperandInstruction {
     virtual void execute();
 };
 
+class ShiftLeftArithmeticInstruction: public TwoOperandInstruction {
+    public:
+        ShiftLeftArithmeticInstruction(InstructionSet* set, GeneralRegister* srcRegister, GeneralRegister* destRegister):
+            TwoOperandInstruction(set, 15, srcRegister, destRegister) {};
+        virtual ~ShiftLeftArithmeticInstruction() {};
+
+    virtual void execute();
+};
+
+class ShiftLeftLogicalInstruction: public TwoOperandInstruction {
+    public:
+        ShiftLeftLogicalInstruction(InstructionSet* set, GeneralRegister* srcRegister, GeneralRegister* destRegister):
+            TwoOperandInstruction(set, 16, srcRegister, destRegister) {};
+        virtual ~ShiftLeftLogicalInstruction() {};
+
+    virtual void execute();
+};
+
+class ShiftRightArithmeticInstruction: public TwoOperandInstruction {
+    public:
+        ShiftRightArithmeticInstruction(InstructionSet* set, GeneralRegister* srcRegister, GeneralRegister* destRegister):
+            TwoOperandInstruction(set, 17, srcRegister, destRegister) {};
+        virtual ~ShiftRightArithmeticInstruction() {};
+
+    virtual void execute();
+};
+
+class ShiftRightLogicalInstruction: public TwoOperandInstruction {
+    public:
+        ShiftRightLogicalInstruction(InstructionSet* set, GeneralRegister* srcRegister, GeneralRegister* destRegister):
+            TwoOperandInstruction(set, 18, srcRegister, destRegister) {};
+        virtual ~ShiftRightLogicalInstruction() {};
+
+    virtual void execute();
+};
+
+class JumpGreaterInstruction: public OneOperandInstruction {
+    public:
+        JumpGreaterInstruction(InstructionSet* set, ProgramMemory* destProgram):
+            OneOperandInstruction(set, 19, destProgram) {};
+        virtual ~JumpGreaterInstruction() {};
+    
+    virtual void execute();
+};
+
+class JumpLessInstruction: public OneOperandInstruction {
+    public:
+        JumpLessInstruction(InstructionSet* set, ProgramMemory* destProgram):
+            OneOperandInstruction(set, 20, destProgram) {};
+        virtual ~JumpLessInstruction() {};
+    
+    virtual void execute();
+};
+
+class JumpEqualInstruction: public OneOperandInstruction {
+    public:
+        JumpEqualInstruction(InstructionSet* set, ProgramMemory* destProgram):
+            OneOperandInstruction(set, 21, destProgram) {};
+        virtual ~JumpEqualInstruction() {};
+    
+    virtual void execute();
+};
+
+class JumpNotEqualInstruction: public OneOperandInstruction {
+    public:
+        JumpNotEqualInstruction(InstructionSet* set, ProgramMemory* destProgram):
+            OneOperandInstruction(set, 22, destProgram) {};
+        virtual ~JumpNotEqualInstruction() {};
+    
+    virtual void execute();
+};
+
+class JumpZeroInstruction: public OneOperandInstruction {
+    public:
+        JumpZeroInstruction(InstructionSet* set, ProgramMemory* destProgram):
+            OneOperandInstruction(set, 23, destProgram) {};
+        virtual ~JumpZeroInstruction() {};
+    
+    virtual void execute();
+};
+
+class JumpNotZeroInstruction: public OneOperandInstruction {
+    public:
+        JumpNotZeroInstruction(InstructionSet* set, ProgramMemory* destProgram):
+            OneOperandInstruction(set, 24, destProgram) {};
+        virtual ~JumpNotZeroInstruction() {};
+    
+    virtual void execute();
+};
+
+class StackPushInstruction: public OneOperandInstruction {
+    public:
+        StackPushInstruction(InstructionSet* set, GeneralRegister* srcRegister):
+            OneOperandInstruction(set, 25, srcRegister) {};
+        virtual ~StackPushInstruction() {};
+    
+    virtual void execute();
+};
+
+class StackPopInstruction: public OneOperandInstruction {
+    public:
+        StackPopInstruction(InstructionSet* set, GeneralRegister* srcRegister):
+            OneOperandInstruction(set, 26, srcRegister) {};
+        virtual ~StackPopInstruction() {};
+    
+    virtual void execute();
+};
+
+class SkipInstruction: public NoOperandInstruction {
+    public:
+        SkipInstruction(InstructionSet* set):
+            NoOperandInstruction(set, 27) {};
+        virtual ~SkipInstruction() {};
+    
+    virtual void execute();
+};
+
+class StopInstruction: public NoOperandInstruction {
+    public:
+        StopInstruction(InstructionSet* set):
+            NoOperandInstruction(set, 28) {};
+        virtual ~StopInstruction() {};
+    
+    virtual void execute();
+};
+
 #endif
