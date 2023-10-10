@@ -1,5 +1,5 @@
-#ifndef REGISTERS_H
-#define REGISTERS_H
+#ifndef OPERANDS_H
+#define OPERANDS_H
 
 #include <vector>
 #include <string>
@@ -55,7 +55,7 @@ class Register: public Operand {
 
         //Read and Write
         virtual void write(std::vector<uint8_t> byteArray) = 0;
-        virtual void std::vector<uint8_t> read() {return m_registerValue;}
+        std::vector<uint8_t> read() {return m_registerValue;}
 
     protected:
         std::vector<uint8_t> m_registerValue; 
@@ -84,7 +84,7 @@ class Memory: public Operand {
         int getMemoryID() {return m_memoryID;}
         
         //Checkers
-        bool validAddress() = 0;
+        virtual bool validAddress(std::vector<uint8_t>) = 0;
 
     private:
         int m_memoryID;
@@ -117,7 +117,7 @@ class GeneralRegister: public Register {
                 m_registerValue = byteArray;
             }
         }
-        virtual clear(){m_registerValue.clear();}
+        virtual void clear(){m_registerValue.clear();}
 
     private:
         int m_registerNum;
@@ -133,7 +133,7 @@ class PointerRegister: public Register {
         //Constructor and Destructor
         PointerRegister(Memory* Memory):
             Register(1),
-            m_programMemory(Memory) {};
+            m_memoryStructure(Memory) {};
         virtual ~PointerRegister();
         
         virtual void write(std::vector<uint8_t> byteArray) {
@@ -168,8 +168,10 @@ class HeapMemory: public Memory {
         void write(std::vector<uint8_t> byteValue, std::vector<uint8_t> memoryAddress); //Write in pre-determined address
         void remove(std::vector<uint8_t> memoryAddress);
 
+        virtual bool validAddress(std::vector<uint8_t>);
+
     private:
-        std::unordered_map<std::vector<uint8_t>, std::vector<uint8_t> m_heapMemory; 
+        std::unordered_map<std::vector<uint8_t>, std::vector<uint8_t>> m_heapMemory; 
 };
 
 //LOW LEVEL PROGRAM MEMORY CLASS
@@ -192,6 +194,8 @@ class ProgramMemory: public Memory {
 
         //Read instruction
         Instruction* read(std::vector<uint8_t> memoryAddress);
+
+        virtual bool validAddress(std::vector<uint8_t>);
 
     private:
         std::map<std::vector<uint8_t>, Instruction*> m_programMemory;
@@ -216,8 +220,10 @@ class StackMemory: public Memory {
         void write(std::vector<uint8_t> byteValue, std::vector<uint8_t> memoryAddress);
         void remove(std::vector<uint8_t> memoryAddress);
 
+        virtual bool validAddress(std::vector<uint8_t>);
+
     private:
-        std::map<std::vector<uint8_t>, std::vector<uint8_t> m_stackMemory;
+        std::map<std::vector<uint8_t>, std::vector<uint8_t>> m_stackMemory;
     
 };
 

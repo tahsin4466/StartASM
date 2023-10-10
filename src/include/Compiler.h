@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "InstructionSet.h"
+
 class Compiler {
     public:
         //Constructors and Destructors
@@ -40,17 +42,24 @@ class Compiler {
         bool checkCode();
 
         //Code Compiling
-        void compileCode();
+        bool compileCode();
+
+        //Code Tokenizing
+        bool tokenizeCode();
 
     private:
         //pathname
         std::string m_pathname;
-        //Vector containing code Lines
-        std::vector<std::vector<std::string>> m_codeLines;
+        //Vector containing code lines
+        std::vector<std::string> m_codeLines;
+        //Vector containing code tokens
+        std::vector<std::vector<std::string>> m_codeTokens;
         //String containing current status
         std::string m_statusMessage;
         //Int containing current line index
         int m_lineIndex;
+        //Instruction set
+        InstructionSet m_instructionSet;
 
         //Helper Functions
         

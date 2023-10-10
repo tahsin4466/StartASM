@@ -13,7 +13,7 @@ class Register;
 class InstructionSet {
     public:
         //Constructor and destructor
-        InstructionSet() {};
+        InstructionSet();
         ~InstructionSet() {
             std::unordered_map<std::string, Instruction*>::iterator iti;
             for (iti=m_instructionMap.begin(); iti!=m_instructionMap.end(); iti++) {
@@ -26,11 +26,10 @@ class InstructionSet {
             }
         };
 
+
         bool isValidInstruction(std::string keyword);
         bool isValidRegister(std::string keyword);
         bool isValidMemoryAddress(std::string keyword);
-
-        std::vector<std::string> getTemplate(std::string keyword) {return m_templateMap.at(keyword);}
 
 
     private:

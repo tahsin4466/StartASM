@@ -37,10 +37,7 @@ class Instruction {
         //Instruction ID
         int m_instructionID;
         //Number of Operands
-        int m_numOperands;
-        //Template, to check the syntax structure for error checking. Validates the order and spelling of tokens for each unqiue instruction
-        std::vector<std::string> m_template;
-        
+        int m_numOperands; 
 };
 
 
