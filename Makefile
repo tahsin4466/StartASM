@@ -3,9 +3,9 @@
 ########################################################################
 
 # Compiler settings - Can be customized.
-CC = g++
-CXXFLAGS = -std=c++11 -Wall -Iinclude
-LDFLAGS = 
+CC = g++-13
+CXXFLAGS = -std=c++11 -Wall -Iinclude -fopenmp # Remove -Xpreprocessor flag
+LDFLAGS = -fopenmp -lgomp # Add OpenMP flags and library
 
 # Makefile settings - Can be customized.
 APPNAME = StartASM

@@ -5,10 +5,11 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <omp.h>
 
 using namespace std;
 
-bool Compiler::loadCode() {
+bool Compiler::loadFile() {
     m_lineIndex = 0;
     m_statusMessage = "Loading code...";
 
@@ -33,6 +34,7 @@ bool Compiler::loadCode() {
     }
         
 }
+
 bool Compiler::tokenizeCode() {
     /*vector<string> tokenizedLine;
                 string token;
@@ -50,12 +52,20 @@ bool Compiler::tokenizeCode() {
     return true;
 }
 
-bool Compiler::checkCode() {
-    for (int i=0; i<m_codeLines.size(); i++) {
+bool Compiler::checkInitialSyntax() {
+    int numLines = m_codeLines.size();
+    string invalidLines = "";
+
+    #pragma omp parallel for
+    for (int i=0; i<numLines; i++) {
         if (!m_instructionSet.isValidInstruction(m_codeLines[i])) {
-            m_statusMessage = "Invalid syntax at line " + to_string(i+1) + ": '" + m_codeLines[i] + "'";
-            return false;
+            invalidLines += "Invalid syntax at line " + to_string(i + 1) + ": '" + m_codeLines[i] + "'\n";
         }
+    }
+
+    if (!invalidLines.empty()) {
+        m_statusMessage = invalidLines;
+        return false;
     }
 
     m_statusMessage = "Syntax validated";

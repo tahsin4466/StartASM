@@ -10,12 +10,12 @@ int main() {
     getline(cin, pathname);
 
     Compiler StartASMCompiler = Compiler("code/" + pathname + ".txt");
-    if (!StartASMCompiler.loadCode()) {
+    if (!StartASMCompiler.loadFile()) {
         cout << StartASMCompiler.getStatus() << endl;
         return 0;
     }
 
-    if(!StartASMCompiler.checkCode()) {
+    if(!StartASMCompiler.checkInitialSyntax()) {
         cout << StartASMCompiler.getStatus() << endl;
         return 0;
     }

@@ -36,10 +36,10 @@ class Compiler {
         }
 
         //Code Loading
-        bool loadCode();
+        bool loadFile();
 
         //Code Checking
-        bool checkCode();
+        bool checkInitialSyntax();
 
         //Code Compiling
         bool compileCode();
