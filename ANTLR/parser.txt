@@ -1,0 +1,88 @@
+parser grammar StartASMParser;
+
+options {
+  tokenVocab = StartASMLexer;
+}
+
+program: statement+ EOF;
+
+statement: moveStmt
+        | loadStmt
+        | storeStmt
+        | arithmeticStmt
+        | logicStmt
+        | shiftStmt
+        | jumpStmt
+        | pushStmt
+        | popStmt
+        | incrementStmt
+        | decrementStmt
+        | stopStmt
+        | commentStmt;
+
+moveStmt: MOVE REGISTER TO REGISTER;
+
+loadStmt: LOAD VALUE TO REGISTER
+        | LOAD MEMORY TO REGISTER;
+
+storeStmt: STORE REGISTER TO MEMORY;
+
+arithmeticStmt: ADD REGISTER AND REGISTER TO REGISTER
+             | SUBTRACT REGISTER AND REGISTER TO REGISTER
+             | MULTIPLY REGISTER AND REGISTER TO REGISTER
+             | DIVIDE REGISTER AND REGISTER TO REGISTER;
+
+logicStmt: OR REGISTER WITH REGISTER
+         | NOR REGISTER WITH REGISTER
+         | XOR REGISTER WITH REGISTER
+         | AND REGISTER WITH REGISTER
+         | NOT REGISTER;
+
+shiftStmt: SHIFT LEFT LOGICALLY REGISTER BY VALUE
+         | SHIFT RIGHT LOGICALLY REGISTER BY VALUE
+         | SHIFT LEFT ARITHMETICALLY REGISTER BY VALUE
+         | SHIFT RIGHT ARITHMETICALLY REGISTER BY VALUE;
+
+jumpStmt: JUMP
+        | JUMP TO INSTRUCTION
+        | JUMP IF condition TO INSTRUCTION;
+
+pushStmt: PUSH FROM REGISTER;
+
+popStmt: POP TO REGISTER;
+
+incrementStmt: INCREMENT REGISTER;
+
+decrementStmt: DECREMENT REGISTER;
+
+stopStmt: STOP;
+
+commentStmt: COMMENT TEXT;
+
+condition: GREATER
+         | LESS
+         | ZERO;
+
+
+
+
+
+NEW PARSER???
+parser grammar StartASMParser;
+
+options {
+    tokenVocab = StartASMLexer;
+}
+
+program: statement+;
+
+// Statement rules
+statement: moveStatement NEWLINE;
+
+moveStatement: MOVE WHITESPACE? REGISTER WHITESPACE? TO WHITESPACE? REGISTER;
+stopStatement: STOP;
+
+
+
+
+
