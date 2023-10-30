@@ -14,18 +14,7 @@ class InstructionSet {
     public:
         //Constructor and destructor
         InstructionSet();
-        ~InstructionSet() {
-            std::unordered_map<std::string, Instruction*>::iterator iti;
-            for (iti=m_instructionMap.begin(); iti!=m_instructionMap.end(); iti++) {
-                delete iti->second;
-            }
-
-            std::unordered_map<std::string, Register*>::iterator itr;
-            for (itr=m_registerMap.begin(); itr!=m_registerMap.end(); itr++) {
-                delete itr->second;
-            }
-        };
-
+        ~InstructionSet() {};
 
         bool isValidInstruction(std::string keyword);
         bool isValidRegister(std::string keyword);
@@ -33,12 +22,28 @@ class InstructionSet {
 
 
     private:
-        //Hash map containing a keyword linked to an instruction object
-        std::unordered_map<std::string, Instruction*> m_instructionMap;
-        //Hash map containing a keyword linked to a register
-        std::unordered_map<std::string, Register*> m_registerMap;
         //Hash map containing a keyword linked to a template
         std::unordered_map<std::string, std::vector<std::string>> m_templateMap;
+        //Hash map containing a keyword linked to a compilation function
+        std::unordered_map<std::string, std::function<bool()>> m_compilerMap;
+
+        //Private Parzing Functions
+        bool parseMove();
+        bool parseLoad();
+        bool parseStore();
+        bool parseAdd();
+        bool parseSub();
+        bool parseMultiply();
+        bool parseDivide();
+        bool parseOr();
+        bool parseNor();
+        bool parseXor();
+        bool parseAnd();
+        bool parseNot();
+        bool parseShift();
+        bool parseJump();
+        bool parsePush();
+        bool parsePop();
 
 
 };

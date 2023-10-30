@@ -6,6 +6,7 @@
 #include <string>
 #include <fstream>
 #include <omp.h>
+#include <sstream>
 
 using namespace std;
 
@@ -36,19 +37,17 @@ bool Compiler::loadFile() {
 }
 
 bool Compiler::tokenizeCode() {
-    /*vector<string> tokenizedLine;
-                string token;
-                for (int i=0; i<currentLine.size(); i++) {
-                    if (currentLine[i] != ' ') {
-                        token.push_back(currentLine[i]);
-                    }
-                    else {
-                        tokenizedLine.push_back(token);
-                        token.clear();
-                    }
-                }
-                tokenizedLine.push_back(token);
-                m_codeTokens.push_back(tokenizedLine); */
+    for (int i = 0; i < m_codeLines.size(); i++) {
+        stringstream ss(m_codeLines[i]);
+        string token;
+        vector<string> tokenizedLine;
+
+        while (ss >> token) {
+            tokenizedLine.push_back(token);
+        }
+
+        m_codeTokens.push_back(tokenizedLine);
+    }
     return true;
 }
 
