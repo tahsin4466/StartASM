@@ -2,17 +2,15 @@ move r1 to r2
 load 8 to r5
 load m8 to r2
 store r6 to m8
-add r1 and r2 to r2
-subtract r6 and r4 to r2
-multiply r5 and r4 to r6
-divide r8 and r8 to r1
+add r1 with r2 to r2
+sub r6 with r4 to r2
+multiply r5 with r4 to r6
+divide r8 with r8 to r1
 or r4 with r2
 nor r1 with r1
 xor r8 with r2
 and r1 with r2
 not r6
-increment r5
-decrement r8
 shift left arithmetically r4 by 8
 shift left logically r8 by 1
 shift right arithmetically r2 by 0
@@ -20,102 +18,11 @@ shift right logically r2 by 1
 jump to i3
 jump if greater to i8
 jump if less to i0
-jump if equal to i11
+jump if equal to io   v11
 jump if not equal to i9
 jump if zero to i7
 jump if not zero to i8
-push from r8
+push r8
 pop to r6
-skip
 stop
 comment "This is a comment"
-
-/*
- * Lexer Rules
- */
- 
-//Letter fragments
-fragment A : ('A' |'a') ;
-fragment B : ('B' |'b') ;
-fragment C : ('C' |'c') ;
-fragment D : ('D' |'d') ;
-fragment E : ('E' |'e') ;
-fragment F : ('F' |'f') ;
-fragment G : ('G' |'g') ;
-fragment H : ('H' |'h') ;
-fragment I : ('I' |'i') ;
-fragment J : ('J' |'j') ;
-fragment K : ('K' |'k') ;
-fragment L : ('L' |'l') ;
-fragment M : ('M' |'m') ;
-fragment N : ('N' |'n') ;
-fragment O : ('O' |'o') ;
-fragment P : ('P' |'p') ;
-fragment Q : ('Q' |'q' );
-fragment R : ('R' |'r') ;
-fragment S : ('S' |'s') ;
-fragment T : ('T' |'t') ;
-fragment U : ('U' |'u') ;
-fragment V : ('V' |'v') ;
-fragment W : ('W' |'w') ;
-fragment X : ('X' |'x') ;
-fragment Y : ('Y' |'y') ;
-fragment Z : ('Z' |'z') ;
-fragment LOWERCASE  : [a-z] ;
-fragment UPPERCASE  : [A-Z] ;
-fragment DIGIT : [0-9] ;
-fragment NUMBER: [0-9]+
-
-//Text, whitespace and newlines
-TEXT       : ~[\])]+ ;
-WHITESPACE : (' ' | '\t') ;
-NEWLINE    : ('\r'? '\n' | '\r')+ ;
-
-//Instruction Opcodes
-MOVE : M O V E ;
-LOAD: L O A D ;
-STORE: S T O R E ;
-ADD: A D D ;
-SUBTRACT: S U B T R A C T ;
-MULTIPLY: M U L T I P L Y ;
-DIVIDE: D I V I D E ;
-OR: O R ;
-NOR: N O R ;
-XOR: X O R ;
-AND: A N D ;
-NOT: N O T ;
-INCREMENT: I N C R E M E N T ;
-DECREMENT: D E C R E M E N T ;
-SHIFT: S H I F T
-JUMP: J U M P ;
-PUSH: P U S H ;
-SKIP: S K I P ;
-STOP: S T O P ;
-COMMENT: C O M M E N T ;
-
-//Directional Keywords
-FROM: F R O M ;
-TO: T O ;
-WITH: W I T H ;
-BY: B Y ;
-IF: I F ;
-
-//Conditional Keywords
-GREATER: G R E A T E R ;
-LESS: L E S S ;
-ZERO: Z E R O ;
-
-//Shifting Keywords
-LEFT: L E F T ;
-RIGHT: R I G H T ;
-LOGICALLY: L O G I C A L L Y ;
-ARITHMETICALLY: A R I T H M E T I C A L L Y ;
-
-//Operands
-REGISTER: R DIGIT;
-INSTRUCTION: I NUMBER;
-MEMORY: M NUMBER;
-
-
-
-

@@ -225,24 +225,6 @@ class NotInstruction: public OneOperandInstruction {
         virtual void execute();
 };
 
-class IncrementInstruction: public OneOperandInstruction {
-    public:
-        IncrementInstruction(InstructionSet* set, GeneralRegister* srcRegister):
-            OneOperandInstruction(set, 13, srcRegister) {};
-        virtual ~IncrementInstruction() {};
-
-        virtual void execute();
-};
-
-class DecrementInstruction: public OneOperandInstruction {
-    public:
-        DecrementInstruction(InstructionSet* set, GeneralRegister* srcRegister):
-            OneOperandInstruction(set, 14, srcRegister) {};
-        virtual ~DecrementInstruction() {};
-
-    virtual void execute();
-};
-
 class ShiftLeftArithmeticInstruction: public TwoOperandInstruction {
     public:
         ShiftLeftArithmeticInstruction(InstructionSet* set, GeneralRegister* srcRegister, GeneralRegister* destRegister):
@@ -278,6 +260,7 @@ class ShiftRightLogicalInstruction: public TwoOperandInstruction {
 
     virtual void execute();
 };
+
 
 class JumpGreaterInstruction: public OneOperandInstruction {
     public:
@@ -347,15 +330,6 @@ class StackPopInstruction: public OneOperandInstruction {
         StackPopInstruction(InstructionSet* set, GeneralRegister* srcRegister):
             OneOperandInstruction(set, 26, srcRegister) {};
         virtual ~StackPopInstruction() {};
-    
-    virtual void execute();
-};
-
-class SkipInstruction: public NoOperandInstruction {
-    public:
-        SkipInstruction(InstructionSet* set):
-            NoOperandInstruction(set, 27) {};
-        virtual ~SkipInstruction() {};
     
     virtual void execute();
 };
