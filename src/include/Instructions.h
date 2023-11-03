@@ -261,6 +261,14 @@ class ShiftRightLogicalInstruction: public TwoOperandInstruction {
     virtual void execute();
 };
 
+class JumpUnconditionalInstruction: public OneOperandInstruction {
+    public:
+        JumpUnconditionalInstruction(InstructionSet* set, ProgramMemory* destProgram):
+            OneOperandInstruction(set, 19, destProgram) {};
+        virtual ~JumpUnconditionalInstruction() {};
+    
+    virtual void execute();
+};
 
 class JumpGreaterInstruction: public OneOperandInstruction {
     public:

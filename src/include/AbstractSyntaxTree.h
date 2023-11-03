@@ -5,105 +5,113 @@
 #include <algorithm>
 #include <string>
 
+enum SemanticType {NONE, FROM, TO, SELF, FROMTO, SELFWITH, FROMWITHTO};
+enum OperandType {REGISTER, MEMORY, VALUE};
+enum NumOperands {NULLARY, UNARY, BINARY, TERNARY};
 
-class AST {
+//Broad ASTNode
+class ASTNode {
     public:
-        //Construct AST with root node and iterator pointing to root
-        AST(): m_root(new ASTNode()), m_iterator(m_root) {};
-        //Delete tree by calling freeTree on root node
-        ~AST() {
-            freeTree(m_root);
-        }
-        //Insert child node at current iterator
-        void insert(const std::string& value) {
-            if(m_iterator!=nullptr) {
-                //Create new node by appending child nodes of current node
-                m_iterator->m_children.push_back(new ASTNode(value, m_iterator));
-            }
-        }
-        //Get value at current iterator
-        const std::string& getValue() const {
-            static const std::string emptyString;
-            if (m_iterator!=nullptr) {
-                return m_iterator->m_value;
-            }
-            else{
-                return emptyString;
-            }
-        }
-        //Advance iterator (depth first)
-        void advanceIterator() {
-            if (!m_iterator) return;
+        virtual ~ASTNode() = default;
 
-            // If the current node has children, visit the left-most unvisited child
-            if (!m_iterator->m_children.empty()) {
-                m_iterator = m_iterator->m_children[0];
-                return;
-            }
+        virtual std::string getNodeValue() {return m_nodeValue;};
 
-            // Backtrack to find the next unvisited sibling
-            while (m_iterator->m_parent) {
-                ASTNode* parent = m_iterator->m_parent;
-                size_t index = std::find(parent->m_children.begin(), parent->m_children.end(), m_iterator) - parent->m_children.begin();
-                
-                // If there's an unvisited sibling, visit it
-                if (index+1 < parent->m_children.size()) {
-                    m_iterator = parent->m_children[index + 1];
-                    return;
-                }
+    protected:
+        ASTNode(std::string nodeValue):
+            m_nodeValue(nodeValue) {};
+        std::string m_nodeValue;
 
-                // Otherwise, continue backtracking
-                m_iterator = parent;
-            }
+};
 
-            // If we've backtracked all the way to the root without finding any unvisited nodes, the traversal is done
-            //Set to the root pointer
-            m_iterator = m_root;
-        }
-        //Backtrack iterator to parent node
-        void backtrackIterator() {
-            if(!m_iterator) return;
-            m_iterator = m_iterator->m_parent;
-        }
-        //Reset iterator to root
-        void resetIterator() {
-            m_iterator = m_root;
-        }
 
-        bool atRoot() {
-            return(m_iterator == m_root);
+
+//Level 2 instruction and operand nodes for the AST
+class InstructionNode: public ASTNode {
+    public:
+        InstructionNode(std::string operation, NumOperands numOperands, SemanticType semantic):
+            ASTNode(operation),
+            m_numOperands(numOperands),
+            m_semanticStructure(semantic) {};
+        virtual ~InstructionNode() = default;
+
+        virtual NumOperands getNumOperands() {return m_numOperands;};
+        virtual SemanticType getSemanticType() {return m_semanticStructure;};
+
+    protected:
+        NumOperands m_numOperands;
+        SemanticType m_semanticStructure;
+};
+
+class OperandNode: public ASTNode {
+    public:
+        OperandNode(std::string operand, OperandType type):
+            ASTNode(operand),
+            m_operandType(type) {};
+        virtual ~OperandNode() = default;
+
+        virtual OperandType getOperandType() {return m_operandType;};
+    
+    private: 
+        OperandType m_operandType;
+};
+
+
+
+//Level 3 specific instruction nodes (nullary, unary, binary, ternary)
+class NullaryNode: public InstructionNode {
+    public:
+        NullaryNode(std::string operation):
+            InstructionNode(operation, NULLARY, NONE) {};
+        virtual ~NullaryNode() = default;
+};
+
+class UnaryNode: public InstructionNode {
+    public:
+        UnaryNode(std::string operation, std::string operand1Value, OperandType operand1Type, SemanticType semantic):
+            InstructionNode(operation, UNARY, semantic),
+            m_operand1(new OperandNode(operand1Value, operand1Type)) {};
+        ~UnaryNode() override {
+            delete m_operand1;
         }
 
     private:
-        struct ASTNode {
-            //Root node constructor
-            ASTNode(): m_parent(nullptr) {};
-            //Child node constructor
-            ASTNode(const std::string& value, ASTNode* parentNode): m_value(value), m_parent(parentNode) {};
-
-            //Nodes contain a value, parent reference, and vector of children
-            std::string m_value;
-            ASTNode* m_parent;
-            std::vector<ASTNode*> m_children;
-        };
-
-        //Recursive free tree function
-        void freeTree(ASTNode* currentNode) {
-            //Return if currentNode is null
-            if (currentNode == nullptr) {
-                return;
-            }
-            //Traverse every child node
-            for(int i=0; i<currentNode->m_children.size(); i++) {
-                //Call freeTree again for the child
-                freeTree(currentNode->m_children[i]);
-            }
-            //Delete current node
-            delete currentNode;
-        };
-
-        //Each Tree contains a root node pointer and an iterator
-        ASTNode* m_root;
-        ASTNode* m_iterator;
+        OperandNode* m_operand1; 
 };
+
+class BinaryNode: public InstructionNode {
+    public:
+        BinaryNode(std::string operation, std::string operand1Value, OperandType operand1Type, std::string operand2Value, OperandType operand2Type, SemanticType semantic):
+            InstructionNode(operation, BINARY, semantic),
+            m_operand1(new OperandNode(operand1Value, operand1Type)),
+            m_operand2(new OperandNode(operand2Value, operand2Type)) {};
+        ~BinaryNode() override {
+            delete m_operand1;
+            delete m_operand2;
+        }
+
+    private:
+        OperandNode* m_operand1; 
+        OperandNode* m_operand2;
+};
+
+class TernaryNode: public InstructionNode {
+    public:
+        TernaryNode(std::string operation, std::string operand1Value, OperandType operand1Type, std::string operand2Value, OperandType operand2Type, std::string operand3Value, OperandType operand3Type, SemanticType semantic):
+            InstructionNode(operation, TERNARY, semantic),
+            m_operand1(new OperandNode(operand1Value, operand1Type)),
+            m_operand2(new OperandNode(operand2Value, operand2Type)),
+            m_operand3(new OperandNode(operand3Value, operand3Type)) {};
+        ~TernaryNode() override {
+            delete m_operand1;
+            delete m_operand2;
+            delete m_operand3;
+        }
+
+    private:
+        OperandNode* m_operand1; 
+        OperandNode* m_operand2;
+        OperandNode* m_operand3;
+};
+
+
 #endif
