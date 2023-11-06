@@ -26,6 +26,7 @@ bool Compiler::loadFile() {
         }
         codeFile.close();
     
+        tokenizeCode();
         m_statusMessage = "Code loaded";
         return true;
     }
@@ -36,7 +37,7 @@ bool Compiler::loadFile() {
         
 }
 
-bool Compiler::tokenizeCode() {
+void Compiler::tokenizeCode() {
     for (int i = 0; i < m_codeLines.size(); i++) {
         stringstream ss(m_codeLines[i]);
         string token;
@@ -48,18 +49,20 @@ bool Compiler::tokenizeCode() {
 
         m_codeTokens.push_back(tokenizedLine);
     }
-    return true;
 }
 
-bool Compiler::checkInitialSyntax() {
+bool Compiler::parseCode() {
     int numLines = m_codeLines.size();
     string invalidLines = "";
 
-    #pragma omp parallel for
+    string error;
+    #pragma omp parallel for private(error)
     for (int i=0; i<numLines; i++) {
-        if (!m_instructionSet.isValidInstruction(m_codeLines[i])) {
-            invalidLines += "Invalid syntax at line " + to_string(i + 1) + ": '" + m_codeLines[i] + "'\n";
+        error = m_instructionSet.validateInstruction(m_codeLines[i], m_codeTokens[i]);
+        if (error != "") {
+            invalidLines += "\nInvalid syntax at line " + to_string(i + 1) + ": '" + m_codeLines[i] + "'\n" + error + "\n";
         }
+        error.clear();
     }
 
     if (!invalidLines.empty()) {

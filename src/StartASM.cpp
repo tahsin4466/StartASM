@@ -15,7 +15,7 @@ int main() {
         return 0;
     }
 
-    if(!StartASMCompiler.checkInitialSyntax()) {
+    if(!StartASMCompiler.parseCode()) {
         cout << StartASMCompiler.getStatus() << endl;
         return 0;
     }

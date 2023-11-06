@@ -39,15 +39,15 @@ class Compiler {
         bool loadFile();
 
         //Code Checking
-        bool checkInitialSyntax();
+        bool parseCode();
 
         //Code Compiling
         bool compileCode();
 
-        //Code Tokenizing
-        bool tokenizeCode();
 
     private:
+        //Code Tokenizing
+        void tokenizeCode();
         //pathname
         std::string m_pathname;
         //Vector containing code lines
