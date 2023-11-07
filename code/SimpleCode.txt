@@ -2,7 +2,7 @@ move r1 to r2
 load r1 and r2
 load r1 and r2
 hehehuhuhaha
-stop
 move r1 to r2
 move r1 and r3
 load m7 and m7
+move r1 and r2 and

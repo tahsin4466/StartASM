@@ -189,24 +189,6 @@ class OrInstruction: public TwoOperandInstruction {
         virtual void execute();
 };
 
-class NorInstruction: public TwoOperandInstruction {
-    public:
-        NorInstruction(InstructionSet* set, GeneralRegister* srcRegister1, GeneralRegister* srcRegister2):
-            TwoOperandInstruction(set, 9, srcRegister1, srcRegister2) {};
-        virtual ~NorInstruction() {};
-
-        virtual void execute();
-};
-
-class XorInstruction: public TwoOperandInstruction {
-    public:
-        XorInstruction(InstructionSet* set, GeneralRegister* srcRegister1, GeneralRegister* srcRegister2):
-            TwoOperandInstruction(set, 10, srcRegister1, srcRegister2) {};
-        virtual ~XorInstruction() {};
-
-        virtual void execute();
-};
-
 class AndInstruction: public TwoOperandInstruction {
     public:
         AndInstruction(InstructionSet* set, GeneralRegister* srcRegister1, GeneralRegister* srcRegister2):

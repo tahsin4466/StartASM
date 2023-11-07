@@ -36,8 +36,6 @@ class InstructionSet {
         static std::string parseMultiply(std::string line, std::vector<std::string> tokens);
         static std::string parseDivide(std::string line, std::vector<std::string> tokens);
         static std::string parseOr(std::string line, std::vector<std::string> tokens);
-        static std::string parseNor(std::string line, std::vector<std::string> tokens);
-        static std::string parseXor(std::string line, std::vector<std::string> tokens);
         static std::string parseAnd(std::string line, std::vector<std::string> tokens);
         static std::string parseNot(std::string line, std::vector<std::string> tokens);
         static std::string parseShift(std::string line, std::vector<std::string> tokens);
@@ -46,6 +44,11 @@ class InstructionSet {
         static std::string parsePop(std::string line, std::vector<std::string> tokens);
         static std::string parseStop(std::string line, std::vector<std::string> tokens);
         static std::string parseComment(std::string line, std::vector<std::string> tokens);
+
+        //Helper Parsing Functions
+        static std::string parseUnconditionalJump(std::string line, std::vector<std::string> tokens);
+        static std::string parseConditionalJump(std::string line, std::vector<std::string> tokens);
+        static std::string parseConditionalComplementJump(std::string line, std::vector<std::string> tokens);
 
 
 };

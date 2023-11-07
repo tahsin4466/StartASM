@@ -7,6 +7,7 @@
 #include <fstream>
 #include <omp.h>
 #include <sstream>
+#include <map>
 
 using namespace std;
 
@@ -53,20 +54,23 @@ void Compiler::tokenizeCode() {
 
 bool Compiler::parseCode() {
     int numLines = m_codeLines.size();
-    string invalidLines = "";
+    map<int, string> invalidLines;
 
     string error;
     #pragma omp parallel for private(error)
     for (int i=0; i<numLines; i++) {
         error = m_instructionSet.validateInstruction(m_codeLines[i], m_codeTokens[i]);
         if (error != "") {
-            invalidLines += "\nInvalid syntax at line " + to_string(i + 1) + ": '" + m_codeLines[i] + "'\n" + error + "\n";
+            invalidLines[i] = "\nInvalid syntax at line " + to_string(i + 1) + ": '" + m_codeLines[i] + "'\n" + error + "\n";
         }
         error.clear();
     }
 
     if (!invalidLines.empty()) {
-        m_statusMessage = invalidLines;
+        m_statusMessage.clear();
+        for (const auto& line : invalidLines) {
+            m_statusMessage += line.second;
+        }
         return false;
     }
 
