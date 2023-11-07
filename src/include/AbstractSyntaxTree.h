@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <string>
 
-enum SemanticType {NONE, FROM, TO, SELF, FROMTO, SELFWITH, FROMWITHTO};
+enum SemanticType {NONE, FROM, TO, SELF, FROMTO, SELFWITH, SELFBY, FROMWITHTO};
 enum OperandType {REGISTER, MEMORY, VALUE};
 enum NumOperands {NULLARY, UNARY, BINARY, TERNARY};
 

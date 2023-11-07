@@ -323,7 +323,7 @@ string InstructionSet::parseNot(string line, vector<string> tokens) {
 }
 
 string InstructionSet::parseShift(string line, vector<string> tokens) {
-    regex lineTemplate("shift (left|right) (logically|arithmetically) r[0-9] with r[0-9]");
+    regex lineTemplate("shift (left|right) (logically|arithmetically) r[0-9] by r[0-9]");
     regex registerTemplate("r[0-9]");
 
     if (regex_match(line, lineTemplate)) {
@@ -342,8 +342,8 @@ string InstructionSet::parseShift(string line, vector<string> tokens) {
         else if(!regex_match(tokens[3], registerTemplate)) {
             return "Unknown source/destination '" + tokens[3] + "'. Expected register r0-r9";
         }
-        else if(tokens[4]!="with") {
-            return "Unknown conjunction '" + tokens[4] + "'. Expected 'with'";
+        else if(tokens[4]!="by") {
+            return "Unknown conjunction '" + tokens[4] + "'. Expected 'by'";
         }
         else if(!regex_match(tokens[5], registerTemplate)) {
             return "Unknown shift amount '" + tokens[5] + "'. Expected register r0-r9";

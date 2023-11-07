@@ -9,10 +9,10 @@ divide r8 with r8 to r1
 or r4 with r2
 and r1 with r2
 not r6
-shift left arithmetically r4 with r1
-shift left logically r8 with r2
-shift right arithmetically r2 with r4
-shift right logically r2 with r6
+shift left arithmetically r4 by r1
+shift left logically r8 by r2
+shift right arithmetically r2 by r4
+shift right logically r2 by r6
 jump unconditionally to i[3]
 jump if greater to i[8]
 jump if less to i[0]
