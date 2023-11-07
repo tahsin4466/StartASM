@@ -57,27 +57,27 @@ In summary:
 # Usage
 Download and run the StartASM binary. Create a text file with StartASM code and place it into the 'code' folder, then run the executable. Here are all possible instruction combinations as of now:
 
-`move (register) to (register)`
-`load (memory/value) to (register)`
-`store (register) to (memory)`
-`add (register) with (register) to (register)`
-`sub (register) with (register) to (register)`
-`multiply (register) with (register) to (register)`
-`divide (register) with (register) to (register)`
-`or (register) with (register)`
-`and (register) with (register)`
-`not (register)`
-`shift left arithmetically (register) by (register)`
-`shift left logically (register) by (register)`
-`shift right arithmetically (register) by (register)`
-`shift right logically (register) by (register)`
-`jump unconditionally to (instruction)`
-`jump if (greater/less/equal/zero) to (instruction)`
-`jump if not (equal/zero) to (instruction)`
-`push (register)`
-`pop to (register)`
-`stop`
-`comment "(comment)"`
+- move (register) to (register)
+- load (memory/value) to (register)
+- store (register) to (memory)
+- add (register) with (register) to (register)
+- sub (register) with (register) to (register)
+- multiply (register) with (register) to (register)
+- divide (register) with (register) to (register)
+- or (register) with (register)
+- and (register) with (register)
+- not (register)`
+- shift left arithmetically (register) by (register)
+- shift left logically (register) by (register)
+- shift right arithmetically (register) by (register)
+- shift right logically (register) by (register)
+- jump unconditionally to (instruction)
+- jump if (greater/less/equal/zero) to (instruction)
+- jump if not (equal/zero) to (instruction)
+- push (register)
+- pop to (register)
+- stop
+- comment "(comment)"
 
 Where: 
 - Registers are r0-r9
