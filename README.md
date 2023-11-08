@@ -132,4 +132,4 @@ StartASM is, as of now, fully developed in C++. The intent is for the compiler a
 **Current Goal:** Finish the compiler by the end of the year.
 
 ## Contact
-If you want to contact me about this project, feel free to send an email to tahsinkalkie@gmail.com
+If you want to contact me about this project, feel free to send an email to tahsinkalkie[at]gmail[dot]com
