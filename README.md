@@ -48,7 +48,7 @@ For a more complex example:
 - Provides direction and type, always after the base instruction `right logically`
 - States implicitly self operand `r1`
 - Provides a transitional conjunction to show relationship as attribute of instruction `by`
-- Sates explicitly the attribute operand `r2)
+- Sates explicitly the attribute operand `r2`
 
 In summary:
 - Transitional conjunctions are used to show operand relationships (except for source/self operands, in which it is implicit for a natural language feel). e.g. `from`, `to`, `with`, `by`. Conditionals are denoted by `if`
@@ -130,6 +130,8 @@ Unknown source 'm<1>'. Expected register r0-r9
 StartASM is, as of now, fully developed in C++. The intent is for the compiler and runtime environment to be built using C++, while the front end will be built using Electron and node.js. This project also uses OpenMP multithreading to improve performance.
 
 ## Progress
+**Please note that StartASM is at its absolute beginning stages of development, and as such many critical features are yet to be implemented. This is a personal project by a student, and as such is being developed incrementally.**
+
 *Last updated: Tuesday, November 7, 2023*
 
 **State:** StartASM currently only consists of a compiler that checks for syntax. The provided program will tell the user whether the given code adheres to the language's syntax. 
