@@ -33,27 +33,27 @@ One of the main features of StartASM is its abstraction to reduce barrier of ent
 
 
 ## Syntax
-StartASM is designed to be as close to plain English as possible. The syntax trades away traditional opcode mnemonics used in most ASM's in favor of readable syntax closer to high-level languages. This includes the use of full-word instructions, transitional conjunctions to demonstrate operand relationships, and clearly denoted register (r0-r9), memory (m<000000>) and instruction memory (i[000000]) operands. For example:
+StartASM is designed to be as close to plain English as possible. The syntax trades away traditional opcode mnemonics used in most ASM's in favor of readable syntax closer to high-level languages. This includes the use of full-word instructions, transitional conjunctions to demonstrate operand relationships, and clearly denoted register (`r0`-`r9`), memory (`m<000000>`-`m<999999>`) and instruction memory (`i[000000]`-`i[999999]`) operands. For example:
 
 `move r1 to r2`
-- Denotes the instruction first (move)
-- States implicit source operand (r1)
-- Provides a transitional conjunction to show where data is flowing (to)
-- States explicitly destination operand (r2)
+- Denotes the instruction first `move`
+- States implicit source operand `r1`
+- Provides a transitional conjunction to show where data is flowing `to`
+- States explicitly destination operand `r2`
 
 For a more complex example:
 
 `shift right logically r1 with r2`
-- Denotes the instruction first (shift)
-- Provides direction and type, always after the base instruction (right logically)
-- States implicitly self operand (r1)
-- Provides a transitional conjunction to show relationship (by, as in attribute for the instruction)
-- Sates explicitly the attribute operand (r2)
+- Denotes the instruction first `shift`
+- Provides direction and type, always after the base instruction `right logically`
+- States implicitly self operand `r1`
+- Provides a transitional conjunction to show relationship as attribute of instruction `by`
+- Sates explicitly the attribute operand `r2)
 
 In summary:
-- Transitional conjunctions are used to show operand relationships (except for source/self operands, in which it is implicit for a natural language feel). e.g. from, to, with, by, if for condittionals
-- Operands are stated explicitly and numerically
-- Base instructions are stated in full, with all instruction conditions also stated in full (no mnemonics)
+- Transitional conjunctions are used to show operand relationships (except for source/self operands, in which it is implicit for a natural language feel). e.g. `from`, `to`, `with`, `by`. Conditionals are denoted by `if`
+- Operands are stated explicitly and numerically. e.g. `r0`, `m<39>`
+- Base instructions are stated in full, with all instruction conditions also stated in full (no mnemonics). e.g. `move`, `shift left logically`
 
 
 ## Usage
@@ -83,9 +83,9 @@ Here are all possible instruction combinations as of now:
 - `comment "(comment)"`
 
 Where: 
-- Registers are r0-r9
-- Memory addresses are m<000000> to m<999999>, with each value being a byte (can be variable length)
-- Instruction addresses are i[000000] to i[999999], with each value being an instruction (can be variable length)
+- Registers are `r0`-`r9`
+- Memory addresses are `m<000000>` to `m<999999>`, with each value being a byte (can be variable length)
+- Instruction addresses are `i[000000] to i[999999]`, with each value being an instruction (can be variable length)
 - Comments are any string within double quotes *"Like this"*
 
 Check the 'code' folder for examples. 'ExampleCode' is a file that provides no syntax errors, whereas the other files are test cases for the compiler. Here is also a general example of valid StartASM code:
