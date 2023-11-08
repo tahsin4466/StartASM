@@ -43,19 +43,25 @@ string InstructionSet::validateInstruction(string line, vector<string> tokens) {
 }
 
 string InstructionSet::parseMove(string line, vector<string> tokens) {
+    //Create regex templates for the whole line and for registers
     regex lineTemplate("move r[0-9] to r[0-9]");
     regex registerTemplate("r[0-9]");
 
+    //Return quickly if syntax directly matches
     if (regex_match(line, lineTemplate)) {
         return ("");
     }
+    //Begin error reporting process otherwise
     else {
+        //Invalid token size
         if((tokens.size() != 4)) {
             return "Incomplete syntax for move instruction";
         }
+        //Invalid operand format
         else if(!regex_match(tokens[1], registerTemplate)) {
             return "Unknown source '" + tokens[1] + "'. Expected register r0-r9";
         }
+        //Invalid conjunction
         else if(tokens[2]!="to") {
             return "Unknown conjunction '" + tokens[2] + "'. Expected 'to'";
         }
@@ -333,9 +339,11 @@ string InstructionSet::parseShift(string line, vector<string> tokens) {
         if((tokens.size() != 6)) {
             return "Incomplete syntax for shift instruction";
         }
+        //Check for multiple tokens (either left or right)
         else if(tokens[1]!="left" && tokens[1]!="right") {
             return "Unknown shift direction '" + tokens[1] + "'. Expected 'left' or 'right''";
         }
+        //Also check for multiple tokens (either logically or arithmetically)
         else if(tokens[2]!="logically" && tokens[2]!="arithmetically") {
             return "Unknown shift type '" + tokens[2] + "'. Expected 'logically' or 'arithmetically'";
         }
@@ -355,16 +363,22 @@ string InstructionSet::parseShift(string line, vector<string> tokens) {
 }
 
 string InstructionSet::parseJump(string line, vector<string> tokens) {
-    if (tokens.size() < 3) {
+    //First check if line is under three tokens to prevent access errors
+    if (tokens.size() < 4) {
         return "Incomplete syntax for jump instruction";
     }
+    //Call helper functions depending on the first token
+    //Unconditional jumps always start with "unconditionally"
     else if (tokens[1] == "unconditionally") {
         return(parseUnconditionalJump(line, tokens));
     }
+    //Check if it is a conditional
     else if (tokens[1] == "if") {
+        //Call helper function for not if "not" is found
         if (tokens[2] == "not") {
             return (parseConditionalComplementJump(line, tokens));
         }
+        //Regular conditional jump otherwise
         else {
             return(parseConditionalJump(line, tokens));
         }
@@ -418,8 +432,11 @@ string InstructionSet::parsePop(string line, vector<string> tokens) {
 }
 
 string InstructionSet::parseStop(string line, vector<string> tokens) {
+    //No operands, so only line regex template
     regex lineTemplate("stop");
 
+    //This code is mostly redundant but here just in case there's a regex error. Should never
+    //lead to an error if the parseStop function is called
     if(regex_match(line, lineTemplate)) {
         return ("");
     }
@@ -440,9 +457,11 @@ string InstructionSet::parseComment(string line, vector<string> tokens) {
         return ("");
     }
     else {
+        //If first character on token after "comment" is not a double quote
         if (tokens[1][0] != '"') {
             return "Expected starting double quotes in '" + tokens[1] + "'";
         }
+        //If last character on last token is not a double quote
         else if (tokens[tokens.size()-1].back() != '"') {
             return "Expected ending double quotes in '" + tokens[tokens.size()-1] + "'";
         }
