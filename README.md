@@ -57,29 +57,30 @@ In summary:
 
 
 ## Usage
-Download the repository and run the StartASM executable. Create a text file with StartASM code and place it into the 'code' folder, then run the executable. Here are all possible instruction combinations as of now:
+Download the repository and open in a code editor. Run the StartASM executable, and ensure a C++ compiler that supports OpenMP is installed (preferably G++). Create a text file with StartASM code and place it into the 'code' folder, then run the executable. When running the executable and providng a filename, omit the `.txt` part. `ExampleCode.txt` should become `ExampleCode`.
 
-- move (register) to (register)
-- load (memory/value) to (register)
-- store (register) to (memory)
-- add (register) with (register) to (register)
-- sub (register) with (register) to (register)
-- multiply (register) with (register) to (register)
-- divide (register) with (register) to (register)
-- or (register) with (register)
-- and (register) with (register)
-- not (register)`
-- shift left arithmetically (register) by (register)
-- shift left logically (register) by (register)
-- shift right arithmetically (register) by (register)
-- shift right logically (register) by (register)
-- jump unconditionally to (instruction)
-- jump if (greater/less/equal/zero) to (instruction)
-- jump if not (equal/zero) to (instruction)
-- push (register)
-- pop to (register)
-- stop
-- comment "(comment)"
+Here are all possible instruction combinations as of now:
+- `move (register) to (register)`
+- `load (memory/value) to (register)`
+- `store (register) to (memory)`
+- `add (register) with (register) to (register)`
+- `sub (register) with (register) to (register)`
+- `multiply (register) with (register) to (register)`
+- `divide (register) with (register) to (register)`
+- `or (register) with (register)`
+- `and (register) with (register)`
+- `not (register)`
+- `shift left arithmetically (register) by (register)`
+- `shift left logically (register) by (register)`
+- `shift right arithmetically (register) by (register)`
+- `shift right logically (register) by (register)`
+- `jump unconditionally to (instruction)`
+- `jump if (greater/less/equal/zero) to (instruction)`
+- `jump if not (equal/zero) to (instruction)`
+- `push (register)`
+- `pop to (register)`
+- `stop`
+- `comment "(comment)"`
 
 Where: 
 - Registers are r0-r9
@@ -87,37 +88,43 @@ Where:
 - Instruction addresses are i[000000] to i[999999], with each value being an instruction (can be variable length)
 - Comments are any string within double quotes *"Like this"*
 
-Check the 'code' folder for examples. 'ExampleCode' is a file that provides no syntax errors, whereas the other files are test cases for the compiler. Here is that code found in 'ExampleCode':
+Check the 'code' folder for examples. 'ExampleCode' is a file that provides no syntax errors, whereas the other files are test cases for the compiler. Here is also a general example of valid StartASM code:
 
 ```
-move r1 to r2
-load 8 to r5
+comment "StartASM!"
+
 load m<435> to r2
-store r6 to m<0234>
-add r1 with r2 to r2
-sub r6 with r4 to r2
-multiply r5 with r4 to r6
-divide r8 with r8 to r1
-or r4 with r2
-and r1 with r2
-not r6
-shift left arithmetically r4 by r1
-shift left logically r8 by r2
-shift right arithmetically r2 by r4
-shift right logically r2 by r6
-jump unconditionally to i[3]
-jump if greater to i[8]
-jump if less to i[0]
-jump if equal to i[11]
-jump if not equal to i[0032149]
-jump if zero to i[7]
-jump if not zero to i[8]
-push r8
-pop to r6
+move r2 to r1
+store r1 to m<0234>
+or r1 with r2
+shift right logically r2 by r1
+not r1
+jump if greater to i[0]
+add r1 with r2 to r3
+divide r3 with r2 to r1
+pop to r3
 stop
-comment "This is a comment"
+
+comment "EndASM! get it? haha"
+```
+The compiler will also return syntax error messages that show the excepted line, token and what the compiler expected if applicable. For example, submitting this invalid code:
+``` 
+shift right logically r2 with r1
+junk r1
+move m<1> to r6
 ```
 
+Will return the following errors:
+```
+Invalid syntax at line 1: 'shift right logically r2 with r1'
+Unknown conjunction 'with'. Expected 'by'
+
+Invalid syntax at line 2: 'junk r1'
+Unknown instruction 'junk'
+
+Invalid syntax at line 3: 'move m<1> to r6'
+Unknown source 'm<1>'. Expected register r0-r9
+```
 
 ## Technologies
 StartASM is, as of now, fully developed in C++. The intent is for the compiler and runtime environment to be built using C++, while the front end will be built using Electron and node.js. This project also uses OpenMP multithreading to improve performance.
