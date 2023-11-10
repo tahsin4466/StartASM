@@ -81,7 +81,7 @@ Here are all possible instruction combinations as of now:
 - `jump unconditionally to (instruction/label)`
 - `jump if (greater/less/equal/zero) to (instruction/label)`
 - `jump if not (equal/zero) to (instruction/label)`
-- `call to (register/label)`
+- `call to (instruction/label)`
 - `push (register)`
 - `pop to (register)`
 - `return`
