@@ -39,10 +39,14 @@ class InstructionSet {
         static std::string parseAnd(std::string line, std::vector<std::string> tokens);
         static std::string parseNot(std::string line, std::vector<std::string> tokens);
         static std::string parseShift(std::string line, std::vector<std::string> tokens);
+        static std::string parseCompare(std::string line, std::vector<std::string> tokens); 
         static std::string parseJump(std::string line, std::vector<std::string> tokens);
+        static std::string parseCall(std::string line, std::vector<std::string> tokens);
         static std::string parsePush(std::string line, std::vector<std::string> tokens);
         static std::string parsePop(std::string line, std::vector<std::string> tokens);
+        static std::string parseReturn(std::string line, std::vector<std::string> tokens);
         static std::string parseStop(std::string line, std::vector<std::string> tokens);
+        static std::string parseLabel(std::string line, std::vector<std::string> tokens);
         static std::string parseComment(std::string line, std::vector<std::string> tokens);
 
         //Helper Parsing Functions

@@ -22,8 +22,11 @@ The language is based on a load-store model, with seperate program and insructio
 - arithmetic (add, sub, multiply, divide)
 - bitwise operations (and, or, not)
 - bitwise shift (left/right, logical/arithmetic)
+- comparison (between registers, numerical)
 - jump (conditional and unconditional)
+- call (unconditional)
 - stack manipulation (push and pop)
+- labels (Denoted with '')
 - comments (Denoted with "")
 
 One of the main features of StartASM is its abstraction to reduce barrier of entry. This includes:
@@ -74,18 +77,23 @@ Here are all possible instruction combinations as of now:
 - `shift left logically (register) by (register)`
 - `shift right arithmetically (register) by (register)`
 - `shift right logically (register) by (register)`
-- `jump unconditionally to (instruction)`
-- `jump if (greater/less/equal/zero) to (instruction)`
-- `jump if not (equal/zero) to (instruction)`
+- `compare (register) with (register)`
+- `jump unconditionally to (instruction/label)`
+- `jump if (greater/less/equal/zero) to (instruction/label)`
+- `jump if not (equal/zero) to (instruction/label)`
+- `call to (register/label)`
 - `push (register)`
 - `pop to (register)`
+- `return`
 - `stop`
+- `label '(label)'`
 - `comment "(comment)"`
 
 Where: 
 - Registers are `r0`-`r9`
 - Memory addresses are `m<000000>` to `m<999999>`, with each value being a byte (can be variable length)
 - Instruction addresses are `i[000000] to i[999999]`, with each value being an instruction (can be variable length)
+- Labels are any word within single quotes *'likeThis'*
 - Comments are any string within double quotes *"Like this"*
 
 Check the 'code' folder for examples. 'ExampleCode' is a file that provides no syntax errors, whereas the other files are test cases for the compiler. Here is also a general example of valid StartASM code:

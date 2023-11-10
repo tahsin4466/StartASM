@@ -108,8 +108,8 @@ class ThreeOperandInstruction: public Instruction {
 //Are not ABCS - execute() is defined
 class MoveInstruction: public TwoOperandInstruction {
     public:
-        MoveInstruction(InstructionSet* set, GeneralRegister* srcRegister, GeneralRegister* destRegister):
-            TwoOperandInstruction(set, 0, srcRegister, destRegister) {};
+        MoveInstruction(InstructionSet* set, GeneralRegister* fromRegister, GeneralRegister* toRegister):
+            TwoOperandInstruction(set, 0, fromRegister, toRegister) {};
         virtual ~MoveInstruction() {};
 
     virtual void execute();
@@ -118,8 +118,8 @@ class MoveInstruction: public TwoOperandInstruction {
 
 class LoadValueInstruction: public OneOperandInstruction {
     public:
-        LoadValueInstruction(InstructionSet* set, std::vector<uint8_t> srcValue, GeneralRegister* destRegister):
-            OneOperandInstruction(set, 1, destRegister) {};
+        LoadValueInstruction(InstructionSet* set, std::vector<uint8_t> fromValue, GeneralRegister* toRegister):
+            OneOperandInstruction(set, 1, toRegister) {};
         virtual ~LoadValueInstruction() {};
 
     virtual void execute();
@@ -128,8 +128,8 @@ class LoadValueInstruction: public OneOperandInstruction {
 
 class LoadMemoryInstruction: public TwoOperandInstruction {
     public:
-        LoadMemoryInstruction(InstructionSet* set, HeapMemory* srcMemory, GeneralRegister* destRegister):
-            TwoOperandInstruction(set, 2, srcMemory, destRegister) {};
+        LoadMemoryInstruction(InstructionSet* set, HeapMemory* fromMemory, GeneralRegister* toRegister):
+            TwoOperandInstruction(set, 2, fromMemory, toRegister) {};
     virtual ~LoadMemoryInstruction() {};
 
     virtual void execute();
@@ -137,8 +137,8 @@ class LoadMemoryInstruction: public TwoOperandInstruction {
 
 class StoreMemoryInstruction: public TwoOperandInstruction {
     public:
-        StoreMemoryInstruction(InstructionSet* set, GeneralRegister* srcRegister, HeapMemory* destMemory):
-            TwoOperandInstruction(set, 3, srcRegister, destMemory) {};
+        StoreMemoryInstruction(InstructionSet* set, GeneralRegister* fromRegister, HeapMemory* toMemory):
+            TwoOperandInstruction(set, 3, fromRegister, toMemory) {};
         virtual ~StoreMemoryInstruction() {};
 
         virtual void execute();
@@ -146,8 +146,8 @@ class StoreMemoryInstruction: public TwoOperandInstruction {
 
 class AdditionInstruction: public ThreeOperandInstruction {
     public:
-        AdditionInstruction(InstructionSet* set, GeneralRegister* srcRegister1, GeneralRegister* srcRegister2, GeneralRegister* destRegister):
-            ThreeOperandInstruction(set, 4, srcRegister1, srcRegister2, destRegister) {};
+        AdditionInstruction(InstructionSet* set, GeneralRegister* fromRegister1, GeneralRegister* withRegister, GeneralRegister* toRegister):
+            ThreeOperandInstruction(set, 4, fromRegister1, withRegister, toRegister) {};
         virtual ~AdditionInstruction() {};
 
     virtual void execute();
@@ -155,8 +155,8 @@ class AdditionInstruction: public ThreeOperandInstruction {
 
 class SubtractionInstruction: public ThreeOperandInstruction {
     public:
-        SubtractionInstruction(InstructionSet* set, GeneralRegister* srcRegister1, GeneralRegister* srcRegister2, GeneralRegister* destRegister):
-            ThreeOperandInstruction(set, 5, srcRegister1, srcRegister2, destRegister) {};
+        SubtractionInstruction(InstructionSet* set, GeneralRegister* fromRegister1, GeneralRegister* withRegister, GeneralRegister* toRegister):
+            ThreeOperandInstruction(set, 5, fromRegister1, withRegister, toRegister) {};
         virtual ~SubtractionInstruction() {};
 
     virtual void execute();
@@ -164,8 +164,8 @@ class SubtractionInstruction: public ThreeOperandInstruction {
 
 class MultiplyInstruction: public ThreeOperandInstruction {
     public:
-        MultiplyInstruction(InstructionSet* set, GeneralRegister* srcRegister1, GeneralRegister* srcRegister2, GeneralRegister* destRegister):
-            ThreeOperandInstruction(set, 6, srcRegister1, srcRegister2, destRegister) {};
+        MultiplyInstruction(InstructionSet* set, GeneralRegister* fromRegister1, GeneralRegister* withRegister, GeneralRegister* toRegister):
+            ThreeOperandInstruction(set, 6, fromRegister1, withRegister, toRegister) {};
         virtual ~MultiplyInstruction() {};
     
     virtual void execute();
@@ -173,8 +173,8 @@ class MultiplyInstruction: public ThreeOperandInstruction {
 
 class DivideInstruction: public ThreeOperandInstruction {
     public:
-        DivideInstruction(InstructionSet* set, GeneralRegister* srcRegister1, GeneralRegister* srcRegister2, GeneralRegister* destRegister):
-            ThreeOperandInstruction(set, 7, srcRegister1, srcRegister2, destRegister) {};
+        DivideInstruction(InstructionSet* set, GeneralRegister* fromRegister1, GeneralRegister* withRegister, GeneralRegister* toRegister):
+            ThreeOperandInstruction(set, 7, fromRegister1, withRegister, toRegister) {};
         virtual ~DivideInstruction() {};
 
         virtual void execute();
@@ -182,8 +182,8 @@ class DivideInstruction: public ThreeOperandInstruction {
 
 class OrInstruction: public TwoOperandInstruction {
     public:
-        OrInstruction(InstructionSet* set, GeneralRegister* srcRegister1, GeneralRegister* srcRegister2):
-            TwoOperandInstruction(set, 8, srcRegister1, srcRegister2) {};
+        OrInstruction(InstructionSet* set, GeneralRegister* selfRegister1, GeneralRegister* withRegister):
+            TwoOperandInstruction(set, 8, selfRegister1, withRegister) {};
         virtual ~OrInstruction() {};
         
         virtual void execute();
@@ -191,8 +191,8 @@ class OrInstruction: public TwoOperandInstruction {
 
 class AndInstruction: public TwoOperandInstruction {
     public:
-        AndInstruction(InstructionSet* set, GeneralRegister* srcRegister1, GeneralRegister* srcRegister2):
-            TwoOperandInstruction(set, 11, srcRegister1, srcRegister2) {};
+        AndInstruction(InstructionSet* set, GeneralRegister* selfRegister1, GeneralRegister* withRegister):
+            TwoOperandInstruction(set, 11, selfRegister1, withRegister) {};
         virtual ~AndInstruction() {};
 
         virtual void execute();
@@ -200,8 +200,8 @@ class AndInstruction: public TwoOperandInstruction {
 
 class NotInstruction: public OneOperandInstruction {
     public:
-        NotInstruction(InstructionSet* set, GeneralRegister* srcRegister):
-            OneOperandInstruction(set, 12, srcRegister) {};
+        NotInstruction(InstructionSet* set, GeneralRegister* selfRegister):
+            OneOperandInstruction(set, 12, selfRegister) {};
         virtual ~NotInstruction() {};
 
         virtual void execute();
@@ -209,8 +209,8 @@ class NotInstruction: public OneOperandInstruction {
 
 class ShiftLeftArithmeticInstruction: public TwoOperandInstruction {
     public:
-        ShiftLeftArithmeticInstruction(InstructionSet* set, GeneralRegister* srcRegister, GeneralRegister* destRegister):
-            TwoOperandInstruction(set, 15, srcRegister, destRegister) {};
+        ShiftLeftArithmeticInstruction(InstructionSet* set, GeneralRegister* selfRegister, GeneralRegister* withRegister):
+            TwoOperandInstruction(set, 15, selfRegister, withRegister) {};
         virtual ~ShiftLeftArithmeticInstruction() {};
 
     virtual void execute();
@@ -218,8 +218,8 @@ class ShiftLeftArithmeticInstruction: public TwoOperandInstruction {
 
 class ShiftLeftLogicalInstruction: public TwoOperandInstruction {
     public:
-        ShiftLeftLogicalInstruction(InstructionSet* set, GeneralRegister* srcRegister, GeneralRegister* destRegister):
-            TwoOperandInstruction(set, 16, srcRegister, destRegister) {};
+        ShiftLeftLogicalInstruction(InstructionSet* set, GeneralRegister* selfRegister, GeneralRegister* withRegister):
+            TwoOperandInstruction(set, 16, selfRegister, withRegister) {};
         virtual ~ShiftLeftLogicalInstruction() {};
 
     virtual void execute();
@@ -227,8 +227,8 @@ class ShiftLeftLogicalInstruction: public TwoOperandInstruction {
 
 class ShiftRightArithmeticInstruction: public TwoOperandInstruction {
     public:
-        ShiftRightArithmeticInstruction(InstructionSet* set, GeneralRegister* srcRegister, GeneralRegister* destRegister):
-            TwoOperandInstruction(set, 17, srcRegister, destRegister) {};
+        ShiftRightArithmeticInstruction(InstructionSet* set, GeneralRegister* selfRegister, GeneralRegister* withRegister):
+            TwoOperandInstruction(set, 17, selfRegister, withRegister) {};
         virtual ~ShiftRightArithmeticInstruction() {};
 
     virtual void execute();
@@ -236,17 +236,26 @@ class ShiftRightArithmeticInstruction: public TwoOperandInstruction {
 
 class ShiftRightLogicalInstruction: public TwoOperandInstruction {
     public:
-        ShiftRightLogicalInstruction(InstructionSet* set, GeneralRegister* srcRegister, GeneralRegister* destRegister):
-            TwoOperandInstruction(set, 18, srcRegister, destRegister) {};
+        ShiftRightLogicalInstruction(InstructionSet* set, GeneralRegister* selfRegister, GeneralRegister* withRegister):
+            TwoOperandInstruction(set, 18, selfRegister, withRegister) {};
         virtual ~ShiftRightLogicalInstruction() {};
+
+    virtual void execute();
+};
+
+class CompareInstruction: public TwoOperandInstruction {
+    public:
+        CompareInstruction(InstructionSet* set, GeneralRegister* selfRegister, GeneralRegister* withRegister):
+            TwoOperandInstruction(set, 18, selfRegister, withRegister) {};
+        virtual ~CompareInstruction() {};
 
     virtual void execute();
 };
 
 class JumpUnconditionalInstruction: public OneOperandInstruction {
     public:
-        JumpUnconditionalInstruction(InstructionSet* set, ProgramMemory* destProgram):
-            OneOperandInstruction(set, 19, destProgram) {};
+        JumpUnconditionalInstruction(InstructionSet* set, ProgramMemory* toInstruction):
+            OneOperandInstruction(set, 19, toInstruction) {};
         virtual ~JumpUnconditionalInstruction() {};
     
     virtual void execute();
@@ -254,8 +263,8 @@ class JumpUnconditionalInstruction: public OneOperandInstruction {
 
 class JumpGreaterInstruction: public OneOperandInstruction {
     public:
-        JumpGreaterInstruction(InstructionSet* set, ProgramMemory* destProgram):
-            OneOperandInstruction(set, 19, destProgram) {};
+        JumpGreaterInstruction(InstructionSet* set, ProgramMemory* toInstruction):
+            OneOperandInstruction(set, 19, toInstruction) {};
         virtual ~JumpGreaterInstruction() {};
     
     virtual void execute();
@@ -263,8 +272,8 @@ class JumpGreaterInstruction: public OneOperandInstruction {
 
 class JumpLessInstruction: public OneOperandInstruction {
     public:
-        JumpLessInstruction(InstructionSet* set, ProgramMemory* destProgram):
-            OneOperandInstruction(set, 20, destProgram) {};
+        JumpLessInstruction(InstructionSet* set, ProgramMemory* toInstruction):
+            OneOperandInstruction(set, 20, toInstruction) {};
         virtual ~JumpLessInstruction() {};
     
     virtual void execute();
@@ -272,8 +281,8 @@ class JumpLessInstruction: public OneOperandInstruction {
 
 class JumpEqualInstruction: public OneOperandInstruction {
     public:
-        JumpEqualInstruction(InstructionSet* set, ProgramMemory* destProgram):
-            OneOperandInstruction(set, 21, destProgram) {};
+        JumpEqualInstruction(InstructionSet* set, ProgramMemory* toInstruction):
+            OneOperandInstruction(set, 21, toInstruction) {};
         virtual ~JumpEqualInstruction() {};
     
     virtual void execute();
@@ -281,8 +290,8 @@ class JumpEqualInstruction: public OneOperandInstruction {
 
 class JumpNotEqualInstruction: public OneOperandInstruction {
     public:
-        JumpNotEqualInstruction(InstructionSet* set, ProgramMemory* destProgram):
-            OneOperandInstruction(set, 22, destProgram) {};
+        JumpNotEqualInstruction(InstructionSet* set, ProgramMemory* toInstruction):
+            OneOperandInstruction(set, 22, toInstruction) {};
         virtual ~JumpNotEqualInstruction() {};
     
     virtual void execute();
@@ -290,8 +299,8 @@ class JumpNotEqualInstruction: public OneOperandInstruction {
 
 class JumpZeroInstruction: public OneOperandInstruction {
     public:
-        JumpZeroInstruction(InstructionSet* set, ProgramMemory* destProgram):
-            OneOperandInstruction(set, 23, destProgram) {};
+        JumpZeroInstruction(InstructionSet* set, ProgramMemory* toInstruction):
+            OneOperandInstruction(set, 23, toInstruction) {};
         virtual ~JumpZeroInstruction() {};
     
     virtual void execute();
@@ -299,8 +308,8 @@ class JumpZeroInstruction: public OneOperandInstruction {
 
 class JumpNotZeroInstruction: public OneOperandInstruction {
     public:
-        JumpNotZeroInstruction(InstructionSet* set, ProgramMemory* destProgram):
-            OneOperandInstruction(set, 24, destProgram) {};
+        JumpNotZeroInstruction(InstructionSet* set, ProgramMemory* toInstruction):
+            OneOperandInstruction(set, 24, toInstruction) {};
         virtual ~JumpNotZeroInstruction() {};
     
     virtual void execute();
@@ -308,8 +317,8 @@ class JumpNotZeroInstruction: public OneOperandInstruction {
 
 class StackPushInstruction: public OneOperandInstruction {
     public:
-        StackPushInstruction(InstructionSet* set, GeneralRegister* srcRegister):
-            OneOperandInstruction(set, 25, srcRegister) {};
+        StackPushInstruction(InstructionSet* set, GeneralRegister* fromRegister):
+            OneOperandInstruction(set, 25, fromRegister) {};
         virtual ~StackPushInstruction() {};
     
     virtual void execute();
@@ -317,8 +326,8 @@ class StackPushInstruction: public OneOperandInstruction {
 
 class StackPopInstruction: public OneOperandInstruction {
     public:
-        StackPopInstruction(InstructionSet* set, GeneralRegister* srcRegister):
-            OneOperandInstruction(set, 26, srcRegister) {};
+        StackPopInstruction(InstructionSet* set, GeneralRegister* toRegister):
+            OneOperandInstruction(set, 26, toRegister) {};
         virtual ~StackPopInstruction() {};
     
     virtual void execute();

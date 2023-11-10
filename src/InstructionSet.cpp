@@ -20,11 +20,16 @@ InstructionSet::InstructionSet() {
     m_parsingMap.emplace("and", parseAnd);
     m_parsingMap.emplace("not", parseNot);
     m_parsingMap.emplace("shift", parseShift);
+    m_parsingMap.emplace("compare", parseCompare);
     m_parsingMap.emplace("jump", parseJump);
+    m_parsingMap.emplace("call", parseCall);
     m_parsingMap.emplace("push", parsePush);
     m_parsingMap.emplace("pop", parsePop);
+    m_parsingMap.emplace("return", parseReturn);
     m_parsingMap.emplace("stop", parseStop);
     m_parsingMap.emplace("comment", parseComment);
+    m_parsingMap.emplace("label", parseLabel);
+
 }
 
 string InstructionSet::validateInstruction(string line, vector<string> tokens) {
@@ -63,7 +68,7 @@ string InstructionSet::parseMove(string line, vector<string> tokens) {
         }
         //Invalid conjunction
         else if(tokens[2]!="to") {
-            return "Unknown conjunction '" + tokens[2] + "'. Expected 'to'";
+            return "Unknown conjunction '" + tokens[2] + "'. Expected to";
         }
         else if(!regex_match(tokens[3], registerTemplate)) {
             return "Unknown destination '" + tokens[3] + "'. Expected register r0-r9";
@@ -91,7 +96,7 @@ string InstructionSet::parseLoad(string line, vector<string> tokens) {
             return "Unknown source '" + tokens[1] + "'. Expected memory address m<000000-999999> or integer value";
         }
         else if(tokens[2]!="to") {
-            return "Unknown conjunction '" + tokens[2] + "'. Expected 'to'";
+            return "Unknown conjunction '" + tokens[2] + "'. Expected to";
         }
         else if(!regex_match(tokens[3], registerTemplate)) {
             return "Unknown destination '" + tokens[3] + "'. Expected register r0-r9";
@@ -117,7 +122,7 @@ string InstructionSet::parseStore(string line, vector<string> tokens) {
             return "Unknown source '" + tokens[1] + "'. Expected register r0-r9";
         } 
         else if (tokens[2] != "to") {
-            return "Unknown conjunction '" + tokens[2] + "'. Expected 'to'";
+            return "Unknown conjunction '" + tokens[2] + "'. Expected to";
         } 
         else if (!regex_match(tokens[3], memoryTemplate)) {
             return "Unknown destination '" + tokens[3] + "'. Expected memory address m<000000-999999>";
@@ -143,13 +148,13 @@ string InstructionSet::parseAdd(string line, vector<string> tokens) {
             return "Unknown source '" + tokens[1] + "'. Expected register r0-r9";
         }
         else if(tokens[2]!="with") {
-            return "Unknown conjunction '" + tokens[2] + "'. Expected 'with'";
+            return "Unknown conjunction '" + tokens[2] + "'. Expected with";
         }
         else if(!regex_match(tokens[3], registerTemplate)) {
             return "Unknown addition argument '" + tokens[3] + "'. Expected register r0-r9";
         }
         else if(tokens[4]!="to") {
-            return "Unknown conjunction '" + tokens[2] + "'. Expected 'to'";
+            return "Unknown conjunction '" + tokens[2] + "'. Expected to";
         }
         else if(!regex_match(tokens[5], registerTemplate)) {
             return "Unknown destination '" + tokens[5] + "'. Expected register r0-r9";
@@ -175,13 +180,13 @@ string InstructionSet::parseSub(string line, vector<string> tokens) {
             return "Unknown source '" + tokens[1] + "'. Expected register r0-r9";
         }
         else if(tokens[2]!="with") {
-            return "Unknown conjunction '" + tokens[2] + "'. Expected 'with'";
+            return "Unknown conjunction '" + tokens[2] + "'. Expected with";
         }
         else if(!regex_match(tokens[3], registerTemplate)) {
             return "Unknown subtraction argument '" + tokens[3] + "'. Expected register r0-r9";
         }
         else if(tokens[4]!="to") {
-            return "Unknown conjunction '" + tokens[2] + "'. Expected 'to'";
+            return "Unknown conjunction '" + tokens[2] + "'. Expected to";
         }
         else if(!regex_match(tokens[5], registerTemplate)) {
             return "Unknown destination '" + tokens[5] + "'. Expected register r0-r9";
@@ -207,13 +212,13 @@ string InstructionSet::parseMultiply(string line, vector<string> tokens) {
             return "Unknown source '" + tokens[1] + "'. Expected register r0-r9";
         }
         else if(tokens[2]!="with") {
-            return "Unknown conjunction '" + tokens[2] + "'. Expected 'with'";
+            return "Unknown conjunction '" + tokens[2] + "'. Expected with";
         }
         else if(!regex_match(tokens[3], registerTemplate)) {
             return "Unknown multiplication argument '" + tokens[3] + "'. Expected register r0-r9";
         }
         else if(tokens[4]!="to") {
-            return "Unknown conjunction '" + tokens[2] + "'. Expected 'to'";
+            return "Unknown conjunction '" + tokens[2] + "'. Expected to";
         }
         else if(!regex_match(tokens[5], registerTemplate)) {
             return "Unknown destination '" + tokens[5] + "'. Expected register r0-r9";
@@ -239,13 +244,13 @@ string InstructionSet::parseDivide(string line, vector<string> tokens) {
             return "Unknown source '" + tokens[1] + "'. Expected register r0-r9";
         }
         else if(tokens[2]!="with") {
-            return "Unknown conjunction '" + tokens[2] + "'. Expected 'with'";
+            return "Unknown conjunction '" + tokens[2] + "'. Expected with";
         }
         else if(!regex_match(tokens[3], registerTemplate)) {
             return "Unknown division argument '" + tokens[3] + "'. Expected register r0-r9";
         }
         else if(tokens[4]!="to") {
-            return "Unknown conjunction '" + tokens[2] + "'. Expected 'to'";
+            return "Unknown conjunction '" + tokens[2] + "'. Expected to";
         }
         else if(!regex_match(tokens[5], registerTemplate)) {
             return "Unknown destination '" + tokens[5] + "'. Expected register r0-r9";
@@ -271,7 +276,7 @@ string InstructionSet::parseOr(string line, vector<string> tokens) {
             return "Unknown source/destination '" + tokens[1] + "'. Expected register r0-r9";
         }
         else if(tokens[2]!="with") {
-            return "Unknown conjunction '" + tokens[2] + "'. Expected 'with'";
+            return "Unknown conjunction '" + tokens[2] + "'. Expected with";
         }
         else if(!regex_match(tokens[3], registerTemplate)) {
             return "Unknown argument '" + tokens[3] + "'. Expected register r0-r9";
@@ -297,7 +302,7 @@ string InstructionSet::parseAnd(string line, vector<string> tokens) {
             return "Unknown source/destination '" + tokens[1] + "'. Expected register r0-r9";
         }
         else if(tokens[2]!="with") {
-            return "Unknown conjunction '" + tokens[2] + "'. Expected 'with'";
+            return "Unknown conjunction '" + tokens[2] + "'. Expected with";
         }
         else if(!regex_match(tokens[3], registerTemplate)) {
             return "Unknown argument '" + tokens[3] + "'. Expected register r0-r9";
@@ -351,13 +356,39 @@ string InstructionSet::parseShift(string line, vector<string> tokens) {
             return "Unknown source/destination '" + tokens[3] + "'. Expected register r0-r9";
         }
         else if(tokens[4]!="by") {
-            return "Unknown conjunction '" + tokens[4] + "'. Expected 'by'";
+            return "Unknown conjunction '" + tokens[4] + "'. Expected by";
         }
         else if(!regex_match(tokens[5], registerTemplate)) {
             return "Unknown shift amount '" + tokens[5] + "'. Expected register r0-r9";
         }
         else {
             return "Compiler exception encountered for divide instruction";
+        }
+    }
+}
+
+string InstructionSet::parseCompare(string line, vector<string> tokens) {
+    regex lineTemplate("compare r[0-9] with r[0-9]");
+    regex registerTemplate("r[0-9]");
+
+    if (regex_match(line, lineTemplate)) {
+        return ("");
+    }
+    else {
+        if((tokens.size() != 4)) {
+            return "Incomplete syntax for compare instruction";
+        }
+        else if(!regex_match(tokens[1], registerTemplate)) {
+            return "Unknown source/destination '" + tokens[1] + "'. Expected register r0-r9";
+        }
+        else if(tokens[2]!="with") {
+            return "Unknown conjunction '" + tokens[2] + "'. Expected with";
+        }
+        else if(!regex_match(tokens[3], registerTemplate)) {
+            return "Unknown argument '" + tokens[3] + "'. Expected register r0-r9";
+        }
+        else {
+            return "Compiler exception encountered for compare instruction";
         }
     }
 }
@@ -385,6 +416,30 @@ string InstructionSet::parseJump(string line, vector<string> tokens) {
     }
     else {
         return "Unknown jump condition. Expected 'greater', 'less', 'equal', 'not' or unconditional";
+    }
+}
+
+string InstructionSet::parseCall(string line, vector<string> tokens) {
+    regex lineTemplate("call to i\\[[0-9]{1,7}\\]");
+    regex instructionTemplate("i\\[[0-9]{1,7}\\]");
+    regex labelTemplate("'([^']+)'");
+
+    if (regex_match(line, lineTemplate)) {
+        return ("");
+    }
+    else {
+        if((tokens.size() != 3)) {
+            return "Incomplete syntax for call instruction";
+        }
+        else if(tokens[1]!="to") {
+            return "Unknown conjunction '" + tokens[1] + "'. Expected to";
+        }
+        else if(!regex_match(tokens[2], instructionTemplate) && !regex_match(tokens[2], labelTemplate)) {
+            return "Unknown destination '" + tokens[2] + "'. Expected instruction address i[000000-999999] or 'label' (single word)";
+        }
+        else {
+            return "Compiler exception encountered for call instruction";
+        }
     }
 }
 
@@ -420,10 +475,10 @@ string InstructionSet::parsePop(string line, vector<string> tokens) {
             return "Incomplete syntax for pop instruction";
         }
         else if(tokens[1]!="to") {
-            return "Unknown conjunction '" + tokens[2] + "'. Expected 'to'";
+            return "Unknown conjunction '" + tokens[1] + "'. Expected to";
         }
         else if(!regex_match(tokens[2], registerTemplate)) {
-            return "Unknown destination '" + tokens[1] + "'. Expected register r0-r9";
+            return "Unknown destination '" + tokens[2] + "'. Expected register r0-r9";
         }
         else {
             return "Compiler exception encountered for pop instruction";
@@ -431,12 +486,28 @@ string InstructionSet::parsePop(string line, vector<string> tokens) {
     }
 }
 
-string InstructionSet::parseStop(string line, vector<string> tokens) {
+string InstructionSet::parseReturn(string line, vector<string> tokens) {
     //No operands, so only line regex template
-    regex lineTemplate("stop");
+    regex lineTemplate("return");
 
     //This code is mostly redundant but here just in case there's a regex error. Should never
-    //lead to an error if the parseStop function is called
+    //lead to an error if the parseReturn function is called
+    if(regex_match(line, lineTemplate)) {
+        return ("");
+    }
+    else {
+        if((tokens.size() != 1)) {
+            return "Incomplete syntax for return instruction";
+        }
+        else {
+            return "Compiler exception encountered for return instruction";
+        }
+    }
+}
+
+string InstructionSet::parseStop(string line, vector<string> tokens) {
+    regex lineTemplate("stop");
+
     if(regex_match(line, lineTemplate)) {
         return ("");
     }
@@ -450,8 +521,26 @@ string InstructionSet::parseStop(string line, vector<string> tokens) {
     }
 }
 
+string InstructionSet::parseLabel(string line, vector<string> tokens) {
+    regex lineTemplate("label '([^']+)'");
+    regex labelTemplate("'([^']+)'");
+
+    if(regex_match(line, lineTemplate)) {
+        return ("");
+    }
+    else {
+        if (!regex_match(tokens[1], labelTemplate)) {
+            return "Unrecognized 'label'. Must be single word in single-quotes";
+        }
+        else {
+            return "Compiler exception encountered for label";
+        }
+    }
+}
+
 string InstructionSet::parseComment(string line, vector<string> tokens) {
     regex lineTemplate(R"(comment ".+")");
+    
 
     if(regex_match(line, lineTemplate)) {
         return ("");
@@ -466,7 +555,7 @@ string InstructionSet::parseComment(string line, vector<string> tokens) {
             return "Expected ending double quotes in '" + tokens[tokens.size()-1] + "'";
         }
         else {
-            return "Compiler exception encountered for comment label";
+            return "Compiler exception encountered for comment";
         }
     }
 }
@@ -477,6 +566,7 @@ string InstructionSet::parseComment(string line, vector<string> tokens) {
 string InstructionSet::parseUnconditionalJump(string line, vector<string> tokens) {
     regex lineTemplate("jump unconditionally to i\\[[0-9]{1,7}\\]");
     regex instructionTemplate("i\\[[0-9]{1,7}\\]");
+    regex labelTemplate("'([^']+)'");
 
     if (regex_match(line, lineTemplate)) {
         return ("");
@@ -489,10 +579,10 @@ string InstructionSet::parseUnconditionalJump(string line, vector<string> tokens
             return "Unknown condition '" + tokens[1] + "'. Expected 'unconditionally'";
         }
         else if(tokens[2]!="to") {
-            return "Unknown conjunction '" + tokens[2] + "'. Expected 'to'";
+            return "Unknown conjunction '" + tokens[2] + "'. Expected to";
         }
-        else if(!regex_match(tokens[3], instructionTemplate)) {
-            return "Unknown destination '" + tokens[3] + "'. Expected instruction address i[000000-999999]";
+        else if(!regex_match(tokens[3], instructionTemplate) && !regex_match(tokens[3], labelTemplate)) {
+            return "Unknown destination '" + tokens[3] + "'. Expected instruction address i[000000-999999] or 'label' (single word)";
         }
         else {
             return "Compiler exception encountered for unconditional jump instruction";
@@ -503,6 +593,7 @@ string InstructionSet::parseUnconditionalJump(string line, vector<string> tokens
 string InstructionSet::parseConditionalJump(string line, vector<string> tokens) {
     regex lineTemplate("jump if (greater|less|equal|zero) to i\\[[0-9]{1,7}\\]");
     regex instructionTemplate("i\\[[0-9]{1,7}\\]");
+    regex labelTemplate("'([^']+)'");
 
     if (regex_match(line, lineTemplate)) {
         return ("");
@@ -512,16 +603,16 @@ string InstructionSet::parseConditionalJump(string line, vector<string> tokens) 
             return "Incomplete syntax for conditional jump instruction";
         }
         else if(tokens[1]!="if") {
-            return "Unknown conjunction '" + tokens[1] + "'. Expected 'if'";
+            return "Unknown conjunction '" + tokens[1] + "'. Expected if";
         }
         else if (tokens[2]!="greater" && tokens[2]!="less" && tokens[2]!="equal" && tokens[2]!="zero") {
             return "Unknown condition '" + tokens[2] + "'. Expected 'greater', 'less', 'equal' or 'zero'";
         }
         else if (tokens[3]!="to") {
-            return "Unknown conjunction '" + tokens[3] + "'. Expected 'to'";
+            return "Unknown conjunction '" + tokens[3] + "'. Expected to";
         }
-        else if(!regex_match(tokens[4], instructionTemplate)) {
-            return "Unknown destination '" + tokens[4] + "'. Expected instruction address i[000000-999999]";
+        else if(!regex_match(tokens[4], instructionTemplate) && !regex_match(tokens[4], labelTemplate)) {
+            return "Unknown destination '" + tokens[4] + "'. Expected instruction address i[000000-999999] or 'label' (single word)";
         }
         else {
             return "Compiler exception encountered for conditional jump instruction";
@@ -532,6 +623,7 @@ string InstructionSet::parseConditionalJump(string line, vector<string> tokens) 
 string InstructionSet::parseConditionalComplementJump(string line, vector<string> tokens) {
     regex lineTemplate("jump if not (equal|zero) to i\\[[0-9]{1,7}\\]");
     regex instructionTemplate("i\\[[0-9]{1,7}\\]");
+    regex labelTemplate("'([^']+)'");
 
     if (regex_match(line, lineTemplate)) {
         return ("");
@@ -544,16 +636,16 @@ string InstructionSet::parseConditionalComplementJump(string line, vector<string
             return "Unknown conjunction '" + tokens[1] + "'. Expected 'if'";
         }
         else if(tokens[2]!="not") {
-            return "Unknown conjunction '" + tokens[2] + "'. Expected 'to'";
+            return "Unknown conjunction '" + tokens[2] + "'. Expected to";
         }
         else if (tokens[3]!="equal" && tokens[3]!="zero") {
             return "Unknown condition '" + tokens[3] + "'. Expected'equal' or 'zero'";
         }
         else if (tokens[4]!="to") {
-            return "Unknown conjunction '" + tokens[4] + "'. Expected 'to'";
+            return "Unknown conjunction '" + tokens[4] + "'. Expected to";
         }
-        else if(!regex_match(tokens[5], instructionTemplate)) {
-            return "Unknown destination '" + tokens[5] + "'. Expected instruction address i[000000-999999]";
+        else if(!regex_match(tokens[5], instructionTemplate) && !regex_match(tokens[5], labelTemplate)) {
+            return "Unknown destination '" + tokens[5] + "'. Expected instruction address i[000000-999999] or 'label' (single word)";
         }
         else {
             return "Compiler exception encountered for complemented conditional jump instruction";
