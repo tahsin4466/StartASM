@@ -13,14 +13,33 @@ shift left arithmetically r4 by r1
 shift left logically r8 by r2
 shift right arithmetically r2 by r4
 shift right logically r2 by r6
-jump unconditionally to i[3]
+compare r2 with r6
+
+
+
+
+
+jump unconditionally to 'myFunc'
 jump if greater to i[8]
 jump if less to i[0]
 jump if equal to i[11]
 jump if not equal to i[0032149]
 jump if zero to i[7]
 jump if not zero to i[8]
+call to 'myFunc'
 push r8
 pop to r6
 stop
+return
 comment "This is a comment"
+label 'myFunc'
+
+
+
+
+
+
+
+
+
+

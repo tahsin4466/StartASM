@@ -35,19 +35,28 @@ class Compiler {
             m_pathname = pathname;
         }
 
-        //Code Loading
-        bool loadFile();
-
-        //Code Checking
-        bool parseCode();
-
-        //Code Compiling
+        //Public compilation method
         bool compileCode();
 
 
     private:
-        //Code Tokenizing
+        //Internal parsing methods
+        //Load the file
+        bool loadFile();
+        //Tokenize the code
         void tokenizeCode();
+        //Validate the syntax using regex matching
+        bool validateSyntax();
+        //Resolve symbols and labels
+        bool resolveSymbols();
+        //Build the AST
+        void buildAST();
+        //Analyze Semantics
+        bool analyzeSemantics();
+        //Generate the code
+        void generateCode();
+
+        //Private variables
         //pathname
         std::string m_pathname;
         //Vector containing code lines

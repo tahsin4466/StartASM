@@ -11,6 +11,26 @@
 
 using namespace std;
 
+bool Compiler::compileCode() {
+    if(!loadFile()) {
+        return false;
+    }
+    tokenizeCode();
+    if(!validateSyntax()) {
+        return false;
+    }
+    if(!resolveSymbols()) {
+        return false;
+    }
+    buildAST();
+    if(!analyzeSemantics()) {
+        return false;
+    }
+    generateCode();
+    return true;
+    
+}
+
 bool Compiler::loadFile() {
     //Set line index to 0
     m_lineIndex = 0;
@@ -61,7 +81,7 @@ void Compiler::tokenizeCode() {
     }
 }
 
-bool Compiler::parseCode() {
+bool Compiler::validateSyntax() {
     int numLines = m_codeLines.size();
     //Create an ordered map that links an integer (line number) to an erorr message
     //This is to leverage OMP parallelization while maintaining the order of errors as they appear in the code
@@ -95,7 +115,19 @@ bool Compiler::parseCode() {
     return true;
 }
 
-bool Compiler::compileCode() {
-    //TO DO
+bool Compiler::resolveSymbols() {
     return true;
+}
+
+void Compiler::buildAST() {
+    
+}
+
+bool Compiler::analyzeSemantics() {
+    return true;
+}
+
+
+void Compiler::generateCode() {
+
 }

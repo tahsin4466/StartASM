@@ -420,7 +420,7 @@ string InstructionSet::parseJump(string line, vector<string> tokens) {
 }
 
 string InstructionSet::parseCall(string line, vector<string> tokens) {
-    regex lineTemplate("call to i\\[[0-9]{1,7}\\]");
+    regex lineTemplate("call to (i\\[[0-9]{1,7}\\]|'([^']+)')");
     regex instructionTemplate("i\\[[0-9]{1,7}\\]");
     regex labelTemplate("'([^']+)'");
 
@@ -564,7 +564,7 @@ string InstructionSet::parseComment(string line, vector<string> tokens) {
 
 //Jump parsing helper function
 string InstructionSet::parseUnconditionalJump(string line, vector<string> tokens) {
-    regex lineTemplate("jump unconditionally to i\\[[0-9]{1,7}\\]");
+    regex lineTemplate("jump unconditionally to (i\\[[0-9]{1,7}\\]|'([^']+)')");
     regex instructionTemplate("i\\[[0-9]{1,7}\\]");
     regex labelTemplate("'([^']+)'");
 
@@ -591,7 +591,7 @@ string InstructionSet::parseUnconditionalJump(string line, vector<string> tokens
 }
 
 string InstructionSet::parseConditionalJump(string line, vector<string> tokens) {
-    regex lineTemplate("jump if (greater|less|equal|zero) to i\\[[0-9]{1,7}\\]");
+    regex lineTemplate("jump if (greater|less|equal|zero) to (i\\[[0-9]{1,7}\\]|'([^']+)')");
     regex instructionTemplate("i\\[[0-9]{1,7}\\]");
     regex labelTemplate("'([^']+)'");
 
@@ -621,7 +621,7 @@ string InstructionSet::parseConditionalJump(string line, vector<string> tokens) 
 }
 
 string InstructionSet::parseConditionalComplementJump(string line, vector<string> tokens) {
-    regex lineTemplate("jump if not (equal|zero) to i\\[[0-9]{1,7}\\]");
+    regex lineTemplate("jump if not (equal|zero) to (i\\[[0-9]{1,7}\\]|'([^']+)')");
     regex instructionTemplate("i\\[[0-9]{1,7}\\]");
     regex labelTemplate("'([^']+)'");
 
