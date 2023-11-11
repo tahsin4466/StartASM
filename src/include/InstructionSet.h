@@ -7,9 +7,14 @@
 #include <unordered_set>
 #include <iostream>
 #include <functional>
+#include <utility>
 
 class Instruction;
 class Register;
+
+enum SemanticType {NONE, FROM, TO, SELF, FROMTO, SELFWITH, SELFBY, FROMWITHTO};
+enum OperandType {REGISTER, INSTRUCTION, MEMORY, VALUE};
+enum NumOperands {NULLARY, UNARY, BINARY, TERNARY};
 
 class InstructionSet {
     public:
@@ -25,6 +30,12 @@ class InstructionSet {
     private:
         //Hash map containing a keyword linked to a parsing function
         std::unordered_map<std::string, std::function<std::string(std::string, std::vector<std::string>)>> m_parsingMap;
+        //Hash map containing a set of instruction keywords
+        //std::unordered_map<std::string, std::pair<NumOperands, SemanticType>> m_instructionMap;
+        //Hash map containing a set of operand regex templates
+        //std::unordered_map<std::string, OperandType> m_operandMap;
+        //Hash map containing a set of conjunction keywords
+        //std::unordered_set<std::string> m_conjunctionSet;
 
 
         //Private Parsing Functions

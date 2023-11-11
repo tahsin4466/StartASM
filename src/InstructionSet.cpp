@@ -4,6 +4,7 @@
 #include <regex>
 #include <string>
 #include <functional>
+#include <utility>
 
 using namespace std;
 
@@ -28,6 +29,36 @@ InstructionSet::InstructionSet() {
     m_parsingMap.emplace("stop", parseStop);
     m_parsingMap.emplace("comment", parseComment);
     m_parsingMap.emplace("label", parseLabel);
+
+    /*m_instructionMap.emplace("move", make_pair(BINARY, FROMTO));
+    m_instructionMap.emplace("load", make_pair(BINARY, FROMTO));
+    m_instructionMap.emplace("store", make_pair(BINARY, FROMTO));
+    m_instructionMap.emplace("add", make_pair(TERNARY, FROMWITHTO));
+    m_instructionMap.emplace("sub", make_pair(TERNARY, FROMWITHTO));
+    m_instructionMap.emplace("multiply", make_pair(TERNARY, FROMWITHTO));
+    m_instructionMap.emplace("divide", make_pair(TERNARY, FROMWITHTO));
+    m_instructionMap.emplace("or", make_pair(BINARY, SELFWITH));
+    m_instructionMap.emplace("and", make_pair(BINARY, SELFWITH));
+    m_instructionMap.emplace("not", make_pair(UNARY, SELF));
+    m_instructionMap.emplace("shift", make_pair(BINARY, SELFBY));
+    m_instructionMap.emplace("compare", make_pair(BINARY, SELFWITH));
+    m_instructionMap.emplace("jump", make_pair(UNARY, TO));
+    m_instructionMap.emplace("call", make_pair(UNARY, TO));
+    m_instructionMap.emplace("push", make_pair(UNARY, FROM));
+    m_instructionMap.emplace("pop", make_pair(UNARY, TO));
+    m_instructionMap.emplace("return", make_pair(NULLARY, NONE));
+    m_instructionMap.emplace("stop", make_pair(NULLARY, NONE));
+    m_instructionMap.emplace("comment", make_pair(NULLARY, NONE));
+    m_instructionMap.emplace("label", make_pair(NULLARY, NONE)); */
+    
+    /*m_operandMap.emplace("r[0-9]", REGISTER);
+    m_operandMap.emplace("m<[0-9]{1,7}>", MEMORY);
+    m_operandMap.emplace("i\\[[0-9]{1,7}\\]", INSTRUCTION);
+    m_operandMap.emplace("\\d+", VALUE); */
+
+   /* m_conjunctionSet.insert("to");
+    m_conjunctionSet.insert("with");
+    m_conjunctionSet.insert("by");*/
 
 }
 

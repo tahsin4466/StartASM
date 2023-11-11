@@ -12,7 +12,7 @@ class Compiler {
         //Constructors and Destructors
         Compiler(std::string pathname):
             m_pathname(pathname),
-            m_statusMessage("Compiler Initialized"),
+            m_statusMessage(""),
             m_lineIndex(0) {};
         ~Compiler() {};
 

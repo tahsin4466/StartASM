@@ -33,10 +33,9 @@ bool Compiler::compileCode() {
 }
 
 bool Compiler::loadFile() {
+    cout << "made it to load file" << endl;
     //Set line index to 0
     m_lineIndex = 0;
-    //Status = loading
-    m_statusMessage = "Loading code...";
 
     //Attempt to open codeFile
     string currentLine;
@@ -55,7 +54,6 @@ bool Compiler::loadFile() {
     
         //Call tokenize() helper function
         tokenizeCode();
-        m_statusMessage = "Code loaded";
         return true;
     }
     else {
@@ -67,6 +65,7 @@ bool Compiler::loadFile() {
 }
 
 void Compiler::tokenizeCode() {
+    cout << "made it to  tokenize" << endl;
     //split each line into individual tokens
     //Do NOT leverage OMP as order must be maintained
     for (int i = 0; i < m_codeLines.size(); i++) {
@@ -83,6 +82,7 @@ void Compiler::tokenizeCode() {
 }
 
 bool Compiler::validateSyntax() {
+    cout << "made it to syntax" << endl;
     int numLines = m_codeLines.size();
     //Create an ordered map that links an integer (line number) to an erorr message
     //This is to leverage OMP parallelization while maintaining the order of errors as they appear in the code
@@ -116,6 +116,7 @@ bool Compiler::validateSyntax() {
 }
 
 bool Compiler::resolveSymbols() {
+    cout << "made it to resolve" << endl;
     //String for error messages
     std::string invalidLines;
     //regex template for labels
@@ -124,7 +125,7 @@ bool Compiler::resolveSymbols() {
     //Find all labels and add to the label table
     for(int i=0; i<m_codeLines.size(); i++) {
         if(m_codeTokens[i][0] == "label") {
-            m_labelTable.emplace(m_codeTokens[i].back(), "i[" + to_string(i+1) + "]");
+            m_labelTable.emplace(m_codeTokens[i].back(), "i[" + to_string(i+2) + "]");
         }
     }
 
@@ -168,7 +169,7 @@ bool Compiler::resolveSymbols() {
 }
 
 void Compiler::buildAST() {
-    
+    cout << "made it to ast" << endl;
 }
 
 bool Compiler::analyzeSemantics() {

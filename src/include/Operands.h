@@ -171,7 +171,7 @@ class HeapMemory: public Memory {
         virtual bool validAddress(std::vector<uint8_t>);
 
     private:
-        std::unordered_map<std::vector<uint8_t>, std::vector<uint8_t>> m_heapMemory; 
+        std::unordered_map<int, std::vector<uint8_t>> m_heapMemory; 
 };
 
 //LOW LEVEL PROGRAM MEMORY CLASS
@@ -186,7 +186,7 @@ class ProgramMemory: public Memory {
         //Constructor and Destructor
         ProgramMemory(std::vector<Instruction*>);
         virtual ~ProgramMemory() {
-            std::map<std::vector<uint8_t>, Instruction*>::iterator itr;
+            std::map<int, Instruction*>::iterator itr;
             for (itr=m_programMemory.begin(); itr!=m_programMemory.end(); itr++) {
                 delete itr->second;
             }
@@ -198,7 +198,7 @@ class ProgramMemory: public Memory {
         virtual bool validAddress(std::vector<uint8_t>);
 
     private:
-        std::map<std::vector<uint8_t>, Instruction*> m_programMemory;
+        std::map<int, Instruction*> m_programMemory;
 };
 
 //LOW LEVEL STACK MEMORY CLASS

@@ -6,7 +6,7 @@
 #include <string>
 
 enum SemanticType {NONE, FROM, TO, SELF, FROMTO, SELFWITH, SELFBY, FROMWITHTO};
-enum OperandType {REGISTER, MEMORY, VALUE, TEXT};
+enum OperandType {REGISTER, INSTRUCTION, MEMORY, VALUE};
 enum NumOperands {NULLARY, UNARY, BINARY, TERNARY};
 
 //AST class to handle AST nodes

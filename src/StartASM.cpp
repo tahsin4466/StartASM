@@ -15,8 +15,6 @@ int main() {
         return 0;
     }
 
-
-    cout << StartASMCompiler.getStatus() << endl;
     cout << StartASMCompiler.getNumLines() << " lines" << endl;
     return 0;
 }
