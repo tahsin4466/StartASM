@@ -7,10 +7,6 @@
 #include <unordered_set>
 #include <iostream>
 #include <functional>
-#include <utility>
-
-class Instruction;
-class Register;
 
 enum SemanticType {NONE, FROM, TO, SELF, FROMTO, SELFWITH, SELFBY, FROMWITHTO};
 enum OperandType {REGISTER, INSTRUCTION, MEMORY, VALUE};
@@ -22,21 +18,21 @@ class InstructionSet {
         InstructionSet();
         ~InstructionSet() {};
 
+        InstructionSet(const InstructionSet&) = delete;
+        InstructionSet& operator=(const InstructionSet&) = delete;
+
         std::string validateInstruction(std::string line, std::vector<std::string> tokens);
-        bool isValidRegister(std::string keyword);
-        bool isValidMemoryAddress(std::string keyword);
 
 
     private:
         //Hash map containing a keyword linked to a parsing function
         std::unordered_map<std::string, std::function<std::string(std::string, std::vector<std::string>)>> m_parsingMap;
         //Hash map containing a set of instruction keywords
-        //std::unordered_map<std::string, std::pair<NumOperands, SemanticType>> m_instructionMap;
+        std::unordered_map<std::string, std::pair<NumOperands, SemanticType>> m_instructionMap;
         //Hash map containing a set of operand regex templates
-        //std::unordered_map<std::string, OperandType> m_operandMap;
+        std::unordered_map<std::string, OperandType> m_operandMap;
         //Hash map containing a set of conjunction keywords
-        //std::unordered_set<std::string> m_conjunctionSet;
-
+        std::unordered_set<std::string> m_conjunctionSet;
 
         //Private Parsing Functions
         static std::string parseMove(std::string line, std::vector<std::string> tokens);
@@ -64,8 +60,6 @@ class InstructionSet {
         static std::string parseUnconditionalJump(std::string line, std::vector<std::string> tokens);
         static std::string parseConditionalJump(std::string line, std::vector<std::string> tokens);
         static std::string parseConditionalComplementJump(std::string line, std::vector<std::string> tokens);
-
-
 };
 
 #endif

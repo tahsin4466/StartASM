@@ -4,17 +4,19 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
+#include <utility>
 
-#include "InstructionSet.h"
+class InstructionSet;
 
 class Compiler {
     public:
         //Constructors and Destructors
-        Compiler(std::string pathname):
-            m_pathname(pathname),
-            m_statusMessage(""),
-            m_lineIndex(0) {};
-        ~Compiler() {};
+        Compiler(std::string pathname);
+        ~Compiler();
+
+        Compiler(const Compiler&) = delete;
+        Compiler& operator=(const Compiler&) = delete;
 
         //Accessors
         //Get number of lines
@@ -68,6 +70,7 @@ class Compiler {
         std::unordered_map<std::string, std::string> m_labelTable;
 
 
+
         //Variables
         //Pathname
         std::string m_pathname;
@@ -76,7 +79,8 @@ class Compiler {
         //Int containing current line index
         int m_lineIndex;
         //Instruction set
-        InstructionSet m_instructionSet;
+        InstructionSet* m_instructionSet;
+    
         
 };
 

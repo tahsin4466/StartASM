@@ -9,7 +9,7 @@ int main() {
     cout << "Enter name of StartASM file: ";
     getline(cin, pathname);
 
-    Compiler StartASMCompiler = Compiler("code/" + pathname + ".txt");
+    Compiler StartASMCompiler("code/" + pathname + ".txt");
     if(!StartASMCompiler.compileCode()) {
         cout << StartASMCompiler.getStatus() << endl;
         return 0;

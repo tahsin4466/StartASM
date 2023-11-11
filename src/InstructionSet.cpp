@@ -30,7 +30,7 @@ InstructionSet::InstructionSet() {
     m_parsingMap.emplace("comment", parseComment);
     m_parsingMap.emplace("label", parseLabel);
 
-    /*m_instructionMap.emplace("move", make_pair(BINARY, FROMTO));
+    m_instructionMap.emplace("move", make_pair(BINARY, FROMTO));
     m_instructionMap.emplace("load", make_pair(BINARY, FROMTO));
     m_instructionMap.emplace("store", make_pair(BINARY, FROMTO));
     m_instructionMap.emplace("add", make_pair(TERNARY, FROMWITHTO));
@@ -49,16 +49,16 @@ InstructionSet::InstructionSet() {
     m_instructionMap.emplace("return", make_pair(NULLARY, NONE));
     m_instructionMap.emplace("stop", make_pair(NULLARY, NONE));
     m_instructionMap.emplace("comment", make_pair(NULLARY, NONE));
-    m_instructionMap.emplace("label", make_pair(NULLARY, NONE)); */
+    m_instructionMap.emplace("label", make_pair(NULLARY, NONE));
     
-    /*m_operandMap.emplace("r[0-9]", REGISTER);
+    m_operandMap.emplace("r[0-9]", REGISTER);
     m_operandMap.emplace("m<[0-9]{1,7}>", MEMORY);
     m_operandMap.emplace("i\\[[0-9]{1,7}\\]", INSTRUCTION);
-    m_operandMap.emplace("\\d+", VALUE); */
+    m_operandMap.emplace("\\d+", VALUE);
 
-   /* m_conjunctionSet.insert("to");
+    m_conjunctionSet.insert("to");
     m_conjunctionSet.insert("with");
-    m_conjunctionSet.insert("by");*/
+    m_conjunctionSet.insert("by");
 
 }
 
@@ -460,7 +460,7 @@ string InstructionSet::parseCall(string line, vector<string> tokens) {
             return "Unknown conjunction '" + tokens[1] + "'. Expected 'to'";
         }
         else if(!regex_match(tokens[2], instructionTemplate) && !regex_match(tokens[2], labelTemplate)) {
-            return "Unknown destination '" + tokens[2] + "'. Expected instruction address i[000000-999999] or 'label' (single word)";
+            return "Unknown destination '" + tokens[2] + "'. Expected instruction address i[000000-999999] or label (single word)";
         }
         else {
             return "Compiler exception encountered for call instruction";
@@ -555,7 +555,7 @@ string InstructionSet::parseLabel(string line, vector<string> tokens) {
     }
     else {
         if (!regex_match(tokens[1], labelTemplate)) {
-            return "Unrecognized 'label'. Must be single word in single-quotes";
+            return "Unrecognized label. Must be single word in single-quotes";
         }
         else {
             return "Compiler exception encountered for label";
@@ -607,7 +607,7 @@ string InstructionSet::parseUnconditionalJump(string line, vector<string> tokens
             return "Unknown conjunction '" + tokens[2] + "'. Expected 'to'";
         }
         else if(!regex_match(tokens[3], instructionTemplate) && !regex_match(tokens[3], labelTemplate)) {
-            return "Unknown destination '" + tokens[3] + "'. Expected instruction address i[000000-999999] or 'label' (single word)";
+            return "Unknown destination '" + tokens[3] + "'. Expected instruction address i[000000-999999] or label (single word)";
         }
         else {
             return "Compiler exception encountered for unconditional jump instruction";
@@ -637,7 +637,7 @@ string InstructionSet::parseConditionalJump(string line, vector<string> tokens) 
             return "Unknown conjunction '" + tokens[3] + "'. Expected 'to'";
         }
         else if(!regex_match(tokens[4], instructionTemplate) && !regex_match(tokens[4], labelTemplate)) {
-            return "Unknown destination '" + tokens[4] + "'. Expected instruction address i[000000-999999] or 'label' (single word)";
+            return "Unknown destination '" + tokens[4] + "'. Expected instruction address i[000000-999999] or label (single word)";
         }
         else {
             return "Compiler exception encountered for conditional jump instruction";
@@ -670,10 +670,10 @@ string InstructionSet::parseConditionalComplementJump(string line, vector<string
             return "Unknown conjunction '" + tokens[4] + "'. Expected 'to'";
         }
         else if(!regex_match(tokens[5], instructionTemplate) && !regex_match(tokens[5], labelTemplate)) {
-            return "Unknown destination '" + tokens[5] + "'. Expected instruction address i[000000-999999] or 'label' (single word)";
+            return "Unknown destination '" + tokens[5] + "'. Expected instruction address i[000000-999999] or label (single word)";
         }
         else {
             return "Compiler exception encountered for complemented conditional jump instruction";
         }
     }
-}
+} 

@@ -12,6 +12,18 @@
 
 using namespace std;
 
+Compiler::Compiler(std::string pathname):
+    m_pathname(pathname),
+    m_statusMessage(""),
+    m_lineIndex(0),
+    m_instructionSet(new InstructionSet()) {
+
+};
+
+Compiler::~Compiler() {
+    delete m_instructionSet;
+}
+
 bool Compiler::compileCode() {
     if(!loadFile()) {
         return false;
@@ -33,7 +45,6 @@ bool Compiler::compileCode() {
 }
 
 bool Compiler::loadFile() {
-    cout << "made it to load file" << endl;
     //Set line index to 0
     m_lineIndex = 0;
 
@@ -51,9 +62,7 @@ bool Compiler::loadFile() {
             }
         }
         codeFile.close();
-    
-        //Call tokenize() helper function
-        tokenizeCode();
+ 
         return true;
     }
     else {
@@ -65,7 +74,6 @@ bool Compiler::loadFile() {
 }
 
 void Compiler::tokenizeCode() {
-    cout << "made it to  tokenize" << endl;
     //split each line into individual tokens
     //Do NOT leverage OMP as order must be maintained
     for (int i = 0; i < m_codeLines.size(); i++) {
@@ -82,7 +90,6 @@ void Compiler::tokenizeCode() {
 }
 
 bool Compiler::validateSyntax() {
-    cout << "made it to syntax" << endl;
     int numLines = m_codeLines.size();
     //Create an ordered map that links an integer (line number) to an erorr message
     //This is to leverage OMP parallelization while maintaining the order of errors as they appear in the code
@@ -94,7 +101,7 @@ bool Compiler::validateSyntax() {
     #pragma omp parallel for private(error)
     for (int i=0; i<numLines; i++) {
         //Call validateInstruction in InstructionSet
-        error = m_instructionSet.validateInstruction(m_codeLines[i], m_codeTokens[i]);
+        error = m_instructionSet->validateInstruction(m_codeLines[i], m_codeTokens[i]);
         //If an error is present
         if (error != "") {
             //Print the excepted line and the syntax error returned from validateInstruction()
@@ -116,7 +123,6 @@ bool Compiler::validateSyntax() {
 }
 
 bool Compiler::resolveSymbols() {
-    cout << "made it to resolve" << endl;
     //String for error messages
     std::string invalidLines;
     //regex template for labels
@@ -169,7 +175,7 @@ bool Compiler::resolveSymbols() {
 }
 
 void Compiler::buildAST() {
-    cout << "made it to ast" << endl;
+
 }
 
 bool Compiler::analyzeSemantics() {
