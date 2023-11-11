@@ -116,18 +116,28 @@ bool Compiler::validateSyntax() {
 }
 
 bool Compiler::resolveSymbols() {
+    /*//Find all labels and add to the label table
+    #pragma omp parallel for
+    for(int i=0; i<m_codeTokens.size(); i++) {
+        if(m_codeTokens[i][0] == "label") {
+            m_labelTable.emplace(m_codeTokens[i][0]);
+        }
+    }
+
+    //Resolve labels
+    for(int i=0; i<m_codeTokens.size(); i++) {
+        if(m_codeTokens[i][0] == "jump" || m_codeTokens[i][0] == "call") {
+            
+        }
+    }*/
     return true;
 }
 
 void Compiler::buildAST() {
     
 }
-
 bool Compiler::analyzeSemantics() {
     return true;
 }
-
-
 void Compiler::generateCode() {
-
 }

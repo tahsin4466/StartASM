@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "InstructionSet.h"
 
@@ -35,15 +36,16 @@ class Compiler {
             m_pathname = pathname;
         }
 
-        //Public compilation method
+        //Public facing compile method
+        //Code Compiling
         bool compileCode();
 
 
     private:
         //Internal parsing methods
-        //Load the file
+        //File loading
         bool loadFile();
-        //Tokenize the code
+        //Code Tokenizing
         void tokenizeCode();
         //Validate the syntax using regex matching
         bool validateSyntax();
@@ -57,20 +59,24 @@ class Compiler {
         void generateCode();
 
         //Private variables
-        //pathname
-        std::string m_pathname;
+        //Data structures
         //Vector containing code lines
         std::vector<std::string> m_codeLines;
         //Vector containing code tokens
         std::vector<std::vector<std::string>> m_codeTokens;
+        //Hash table for symbol resolution, mapping labels to instruction addresses
+        std::unordered_map<std::string, std::string> m_labelTable;
+
+
+        //Variables
+        //Pathname
+        std::string m_pathname;
         //String containing current status
         std::string m_statusMessage;
         //Int containing current line index
         int m_lineIndex;
         //Instruction set
         InstructionSet m_instructionSet;
-
-        //Helper Functions
         
 };
 
