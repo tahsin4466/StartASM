@@ -8,6 +8,7 @@
 #include <omp.h>
 #include <sstream>
 #include <map>
+#include <regex>
 
 using namespace std;
 
@@ -97,7 +98,7 @@ bool Compiler::validateSyntax() {
         //If an error is present
         if (error != "") {
             //Print the excepted line and the syntax error returned from validateInstruction()
-            invalidLines[i] = "\nInvalid syntax at line " + to_string(i + 1) + ": '" + m_codeLines[i] + "'\n" + error + "\n";
+            invalidLines[i] = "\nInvalid syntax at line " + to_string(i + 1) + ": " + m_codeLines[i] + "\n" + error + "\n";
         }
         error.clear();
     }
@@ -111,33 +112,68 @@ bool Compiler::validateSyntax() {
         return false;
     }
 
-    m_statusMessage = "Syntax validated";
     return true;
 }
 
 bool Compiler::resolveSymbols() {
-    /*//Find all labels and add to the label table
-    #pragma omp parallel for
-    for(int i=0; i<m_codeTokens.size(); i++) {
+    //String for error messages
+    std::string invalidLines;
+    //regex template for labels
+    regex labelTemplate("'([^']+)'");
+
+    //Find all labels and add to the label table
+    for(int i=0; i<m_codeLines.size(); i++) {
         if(m_codeTokens[i][0] == "label") {
-            m_labelTable.emplace(m_codeTokens[i][0]);
+            m_labelTable.emplace(m_codeTokens[i].back(), "i[" + to_string(i+1) + "]");
         }
     }
 
-    //Resolve labels
-    for(int i=0; i<m_codeTokens.size(); i++) {
-        if(m_codeTokens[i][0] == "jump" || m_codeTokens[i][0] == "call") {
-            
+    //Check scope for addresses and resolve labels
+    for(int i=0; i<m_codeLines.size(); i++) {
+        //Check for all instances where an instruction address is invoked (jump and call)
+        if (m_codeTokens[i][0] == "jump" || m_codeTokens[i][0] == "call") {
+            //First check if address is a label
+            if(regex_match(m_codeTokens[i].back(), labelTemplate)) {
+                //Check if label is in symbol table
+                auto itr = m_labelTable.find(m_codeTokens[i].back());
+                if (itr == m_labelTable.end()) {
+                    //Return error if not in symbol table
+                    invalidLines += "\nScope error at " + to_string(i + 1) + ": " + m_codeLines[i] + "\nUndefined label " + m_codeTokens[i].back() + "\n";
+                }
+                else {
+                    //Resolve label to instruction address if in scope
+                    m_codeTokens[i].back() = m_labelTable.at(m_codeTokens[i].back());
+                }
+            } 
+            else {
+                //Validate that instruction address is in scope of program
+                string instructionAddress;
+                //Convert string to integer
+                for(int j=2; j<((m_codeTokens[i].back()).size()-1); j++) {
+                    instructionAddress += m_codeTokens[i].back()[j];
+                }
+                //Check if address is in scope
+                if(stoi(instructionAddress) > m_codeLines.size()) {
+                    invalidLines += "\nScope error at " + to_string(i + 1) + ": " + m_codeLines[i] + "\nInstruction address " + m_codeTokens[i].back() + " is out of bounds\n";
+                }
+            }
         }
-    }*/
+    } 
+    if (!invalidLines.empty()) {
+        m_statusMessage = invalidLines;
+        return false;
+    }
+
     return true;
 }
 
 void Compiler::buildAST() {
     
 }
+
 bool Compiler::analyzeSemantics() {
     return true;
 }
+
 void Compiler::generateCode() {
 }

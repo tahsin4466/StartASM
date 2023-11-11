@@ -18,9 +18,10 @@ jump unconditionally to i[3]
 jump if greater to i[8]
 jump if less to i[0]
 jump if equal to 'myFunc'
-jump if not equal to i[0032149]
+jump if not equal to 'myFunc'
 jump if zero to i[7]
-jump if not zero to i[8]
+jump if not zero to i[000008]
+call to 'myFunc'
 push r8
 pop to r6
 return
