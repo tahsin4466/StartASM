@@ -3,7 +3,6 @@
 #include <iostream>
 #include <regex>
 #include <string>
-#include <sstream>
 #include <functional>
 
 using namespace std;
@@ -33,15 +32,10 @@ InstructionSet::InstructionSet() {
 }
 
 string InstructionSet::validateInstruction(string line, vector<string> tokens) {
-    // Extract the keyword from the line
-    istringstream iss(line);
-    string keyword;
-    iss >> keyword;
-
     //If keyword doesn't match, return error
-    auto itr = m_parsingMap.find(keyword);
+    auto itr = m_parsingMap.find(tokens[0]);
     if (itr == m_parsingMap.end()) {
-        return "Unknown instruction '" + keyword + "'";
+        return "Unknown instruction '" + tokens[0] + "'";
     }
 
     return itr->second(line, tokens);
