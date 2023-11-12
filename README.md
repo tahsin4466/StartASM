@@ -145,7 +145,7 @@ StartASM is, as of now, fully developed in C++. The intent is for the compiler a
 ## Progress
 **Please note that StartASM is at its absolute beginning stages of development, and as such many critical features are yet to be implemented. This is a personal project by a student, and as such is being developed incrementally.**
 
-*Last updated: Tuesday, November 11, 2023*
+*Last updated: November 11, 2023*
 
 **State:** StartASM currently only consists of a compiler that validates syntax, resolves symbols and builds an AST. The provided program will tell the user whether the given code adheres to the language's syntax, scope bounds and will build an AST if adhering to the language's grammar.
 
