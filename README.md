@@ -60,7 +60,7 @@ In summary:
 
 
 ## Usage
-Download the repository and open in a code editor. Run the StartASM executable, and ensure a C++ compiler that supports OpenMP is installed (preferably G++). Create a text file with StartASM code and place it into the 'code' folder, then run the executable. When running the executable and providng a filename, omit the `.txt` part. `ExampleCode.txt` should become `ExampleCode`.
+Download the repository and open in a code editor. Run the StartASM executable, and ensure a C++ compiler that supports OpenMP is installed (preferably g++). Create a text file with StartASM code and place it into the 'code' folder, then run the executable. When running the executable and providng a filename, omit the `.txt` part. `ExampleCode.txt` should become `ExampleCode`.
 
 Here are all possible instruction combinations as of now:
 - `move (register) to (register)`
@@ -96,7 +96,7 @@ Where:
 - Labels are any word within single quotes *'likeThis'*
 - Comments are any string within double quotes *"Like this"*
 
-Check the 'code' folder for examples. 'ExampleCode' is a file that provides no syntax errors, whereas the other files are test cases for the compiler. Here is also a general example of valid StartASM code:
+Check the 'code' folder for examples. 'ExampleCode' is a file that provides no syntax errors, whereas the other files are test cases for the compiler. The 'Long' examples are for benchmarking the compiler and it's efficiency/ Here is a general example of valid StartASM code:
 
 ```
 comment "StartASM!"
@@ -107,15 +107,20 @@ store r1 to m<0234>
 or r1 with r2
 shift right logically r2 by r1
 not r1
+compare r2 with r1
 jump if greater to i[0]
+jump to 'overHere!'
 add r1 with r2 to r3
 divide r3 with r2 to r1
 pop to r3
 stop
 
+label 'overHere!'
+stop
+
 comment "EndASM! get it? haha"
 ```
-The compiler will also return syntax error messages that show the excepted line, token and what the compiler expected if applicable. For example, submitting this invalid code:
+The compiler will also return syntax and symbol/scope error messages that show the excepted line, token and what the compiler expected if applicable. For example, submitting this invalid code:
 ``` 
 shift right logically r2 with r1
 junk r1
@@ -140,13 +145,13 @@ StartASM is, as of now, fully developed in C++. The intent is for the compiler a
 ## Progress
 **Please note that StartASM is at its absolute beginning stages of development, and as such many critical features are yet to be implemented. This is a personal project by a student, and as such is being developed incrementally.**
 
-*Last updated: Tuesday, November 7, 2023*
+*Last updated: Tuesday, November 11, 2023*
 
-**State:** StartASM currently only consists of a compiler that checks for syntax. The provided program will tell the user whether the given code adheres to the language's syntax. 
+**State:** StartASM currently only consists of a compiler that validates syntax, resolves symbols and builds an AST. The provided program will tell the user whether the given code adheres to the language's syntax, scope bounds and will build an AST if adhering to the language's grammar.
 
-**Progress:** Currently working on implementing the compilation method to turn valid syntax into an AST (the class for which is complete), which will then turn into instruction objects for the runtime environment.
+**Progress:** Currently working on implementing semantic analysis and code generation via the generated AST.
 
-**Current Goal:** Finish the compiler by the end of the year.
+**Current Goal:** Finish the compiler by the end of November.
 
 ## Contact
 If you want to contact me about this project, feel free to send an email to tahsinkalkie[at]gmail[dot]com
