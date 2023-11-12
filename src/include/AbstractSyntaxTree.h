@@ -1,43 +1,13 @@
 #ifndef ABSTRACTSYNTAXTREE_H
 #define ABSTRACTSYNTAXTREE_H
 
-#include <vector>
+#include <map>
 #include <algorithm>
 #include <string>
 
 enum SemanticType {NONE, FROM, TO, SELF, FROMTO, SELFWITH, SELFBY, FROMWITHTO};
 enum OperandType {REGISTER, INSTRUCTION, MEMORY, VALUE};
 enum NumOperands {NULLARY, UNARY, BINARY, TERNARY};
-
-//AST class to handle AST nodes
-class AST {
-    public:
-        AST() {};
-        ~AST() {
-            for(int i=0; i<instructionNodes.size(); i++) {
-                delete instructionNodes[i];
-            }
-        };
-        AST(const AST&) = delete;
-        AST& operator=(const AST&) = delete;
-
-        int numInstructionNodes() {return instructionNodes.size();};
-
-        void createInstructionNode(std::string operation) {
-            instructionNodes.push_back(new NullaryNode(operation));
-        };
-        void createInstructionNode(std::string operation, std::string operand1Value, OperandType operand1Type, SemanticType semantic) {
-            instructionNodes.push_back(new UnaryNode(operation, operand1Value, operand1Type, semantic));
-        };
-        void createInstructionNode(std::string operation, std::string operand1Value, OperandType operand1Type, std::string operand2Value, OperandType operand2Type, SemanticType semantic) {
-            instructionNodes.push_back(new BinaryNode(operation, operand1Value, operand1Type, operand2Value, operand2Type, semantic));
-        };
-        void createInstructionNode(std::string operation, std::string operand1Value, OperandType operand1Type, std::string operand2Value, OperandType operand2Type, std::string operand3Value, OperandType operand3Type, SemanticType semantic) {
-            instructionNodes.push_back(new TernaryNode(operation, operand1Value, operand1Type, operand2Value, operand2Type, operand3Value, operand3Type, semantic));
-        };
-
-        std::vector<InstructionNode*> instructionNodes;
-};
 
 //Broad ASTNode
 class ASTNode {
@@ -162,6 +132,36 @@ class TernaryNode: public InstructionNode {
         OperandNode* m_operand1; 
         OperandNode* m_operand2;
         OperandNode* m_operand3;
+};
+
+//AST class to handle AST nodes
+class AST {
+    public:
+        AST() {};
+        ~AST() {
+            for(int i=0; i<instructionNodes.size(); i++) {
+                delete instructionNodes[i];
+            }
+        };
+        AST(const AST&) = delete;
+        AST& operator=(const AST&) = delete;
+
+        int numInstructionNodes() {return instructionNodes.size();};
+
+        void createInstructionNode(int line, std::string operation) {
+            instructionNodes[line] = new NullaryNode(operation);
+        };
+        void createInstructionNode(int line, std::string operation, std::string operand1Value, OperandType operand1Type, SemanticType semantic) {
+            instructionNodes[line] = new UnaryNode(operation, operand1Value, operand1Type, semantic);
+        };
+        void createInstructionNode(int line, std::string operation, std::string operand1Value, OperandType operand1Type, std::string operand2Value, OperandType operand2Type, SemanticType semantic) {
+            instructionNodes[line] = new BinaryNode(operation, operand1Value, operand1Type, operand2Value, operand2Type, semantic);
+        };
+        void createInstructionNode(int line, std::string operation, std::string operand1Value, OperandType operand1Type, std::string operand2Value, OperandType operand2Type, std::string operand3Value, OperandType operand3Type, SemanticType semantic) {
+            instructionNodes[line] = new TernaryNode(operation, operand1Value, operand1Type, operand2Value, operand2Type, operand3Value, operand3Type, semantic);
+        };
+
+        std::map<int, InstructionNode*> instructionNodes;
 };
 
 #endif

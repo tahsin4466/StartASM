@@ -1,5 +1,6 @@
 #include "include/Compiler.h"
 #include "include/InstructionSet.h"
+#include "include/AbstractSyntaxTree.h"
 
 #include <iostream>
 #include <vector>
@@ -9,6 +10,7 @@
 #include <sstream>
 #include <map>
 #include <regex>
+#include <utility>
 
 using namespace std;
 
@@ -16,12 +18,14 @@ Compiler::Compiler(std::string pathname):
     m_pathname(pathname),
     m_statusMessage(""),
     m_lineIndex(0),
-    m_instructionSet(new InstructionSet()) {
+    m_instructionSet(new InstructionSet()),
+    m_AST(new AST()) {
 
 };
 
 Compiler::~Compiler() {
     delete m_instructionSet;
+    delete m_AST;
 }
 
 bool Compiler::compileCode() {
@@ -175,7 +179,63 @@ bool Compiler::resolveSymbols() {
 }
 
 void Compiler::buildAST() {
+    //Use OMP to parallelize line reading to build the AST
+    //AST will store nodes in ordered state
+    #pragma omp parallel for
+    for(int i=0; i<m_codeLines.size(); i++) {
+        //Declare all necessary info to build each AST node
+        string instructionKeyword;
+        NumOperands instructionOperands;
+        SemanticType instructionSemantic;
+        vector<pair<string, OperandType>> operands;
 
+        //Grab instruction keyword (first token)
+        instructionKeyword = m_codeTokens[i][0];
+        //Grab operand and semantic info from instructionSet (stored as pair)
+        instructionOperands = m_instructionSet->returnInstructionInfo(instructionKeyword).first;
+        instructionSemantic = m_instructionSet->returnInstructionInfo(instructionKeyword).second;
+
+        //Loop through rest of tokens to search for operands
+        //Do NOT use OMP as operand order must be preserved
+        for (int j=1; j<m_codeTokens[i].size(); j++) {
+            //Check token against all regex templates for operands in InstructionSet
+            for(int k=0; k<m_instructionSet->getNumOperands(); k++) {
+                regex operandTemplate(m_instructionSet->returnOperandInfo(k).first);
+                if (regex_match(m_codeTokens[i][j], operandTemplate)) {
+                    //Push back operand vector with a copy of operand and its info
+                    operands.push_back(make_pair(m_codeTokens[i][j], m_instructionSet->returnOperandInfo(k).second));
+                    //Terminate the loop (saves a few cycles)
+                    k = m_instructionSet->getNumOperands();
+                }
+            }
+        }
+
+        //Critical OMP section
+        //Map insertion is NOT thread safe, each thread must modify AST one at a time
+        #pragma omp critical
+        {
+            //Insert nullary, unary, binary or ternary node into AST depending on the number of operands specified by
+            //the instruction
+            switch(instructionOperands) {
+                //Switch statement calls overloaded constructors for nodes in AST class
+                case 0:
+                    m_AST->createInstructionNode(i, instructionKeyword);
+                    break;
+                case 1:
+                    m_AST->createInstructionNode(i, instructionKeyword, operands[0].first, operands[0].second, instructionSemantic);
+                    break;
+                case 2:
+                    m_AST->createInstructionNode(i, instructionKeyword, operands[0].first, operands[0].second, operands[1].first, operands[1].second, instructionSemantic);
+                    break;
+                case 3:
+                    m_AST->createInstructionNode(i,instructionKeyword, operands[0].first, operands[0].second, operands[1].first, operands[1].second, operands[2].first, operands[2].second, instructionSemantic);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+    }
 }
 
 bool Compiler::analyzeSemantics() {

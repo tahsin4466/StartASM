@@ -51,14 +51,10 @@ InstructionSet::InstructionSet() {
     m_instructionMap.emplace("comment", make_pair(NULLARY, NONE));
     m_instructionMap.emplace("label", make_pair(NULLARY, NONE));
     
-    m_operandMap.emplace("r[0-9]", REGISTER);
-    m_operandMap.emplace("m<[0-9]{1,7}>", MEMORY);
-    m_operandMap.emplace("i\\[[0-9]{1,7}\\]", INSTRUCTION);
-    m_operandMap.emplace("\\d+", VALUE);
-
-    m_conjunctionSet.insert("to");
-    m_conjunctionSet.insert("with");
-    m_conjunctionSet.insert("by");
+    m_operandList.push_back(make_pair("r[0-9]", REGISTER));
+    m_operandList.push_back(make_pair("m<[0-9]{1,7}>", MEMORY));
+    m_operandList.push_back(make_pair("i\\[[0-9]{1,7}\\]", INSTRUCTION));
+    m_operandList.push_back(make_pair("\\d+", VALUE));
 
 }
 
@@ -70,6 +66,11 @@ string InstructionSet::validateInstruction(string line, vector<string> tokens) {
     }
 
     return itr->second(line, tokens);
+}
+
+pair<NumOperands, SemanticType>& InstructionSet::returnInstructionInfo(string instructionKeyword) {
+    auto itr = m_instructionMap.find(instructionKeyword);
+    return itr->second;
 }
 
 string InstructionSet::parseMove(string line, vector<string> tokens) {

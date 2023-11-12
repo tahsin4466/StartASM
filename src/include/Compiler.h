@@ -8,6 +8,7 @@
 #include <utility>
 
 class InstructionSet;
+class AST;
 
 class Compiler {
     public:
@@ -80,6 +81,8 @@ class Compiler {
         int m_lineIndex;
         //Instruction set
         InstructionSet* m_instructionSet;
+        //Abstract Syntax Tree
+        AST* m_AST;
     
         
 };

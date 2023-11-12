@@ -7,10 +7,7 @@
 #include <unordered_set>
 #include <iostream>
 #include <functional>
-
-enum SemanticType {NONE, FROM, TO, SELF, FROMTO, SELFWITH, SELFBY, FROMWITHTO};
-enum OperandType {REGISTER, INSTRUCTION, MEMORY, VALUE};
-enum NumOperands {NULLARY, UNARY, BINARY, TERNARY};
+#include "AbstractSyntaxTree.h"
 
 class InstructionSet {
     public:
@@ -18,21 +15,31 @@ class InstructionSet {
         InstructionSet();
         ~InstructionSet() {};
 
+        //Delete copy and assignment
         InstructionSet(const InstructionSet&) = delete;
         InstructionSet& operator=(const InstructionSet&) = delete;
 
+        //Getters
+        //Get num operands
+        int getNumOperands() {return m_operandList.size();};
+        //Get num instructions
+        int getNumInstructions() {return m_instructionMap.size();};
+
+        //Validate instruction method
         std::string validateInstruction(std::string line, std::vector<std::string> tokens);
 
+        //Return pair of operand type and semantic type for given instruction
+        std::pair<NumOperands, SemanticType>& returnInstructionInfo(std::string instructionKeyword);
+        //Return pair of regex template and operand type for operand
+        std::pair<std::string, OperandType>& returnOperandInfo(int index) {return m_operandList.at(index);};
 
     private:
         //Hash map containing a keyword linked to a parsing function
         std::unordered_map<std::string, std::function<std::string(std::string, std::vector<std::string>)>> m_parsingMap;
         //Hash map containing a set of instruction keywords
         std::unordered_map<std::string, std::pair<NumOperands, SemanticType>> m_instructionMap;
-        //Hash map containing a set of operand regex templates
-        std::unordered_map<std::string, OperandType> m_operandMap;
-        //Hash map containing a set of conjunction keywords
-        std::unordered_set<std::string> m_conjunctionSet;
+        //Vector containing a set of operand regex templates
+        std::vector<std::pair<std::string, OperandType>> m_operandList;
 
         //Private Parsing Functions
         static std::string parseMove(std::string line, std::vector<std::string> tokens);
