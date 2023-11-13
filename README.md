@@ -143,7 +143,7 @@ Unknown source 'm<1>'. Expected register r0-r9
 StartASM is, as of now, fully developed in C++. The intent is for the compiler and runtime environment to be built using C++, while the front end will be built using Electron and node.js. This project also uses OpenMP multithreading to improve performance.
 
 ## Progress
-**Please note that StartASM is at its absolute beginning stages of development, and as such many critical features are yet to be implemented. This is a personal project by a student, and as such is being developed incrementally.**
+**Please note that StartASM is still in early development, and as such many critical features are yet to be implemented. This is a personal project by a student, and as such is being developed incrementally.**
 
 *Last updated: November 11, 2023*
 
