@@ -12,6 +12,8 @@ InstructionSet::InstructionSet() {
     m_parsingMap.emplace("move", parseMove);
     m_parsingMap.emplace("load", parseLoad);
     m_parsingMap.emplace("store", parseStore);
+    m_parsingMap.emplace("create", parseCreate);
+    m_parsingMap.emplace("cast", parseCast);
     m_parsingMap.emplace("add", parseAdd);
     m_parsingMap.emplace("sub", parseSub);
     m_parsingMap.emplace("multiply", parseMultiply);
@@ -33,6 +35,8 @@ InstructionSet::InstructionSet() {
     m_instructionMap.emplace("move", make_pair(BINARY, FROMTO));
     m_instructionMap.emplace("load", make_pair(BINARY, FROMTO));
     m_instructionMap.emplace("store", make_pair(BINARY, FROMTO));
+    m_instructionMap.emplace("create", make_pair(BINARY, FROMTO));
+    m_instructionMap.emplace("cast", make_pair(UNARY, SELF));
     m_instructionMap.emplace("add", make_pair(TERNARY, FROMWITHTO));
     m_instructionMap.emplace("sub", make_pair(TERNARY, FROMWITHTO));
     m_instructionMap.emplace("multiply", make_pair(TERNARY, FROMWITHTO));
@@ -54,7 +58,11 @@ InstructionSet::InstructionSet() {
     m_operandList.push_back(make_pair("r[0-9]", REGISTER));
     m_operandList.push_back(make_pair("m<[0-9]{1,7}>", MEMORY));
     m_operandList.push_back(make_pair("i\\[[0-9]{1,7}\\]", INSTRUCTION));
-    m_operandList.push_back(make_pair("\\d+", VALUE));
+    m_operandList.push_back(make_pair("-?[1-9][0-9]{0,9}|0", INT));
+    m_operandList.push_back(make_pair("-?\\d+\\.\\d+", FLOAT));
+    m_operandList.push_back(make_pair(".", CHAR));
+    m_operandList.push_back(make_pair("(true|false|0|1)", BOOL));
+
 
 }
 
@@ -106,10 +114,9 @@ string InstructionSet::parseMove(string line, vector<string> tokens) {
 }
 
 string InstructionSet::parseLoad(string line, vector<string> tokens) {
-    regex lineTemplate("load (m<[0-9]{1,7}>|\\d+) to r[0-9]");
+    regex lineTemplate("load m<[0-9]{1,9}> to r[0-9]");
     regex registerTemplate("r[0-9]");
-    regex memoryTemplate("m<[0-9]{1,7}>");
-    regex valueTemplate("\\d+");
+    regex memoryTemplate("m<[0-9]{1,9}>");
 
     if (regex_match(line, lineTemplate)) {
         return ("");
@@ -118,8 +125,8 @@ string InstructionSet::parseLoad(string line, vector<string> tokens) {
         if((tokens.size() != 4)) {
             return "Incomplete syntax for load instruction. Expected: load (memory/value) to (register)";
         }
-        else if(!regex_match(tokens[1], memoryTemplate) && !regex_match(tokens[1], valueTemplate)) {
-            return "Unknown source '" + tokens[1] + "'. Expected memory address m<000000-999999> or integer value";
+        else if(!regex_match(tokens[1], memoryTemplate)) {
+            return "Unknown source '" + tokens[1] + "'. Expected memory address m<000000-999999>";
         }
         else if(tokens[2]!="to") {
             return "Unknown conjunction '" + tokens[2] + "'. Expected 'to'";
@@ -134,9 +141,9 @@ string InstructionSet::parseLoad(string line, vector<string> tokens) {
 }
 
 string InstructionSet::parseStore(string line, vector<string> tokens) {
-    regex lineTemplate("store r[0-9] to m<[0-9]{1,7}>");
+    regex lineTemplate("store r[0-9] to m<[0-9]{1,9}>");
     regex registerTemplate("r[0-9]");
-    regex memoryTemplate("m<[0-9]{1,7}>");
+    regex memoryTemplate("m<[0-9]{1,9}>");
 
     if (regex_match(line, lineTemplate)) {
         return "";
@@ -151,10 +158,60 @@ string InstructionSet::parseStore(string line, vector<string> tokens) {
             return "Unknown conjunction '" + tokens[2] + "'. Expected 'to'";
         } 
         else if (!regex_match(tokens[3], memoryTemplate)) {
-            return "Unknown destination '" + tokens[3] + "'. Expected memory address m<000000-999999>";
+            return "Unknown destination '" + tokens[3] + "'. Expected memory address m<0-999999999>";
         } 
         else {
             return "Compiler exception encountered for store instruction";
+        }
+    }
+}
+
+string InstructionSet::parseCreate(string line, vector<string> tokens) {
+    if (tokens.size() < 2) {
+        return "Missing cast type for create instruction. Expected 'integer', 'float', 'character', 'boolean' or 'address'.";
+    }
+    else {
+        if (tokens[1] == "integer") {
+            return (parseCreateInteger(line, tokens));
+        }
+        else if (tokens[1] == "float") {
+            return (parseCreateFloat(line, tokens));
+        }
+        else if (tokens[1] == "character") {
+            return (parseCreateCharacter(line, tokens));
+        }
+        else if (tokens[1] == "boolean") {
+            return (parseCreateBoolean(line, tokens));
+        }
+        else if (tokens[1] == "address") {
+            return (parseCreateAddress(line, tokens));
+        }
+        else {
+            return "Unknown cast type for create instruction. Expected 'integer', 'float', 'character', 'boolean' or 'address'";
+        }
+    }
+    return "Compiler exception encountered for create instruction";
+}
+
+string InstructionSet::parseCast(string line, vector<string> tokens) {
+    regex lineTemplate("cast (integer|boolean|character|float|address) r[0-9]");
+    regex registerTemplate("r[0-9]");
+
+    if (regex_match(line, lineTemplate)) {
+        return ("");
+    }
+    else {
+        if((tokens.size() != 3)) {
+            return "Incomplete syntax for cast instruction. Expected: cast integer/float/boolean/character/address (register)";
+        }
+        else if (tokens[1]!="integer" && tokens[1]!="boolean" && tokens[1]!="character" && tokens[1]!="float" && tokens[1]!="address") {
+            return "Unknown data type. Expected integer/float/boolean/character/address";
+        }
+        else if(!regex_match(tokens[2], registerTemplate)) {
+            return "Unknown source/destination '" + tokens[2] + "'. Expected register r0-r9";
+        }
+        else {
+            return "Compiler exception encountered for cast instruction";
         }
     }
 }
@@ -446,8 +503,8 @@ string InstructionSet::parseJump(string line, vector<string> tokens) {
 }
 
 string InstructionSet::parseCall(string line, vector<string> tokens) {
-    regex lineTemplate("call to (i\\[[0-9]{1,7}\\]|'([^']+)')");
-    regex instructionTemplate("i\\[[0-9]{1,7}\\]");
+    regex lineTemplate("call to (i\\[[0-9]{1,9}\\]|'([^']+)')");
+    regex instructionTemplate("i\\[[0-9]{1,9}\\]");
     regex labelTemplate("'([^']+)'");
 
     if (regex_match(line, lineTemplate)) {
@@ -461,7 +518,7 @@ string InstructionSet::parseCall(string line, vector<string> tokens) {
             return "Unknown conjunction '" + tokens[1] + "'. Expected 'to'";
         }
         else if(!regex_match(tokens[2], instructionTemplate) && !regex_match(tokens[2], labelTemplate)) {
-            return "Unknown destination '" + tokens[2] + "'. Expected instruction address i[000000-999999] or label (single word)";
+            return "Unknown destination '" + tokens[2] + "'. Expected instruction address i[0-999999999] or label";
         }
         else {
             return "Compiler exception encountered for call instruction";
@@ -590,8 +647,8 @@ string InstructionSet::parseComment(string line, vector<string> tokens) {
 
 //Jump parsing helper function
 string InstructionSet::parseUnconditionalJump(string line, vector<string> tokens) {
-    regex lineTemplate("jump unconditionally to (i\\[[0-9]{1,7}\\]|'([^']+)')");
-    regex instructionTemplate("i\\[[0-9]{1,7}\\]");
+    regex lineTemplate("jump unconditionally to (i\\[[0-9]{1,9}\\]|'([^']+)')");
+    regex instructionTemplate("i\\[[0-9]{1,9}\\]");
     regex labelTemplate("'([^']+)'");
 
     if (regex_match(line, lineTemplate)) {
@@ -608,7 +665,7 @@ string InstructionSet::parseUnconditionalJump(string line, vector<string> tokens
             return "Unknown conjunction '" + tokens[2] + "'. Expected 'to'";
         }
         else if(!regex_match(tokens[3], instructionTemplate) && !regex_match(tokens[3], labelTemplate)) {
-            return "Unknown destination '" + tokens[3] + "'. Expected instruction address i[000000-999999] or label (single word)";
+            return "Unknown destination '" + tokens[3] + "'. Expected instruction address i[0-999999999] or label (single word)";
         }
         else {
             return "Compiler exception encountered for unconditional jump instruction";
@@ -617,8 +674,8 @@ string InstructionSet::parseUnconditionalJump(string line, vector<string> tokens
 }
 
 string InstructionSet::parseConditionalJump(string line, vector<string> tokens) {
-    regex lineTemplate("jump if (greater|less|equal|zero) to (i\\[[0-9]{1,7}\\]|'([^']+)')");
-    regex instructionTemplate("i\\[[0-9]{1,7}\\]");
+    regex lineTemplate("jump if (greater|less|equal|zero) to (i\\[[0-9]{1,9}\\]|'([^']+)')");
+    regex instructionTemplate("i\\[[0-9]{1,9}\\]");
     regex labelTemplate("'([^']+)'");
 
     if (regex_match(line, lineTemplate)) {
@@ -638,7 +695,7 @@ string InstructionSet::parseConditionalJump(string line, vector<string> tokens) 
             return "Unknown conjunction '" + tokens[3] + "'. Expected 'to'";
         }
         else if(!regex_match(tokens[4], instructionTemplate) && !regex_match(tokens[4], labelTemplate)) {
-            return "Unknown destination '" + tokens[4] + "'. Expected instruction address i[000000-999999] or label (single word)";
+            return "Unknown destination '" + tokens[4] + "'. Expected instruction address i[0-999999999] or label";
         }
         else {
             return "Compiler exception encountered for conditional jump instruction";
@@ -647,8 +704,8 @@ string InstructionSet::parseConditionalJump(string line, vector<string> tokens) 
 }
 
 string InstructionSet::parseConditionalComplementJump(string line, vector<string> tokens) {
-    regex lineTemplate("jump if not (equal|zero) to (i\\[[0-9]{1,7}\\]|'([^']+)')");
-    regex instructionTemplate("i\\[[0-9]{1,7}\\]");
+    regex lineTemplate("jump if not (equal|zero) to (i\\[[0-9]{1,9}\\]|'([^']+)')");
+    regex instructionTemplate("i\\[[0-9]{1,9}\\]");
     regex labelTemplate("'([^']+)'");
 
     if (regex_match(line, lineTemplate)) {
@@ -671,10 +728,145 @@ string InstructionSet::parseConditionalComplementJump(string line, vector<string
             return "Unknown conjunction '" + tokens[4] + "'. Expected 'to'";
         }
         else if(!regex_match(tokens[5], instructionTemplate) && !regex_match(tokens[5], labelTemplate)) {
-            return "Unknown destination '" + tokens[5] + "'. Expected instruction address i[000000-999999] or label (single word)";
+            return "Unknown destination '" + tokens[5] + "'. Expected instruction address i[0-999999999] or label";
         }
         else {
             return "Compiler exception encountered for complemented conditional jump instruction";
         }
     }
 } 
+
+//Create parsing helper functions
+string InstructionSet::parseCreateInteger(string line, vector<string> tokens) {
+    regex lineTemplate("create integer (-?[1-9][0-9]{0,9}|) to r[0-9]");
+    regex registerTemplate("r[0-9]");
+    regex integerTemplate("-?[1-9][0-9]{0,9}|0");
+
+    if (regex_match(line, lineTemplate)) {
+        return ("");
+    }
+    else {
+        if((tokens.size() != 5)) {
+            return "Incomplete syntax for create integer instruction. Expected: create integer (integer) to (register)";
+        }
+        else if(!regex_match(tokens[2], integerTemplate)) {
+            return "Unknown source '" + tokens[2] + "'. Expected integer up to 10 digits";
+        }
+        else if(tokens[3]!="to") {
+            return "Unknown conjunction '" + tokens[3] + "'. Expected 'to'";
+        }
+        else if(!regex_match(tokens[4], registerTemplate)) {
+            return "Unknown destination '" + tokens[4] + "'. Expected register r0-r9";
+        }
+        else {
+            return "Compiler exception encountered for create integer instruction";
+        }
+    }
+}
+
+string InstructionSet::parseCreateFloat(string line, vector<string> tokens) {
+    regex lineTemplate("create float (-?\\d+\\.\\d+) to r[0-9]");
+    regex registerTemplate("r[0-9]");
+    regex floatTemplate("-?\\d+\\.\\d+");
+
+    if (regex_match(line, lineTemplate)) {
+        return ("");
+    }
+    else {
+        if((tokens.size() != 5)) {
+            return "Incomplete syntax for create float instruction. Expected: create float (float) to (register)";
+        }
+        else if(!regex_match(tokens[2], floatTemplate)) {
+            return "Unknown source '" + tokens[2] + "'. Expected float up to 8 digits";
+        }
+        else if(tokens[3]!="to") {
+            return "Unknown conjunction '" + tokens[3] + "'. Expected 'to'";
+        }
+        else if(!regex_match(tokens[4], registerTemplate)) {
+            return "Unknown destination '" + tokens[4] + "'. Expected register r0-r9";
+        }
+        else {
+            return "Compiler exception encountered for create float instruction";
+        }
+    }
+}
+
+string InstructionSet::parseCreateCharacter(string line, vector<string> tokens) {
+    regex lineTemplate("create character (.) to r[0-9]");
+    regex registerTemplate("r[0-9]");
+    regex characterTemplate(".");
+
+    if (regex_match(line, lineTemplate)) {
+        return ("");
+    }
+    else {
+        if((tokens.size() != 5)) {
+            return "Incomplete syntax for create character instruction. Expected: create character (character) to (register)";
+        }
+        else if(!regex_match(tokens[2], characterTemplate)) {
+            return "Unknown source '" + tokens[2] + "'. Expected single character";
+        }
+        else if(tokens[3]!="to") {
+            return "Unknown conjunction '" + tokens[3] + "'. Expected 'to'";
+        }
+        else if(!regex_match(tokens[4], registerTemplate)) {
+            return "Unknown destination '" + tokens[4] + "'. Expected register r0-r9";
+        }
+        else {
+            return "Compiler exception encountered for create character instruction";
+        }
+    }
+}
+
+string InstructionSet::parseCreateBoolean(string line, vector<string> tokens) {
+    regex lineTemplate("create boolean (true|false|0|1) to r[0-9]");
+    regex registerTemplate("r[0-9]");
+
+    if (regex_match(line, lineTemplate)) {
+        return ("");
+    }
+    else {
+        if((tokens.size() != 5)) {
+            return "Incomplete syntax for create boolean instruction. Expected: create boolean (boolean) to (register)";
+        }
+        else if(tokens[2]!="true" && tokens[2]!="false" && tokens[2]!="0" && tokens[2]!="1") {
+            return "Unknown source '" + tokens[2] + "'. Expected true/false";
+        }
+        else if(tokens[3]!="to") {
+            return "Unknown conjunction '" + tokens[3] + "'. Expected 'to'";
+        }
+        else if(!regex_match(tokens[4], registerTemplate)) {
+            return "Unknown destination '" + tokens[4] + "'. Expected register r0-r9";
+        }
+        else {
+            return "Compiler exception encountered for create boolean instruction";
+        }
+    }
+}
+
+string InstructionSet::parseCreateAddress(string line, vector<string> tokens) {
+    regex lineTemplate("create address m<[0-9]{1,9}> to r[0-9]");
+    regex registerTemplate("r[0-9]");
+    regex memoryTemplate("m<[0-9]{1,9}>");
+
+    if (regex_match(line, lineTemplate)) {
+        return ("");
+    }
+    else {
+        if((tokens.size() != 5)) {
+            return "Incomplete syntax for create address instruction. Expected: create address (memory) to (register)";
+        }
+        else if(!regex_match(tokens[2], memoryTemplate)) {
+            return "Unknown source '" + tokens[2] + "'. Expected memory address m<0-999999999>";
+        }
+        else if(tokens[3]!="to") {
+            return "Unknown conjunction '" + tokens[3] + "'. Expected 'to'";
+        }
+        else if(!regex_match(tokens[4], registerTemplate)) {
+            return "Unknown destination '" + tokens[4] + "'. Expected register r0-r9";
+        }
+        else {
+            return "Compiler exception encountered for create address instruction";
+        }
+    }
+}

@@ -6,11 +6,11 @@
 #include <string>
 
 enum SemanticType {NONE, FROM, TO, SELF, FROMTO, SELFWITH, SELFBY, FROMWITHTO};
-enum OperandType {REGISTER, INSTRUCTION, MEMORY, VALUE};
+enum OperandType {REGISTER, INSTRUCTION, MEMORY, INT, FLOAT, CHAR, BOOL};
 enum NumOperands {NULLARY, UNARY, BINARY, TERNARY};
 
 //Broad ASTNode
-class ASTNode {
+class ASTNode { 
     public:
         virtual std::string getNodeValue() {return m_nodeValue;};
 

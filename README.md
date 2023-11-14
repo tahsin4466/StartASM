@@ -11,14 +11,16 @@ StartASM was created after personally struggling learning x86 as a complete newc
 
 ## Features
 StartASM will be composed of three parts:
-- A custom compiler, written in C++, that validates and compiles StartASM code into intermediate instructions
-- A full simulator and runtime environment written in C++, complete with registers and memory data structures, capable of executing StartASM instructions
-- A custom IDE, built using Electron, to provide a visual development environment
+- A custom compiler, written in C++, that validates and compiles StartASM code into intermediate instruction objects
+- A full 32 bit simulator and runtime environment written in C++ - complete with registers and memory data structures - capable of executing StartASM instructions
+- A custom IDE - built using Electron - to provide a visual development environment
 
-The language is based on a load-store model, with seperate program and insruction memory (Harvard) in a big-endian layout. The runtime environment will also feature 10 registers, up to 1 MB of both program and instruction memory as well as a simple stack. The following operations will be supported:
+The language is based on a load-store model, with seperate program and insruction memory (Harvard) in a big-endian layout. The runtime environment will also feature 10 registers, 32 bit addressable memory and instruction pools as well as a simple stack. The following operations will be supported:
 - move (between registers)
-- load (data/memory to register)
+- load (memory to register)
 - store (register to memory)
+- create (value to register)
+- cast (register)
 - arithmetic (add, sub, multiply, divide)
 - bitwise operations (and, or, not)
 - bitwise shift (left/right, logical/arithmetic)
@@ -26,17 +28,17 @@ The language is based on a load-store model, with seperate program and insructio
 - jump (conditional and unconditional)
 - call (unconditional)
 - stack manipulation (push and pop)
-- labels (Denoted with '')
-- comments (Denoted with "")
+- labels (Denoted with ' ')
+- comments (Denoted with " ")
 
 One of the main features of StartASM is its abstraction to reduce barrier of entry. This includes:
-- Ability to cast data rather than working with raw hex
-- Automatically handled dyamic memory allocation
-- Simplified data and storage models
+- Datatypes (ints, floats, bools, chars, addresses) that eliminates the need to interpret hex directly
+- A static type system with enforced type safety while allowing users to 'cast' data (interpret the byte sequence differently) 
+- Simplified memory model aligned to 32 bits for every datatype
 
 
 ## Syntax
-StartASM is designed to be as close to plain English as possible. The syntax trades away traditional opcode mnemonics used in most ASM's in favor of readable syntax closer to high-level languages. This includes the use of full-word instructions, transitional conjunctions to demonstrate operand relationships, and clearly denoted register (`r0`-`r9`), memory (`m<000000>`-`m<999999>`) and instruction memory (`i[000000]`-`i[999999]`) operands. For example:
+StartASM is designed to be as close to plain English as possible. The syntax trades away traditional opcode mnemonics used in most ASM's in favor of readable syntax closer to high-level languages. This includes the use of full-word instructions, transitional conjunctions to demonstrate operand relationships, and clearly denoted register (`r0`-`r9`), memory (`m<0>`-`m<999999999>`) and instruction memory (`i[0]`-`i[999999999]`) operands. For example:
 
 `move r1 to r2`
 - Denotes the instruction first `move`
@@ -53,10 +55,19 @@ For a more complex example:
 - Provides a transitional conjunction to show relationship as attribute of instruction `by`
 - Sates explicitly the attribute operand `r2`
 
+StartASM will enforce type safety as checked at compile time. For example:
+
+`add r1 with r2 to r3`
+
+- Will throw an exception if r1 and r2 are not tracked to be of the same datatype
+- Will cast r3 into the datatype of the result
+- Will perform the correct addition operation for the given datatypes (integer arithmetic, floating point arithmetic, etc.)
+
 In summary:
 - Transitional conjunctions are used to show operand relationships (except for source/self operands, in which it is implicit for a natural language feel). e.g. `from`, `to`, `with`, `by`. Conditionals are denoted by `if`
 - Operands are stated explicitly and numerically. e.g. `r0`, `m<39>`
 - Base instructions are stated in full, with all instruction conditions also stated in full (no mnemonics). e.g. `move`, `shift left logically`
+- Types are stated and enforced, but flexibile in allowing reinterpretations of the same byte value
 
 
 ## Usage
@@ -64,8 +75,10 @@ Download the repository and open in a code editor. Run the StartASM executable, 
 
 Here are all possible instruction combinations as of now:
 - `move (register) to (register)`
-- `load (memory/value) to (register)`
+- `load (memory) to (register)`
 - `store (register) to (memory)`
+- `create integer/float/boolean/character (value) to (register)`
+- `cast integer/float/boolean/character/address (register)`
 - `add (register) with (register) to (register)`
 - `sub (register) with (register) to (register)`
 - `multiply (register) with (register) to (register)`
@@ -73,10 +86,8 @@ Here are all possible instruction combinations as of now:
 - `or (register) with (register)`
 - `and (register) with (register)`
 - `not (register)`
-- `shift left arithmetically (register) by (register)`
-- `shift left logically (register) by (register)`
-- `shift right arithmetically (register) by (register)`
-- `shift right logically (register) by (register)`
+- `shift left logically/arithmetically (register) by (register)`
+- `shift right logically/arithmetically (register) by (register)`
 - `compare (register) with (register)`
 - `jump unconditionally to (instruction/label)`
 - `jump if (greater/less/equal/zero) to (instruction/label)`
@@ -91,8 +102,8 @@ Here are all possible instruction combinations as of now:
 
 Where: 
 - Registers are `r0`-`r9`
-- Memory addresses are `m<000000>` to `m<999999>`, with each value being a byte (can be variable length)
-- Instruction addresses are `i[000000] to i[999999]`, with each value being an instruction (can be variable length)
+- Memory addresses are `m<0>` to `m<999999999>`, with each value being 4 bytes in program memory
+- Instruction addresses are `i[0] to i[999999999]`, with each value being a 4 byte instruction
 - Labels are any word within single quotes *'likeThis'*
 - Comments are any string within double quotes *"Like this"*
 
@@ -151,7 +162,7 @@ StartASM is, as of now, fully developed in C++. The intent is for the compiler a
 
 **Progress:** Currently working on implementing semantic analysis and code generation via the generated AST.
 
-**Current Goal:** Finish the compiler by the end of November.
+**Current Goal:** Finish the compiler by the end of the year.
 
 ## Contact
 If you want to contact me about this project, feel free to send an email to tahsinkalkie[at]gmail[dot]com

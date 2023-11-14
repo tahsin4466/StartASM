@@ -45,6 +45,8 @@ class InstructionSet {
         static std::string parseMove(std::string line, std::vector<std::string> tokens);
         static std::string parseLoad(std::string line, std::vector<std::string> tokens);
         static std::string parseStore(std::string line, std::vector<std::string> tokens);
+        static std::string parseCreate(std::string line, std::vector<std::string> tokens);
+        static std::string parseCast(std::string line, std::vector<std::string> tokens);
         static std::string parseAdd(std::string line, std::vector<std::string> tokens);
         static std::string parseSub(std::string line, std::vector<std::string> tokens);
         static std::string parseMultiply(std::string line, std::vector<std::string> tokens);
@@ -63,10 +65,17 @@ class InstructionSet {
         static std::string parseLabel(std::string line, std::vector<std::string> tokens);
         static std::string parseComment(std::string line, std::vector<std::string> tokens);
 
-        //Helper Parsing Functions
+        //Helper Jump Parsing Functions
         static std::string parseUnconditionalJump(std::string line, std::vector<std::string> tokens);
         static std::string parseConditionalJump(std::string line, std::vector<std::string> tokens);
         static std::string parseConditionalComplementJump(std::string line, std::vector<std::string> tokens);
+
+        //Helper Create Parsing Functions
+        static std::string parseCreateInteger(std::string line, std::vector<std::string> tokens);
+        static std::string parseCreateFloat(std::string line, std::vector<std::string> tokens);
+        static std::string parseCreateCharacter(std::string line, std::vector<std::string> tokens);
+        static std::string parseCreateBoolean(std::string line, std::vector<std::string> tokens);
+        static std::string parseCreateAddress(std::string line, std::vector<std::string> tokens);
 };
 
 #endif

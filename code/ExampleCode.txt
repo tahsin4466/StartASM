@@ -1,5 +1,4 @@
 move r1 to r2
-load 8 to r5
 load m<435> to r2
 store r6 to m<0234>
 add r1 with r2 to r2
@@ -28,3 +27,30 @@ return
 stop
 label 'myFunc'
 comment "This is a comment"
+
+label 'start'
+move r1 to r2
+load m<0> to r3
+create integer 8 to r8
+create integer 8 to r8
+create float 3.555553 to r9
+create character a to r5
+create address m<0000> to r4
+create boolean 0 to r6
+create boolean false to r6
+jump unconditionally to 'myFunc'
+
+label 'myFunc'
+compare r1 with r2
+jump if greater to 'comparison'
+store r1 to m<1>
+stop
+
+label 'comparison'
+comment "This is just to see if r1 is greater than r2"
+cast float r1
+cast float r2
+add r1 with r2 to r7
+compare r2 with r7
+jump if not zero to 'comparison'
+stop
