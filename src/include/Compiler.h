@@ -61,6 +61,9 @@ class Compiler {
         //Generate the code
         void generateCode();
 
+        //Semantic checking helper functions
+        
+
         //Private variables
         //Data structures
         //Vector containing code lines

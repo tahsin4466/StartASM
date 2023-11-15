@@ -80,7 +80,7 @@ bool Compiler::loadFile() {
 void Compiler::tokenizeCode() {
     //split each line into individual tokens
     //Do NOT leverage OMP as order must be maintained
-    for (int i = 0; i < m_codeLines.size(); i++) {
+    for (long unsigned int i = 0; i < m_codeLines.size(); i++) {
         stringstream ss(m_codeLines[i]);
         string token;
         vector<string> tokenizedLine;
@@ -133,14 +133,14 @@ bool Compiler::resolveSymbols() {
     regex labelTemplate("'([^']+)'");
 
     //Find all labels and add to the label table
-    for(int i=0; i<m_codeLines.size(); i++) {
+    for(long unsigned int i=0; i<m_codeLines.size(); i++) {
         if(m_codeTokens[i][0] == "label") {
             m_labelTable.emplace(m_codeTokens[i].back(), "i[" + to_string(i+2) + "]");
         }
     }
 
     //Check scope for addresses and resolve labels
-    for(int i=0; i<m_codeLines.size(); i++) {
+    for(long unsigned int i=0; i<m_codeLines.size(); i++) {
         //Check for all instances where an instruction address is invoked (jump and call)
         if (m_codeTokens[i][0] == "jump" || m_codeTokens[i][0] == "call") {
             //First check if address is a label
@@ -160,7 +160,7 @@ bool Compiler::resolveSymbols() {
                 //Validate that instruction address is in scope of program
                 string instructionAddress;
                 //Convert string to integer
-                for(int j=2; j<((m_codeTokens[i].back()).size()-1); j++) {
+                for(long unsigned int j=2; j<((m_codeTokens[i].back()).size()-1); j++) {
                     instructionAddress += m_codeTokens[i].back()[j];
                 }
                 //Check if address is in scope
@@ -182,7 +182,7 @@ void Compiler::buildAST() {
     //Use OMP to parallelize line reading to build the AST
     //AST will store nodes in ordered state
     #pragma omp parallel for
-    for(int i=0; i<m_codeLines.size(); i++) {
+    for(long unsigned int i=0; i<m_codeLines.size(); i++) {
         //Declare all necessary info to build each AST node
         string instructionKeyword;
         NumOperands instructionOperands;
@@ -197,7 +197,7 @@ void Compiler::buildAST() {
 
         //Loop through rest of tokens to search for operands
         //Do NOT use OMP as operand order must be preserved
-        for (int j=1; j<m_codeTokens[i].size(); j++) {
+        for (long unsigned int j=1; j<m_codeTokens[i].size(); j++) {
             //Check token against all regex templates for operands in InstructionSet
             for(int k=0; k<m_instructionSet->getNumOperands(); k++) {
                 regex operandTemplate(m_instructionSet->returnOperandInfo(k).first);

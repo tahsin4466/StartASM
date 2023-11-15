@@ -139,7 +139,7 @@ class AST {
     public:
         AST() {};
         ~AST() {
-            for(int i=0; i<instructionNodes.size(); i++) {
+            for(long unsigned int i=0; i<instructionNodes.size(); i++) {
                 delete instructionNodes[i];
             }
         };

@@ -126,7 +126,7 @@ string InstructionSet::parseLoad(string line, vector<string> tokens) {
             return "Incomplete syntax for load instruction. Expected: load (memory/value) to (register)";
         }
         else if(!regex_match(tokens[1], memoryTemplate)) {
-            return "Unknown source '" + tokens[1] + "'. Expected memory address m<000000-999999>";
+            return "Unknown source '" + tokens[1] + "'. Expected memory address m<0-999999999>";
         }
         else if(tokens[2]!="to") {
             return "Unknown conjunction '" + tokens[2] + "'. Expected 'to'";
