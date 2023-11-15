@@ -1,92 +1,86 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#include "ParseTree.h"
+
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <iostream>
 #include <functional>
+#include <regex>
 
 class Parser {
     public:
         //Constructor and destructor
         Parser();
-        ~Parser() {};
+        ~Parser() {delete m_parseTree;};
 
         //Delete copy and assignment
         Parser(const Parser&) = delete;
         Parser& operator=(const Parser&) = delete;
 
         //Validate instruction method
-        std::string validateInstruction(std::vector<std::string> tokens);
+        std::string validateInstruction(int line, std::vector<std::string> tokens);
+        //Get pointer to parse tree
+        PT* getParseTree() {return m_parseTree;};
 
     private:
+        //Pointer to PT
+        PT* m_parseTree;
         //Hash map containing a keyword linked to an instruction parsing function
-        std::unordered_map<std::string, std::function<std::string(std::vector<std::string>)>> m_instructionMap;
+        std::unordered_map<std::string, std::function<std::string(PTNode*, std::vector<std::string>)>> m_instructionMap;
+        //Vector containing operand regex templates
+        std::vector<std::regex> m_operandList;
+        //Hash set containing descriptors
+        std::unordered_set<std::string> m_descriptorSet;
 
+
+        //LEVEL 1 - INSTRUCTION PARSERS
         //Instruction Parsing Functions
-        static std::string instructionMove(std::vector<std::string> tokens);
-        static std::string instructionLoad(std::vector<std::string> tokens);
-        static std::string instructionStore(std::vector<std::string> tokens);
-        static std::string instructionCreate(std::vector<std::string> tokens);
-        static std::string instructionCast(std::vector<std::string> tokens);
-        static std::string instructionAdd(std::vector<std::string> tokens);
-        static std::string instructionSub(std::vector<std::string> tokens);
-        static std::string instructionMultiply(std::vector<std::string> tokens);
-        static std::string instructionDivide(std::vector<std::string> tokens);
-        static std::string instructionOr(std::vector<std::string> tokens);
-        static std::string instructionAnd(std::vector<std::string> tokens);
-        static std::string instructionNot(std::vector<std::string> tokens);
-        static std::string instructionShift(std::vector<std::string> tokens);
-        static std::string instructionCompare(std::vector<std::string> tokens); 
-        static std::string instructionJump(std::vector<std::string> tokens);
-        static std::string instructionCall(std::vector<std::string> tokens);
-        static std::string instructionPush(std::vector<std::string> tokens);
-        static std::string instructionPop(std::vector<std::string> tokens);
-        static std::string instructionReturn(std::vector<std::string> tokens);
-        static std::string instructionStop(std::vector<std::string> tokens);
-        static std::string instructionLabel(std::vector<std::string> tokens);
-        static std::string instructionComment(std::vector<std::string> tokens);
+        std::string instructionMove(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionLoad(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionStore(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionCreate(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionCast(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionAdd(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionSub(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionMultiply(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionDivide(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionOr(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionAnd(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionNot(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionShift(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionCompare(PTNode* node, std::vector<std::string> tokens); 
+        std::string instructionJump(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionCall(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionPush(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionPop(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionReturn(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionStop(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionLabel(PTNode* node, std::vector<std::string> tokens);
+        std::string instructionComment(PTNode* node, std::vector<std::string> tokens);
 
-        //Operand Parsing Functions
-        static std::string operandRegister(std::string token);
-        static std::string operandMemory(std::string token);
-        static std::string operandInstruction(std::string token);
-        static std::string operandInteger(std::string token);
-        static std::string operandFloat(std::string token);
-        static std::string operandBoolean(std::string token);
-        static std::string operandCharacter(std::string token);
-        static std::string operandLabel(std::string token);
-        static std::string operandComment(std::string token);
 
+        //LEVEL 2 - CONJUNCTION AND CONDITION PARSERS
         //Conjunction Parsing Functions
-        static std::string conjunctionFrom(std::string token);
-        static std::string conjunctionWith(std::string token);
-        static std::string conjunctionSelf(std::string token);
-        static std::string conjunctionTo(std::string token);
-        static std::string conjunctionBy(std::string token);
+        std::string conjunctionFrom(PTNode* node, std::vector<std::string> tokens);
+        std::string conjunctionWith(PTNode* node, std::vector<std::string> tokens);
+        std::string conjunctionSelf(PTNode* node, std::vector<std::string> tokens);
+        std::string conjunctionTo(PTNode* node, std::vector<std::string> tokens);
+        std::string conjunctionBy(PTNode* node, std::vector<std::string> tokens);
 
         //Condition Parsing Functions
-        //Shifting
-        static std::string conditionLeft(std::string token);
-        static std::string conditionRight(std::string token);
-        static std::string conditionLogically(std::string token);
-        static std::string conditionArithmetically(std::string token);
+        std::string conditionLeft(PTNode* node, std::string tokens);
+        std::string conditionRight(PTNode* node, std::string tokens);
+        std::string conditionIf(PTNode* node, std::string tokens);
+        std::string conditionExcept(PTNode* node, std::string tokens);
 
-        //Jumping
-        static std::string conditionIf(std::string token);
-        static std::string conditionNot(std::string token);
-        static std::string conditionGreater(std::string token);
-        static std::string conditionLess(std::string token);
-        static std::string conditionEqual(std::string token);
-        static std::string conditionZero(std::string token);
 
-        //Creating
-        static std::string conditionInteger(std::string token);
-        static std::string conditionFloat(std::string token);
-        static std::string conditionBool(std::string token);
-        static std::string conditionCharacter(std::string token);
-        static std::string conditionAddress(std::string token);
+        //LEVEL 3 - OPERAND AND DESCRIPTOR CHECKERS
+        bool isOperand(std::string token);
+        bool isDescriptor(std::string token);
 
 
 };

@@ -127,6 +127,7 @@ bool Compiler::validateSyntax() {
 }
 
 bool Compiler::resolveSymbols() {
+    /*
     //String for error messages
     std::string invalidLines;
     //regex template for labels
@@ -174,12 +175,12 @@ bool Compiler::resolveSymbols() {
         m_statusMessage = invalidLines;
         return false;
     }
-
+    */
     return true;
 }
 
 void Compiler::buildAST() {
-    //Use OMP to parallelize line reading to build the AST
+    /*//Use OMP to parallelize line reading to build the AST
     //AST will store nodes in ordered state
     #pragma omp parallel for
     for(long unsigned int i=0; i<m_codeLines.size(); i++) {
@@ -235,7 +236,7 @@ void Compiler::buildAST() {
             }
         }
 
-    }
+    } */
 }
 
 bool Compiler::analyzeSemantics() {

@@ -8,14 +8,16 @@
 
 enum NodeType {ROOT, GENERAL, OPERAND};
 enum GeneralType {INSTRUCTION, CONJUNCTION, CONDITION};
-enum OperandType {REGISTER, INSTRUCTION, MEMORY, INTEGER, FLOAT, BOOLEAN, CHARACTER, LABEL, COMMENT};
+enum OperandType {REGISTER, INSTRUCTIONADDRESS, MEMORYADDRESS, INTEGER, FLOAT, BOOLEAN, CHARACTER, LABEL, COMMENT};
+int NULLINDEX = -1;
 
 
 //Broad PTNode
 class PTNode { 
     public:
         //Constructor/Destructor
-        PTNode(std::string nodeValue, NodeType nodeType):
+        PTNode(int tokenIndex, std::string nodeValue, NodeType nodeType):
+            m_tokenIndex(tokenIndex),
             m_nodeValue(nodeValue),
             m_nodeType(nodeType) {};
         virtual ~PTNode() {
@@ -62,6 +64,7 @@ class PTNode {
         }
 
     protected:
+        int m_tokenIndex;
         std::string m_nodeValue;
         NodeType m_nodeType;
         std::map<int, PTNode*> m_children;
@@ -70,11 +73,11 @@ class PTNode {
 //Specialized PTNode Classes
 class RootNode: public PTNode {
     friend class PT;
-    
+
     public:
         //Constructor/Destructor
         RootNode():
-            PTNode("", ROOT) {};
+            PTNode(NULLINDEX, "", ROOT) {};
         virtual ~RootNode() {}; 
         RootNode(const RootNode&) = delete;
         RootNode& operator=(const RootNode&) = delete; 
@@ -83,8 +86,8 @@ class RootNode: public PTNode {
 class GeneralNode: public PTNode {
     public:
         //Constructor/Destructor
-        GeneralNode(std::string nodeValue, GeneralType generalType):
-            PTNode(nodeValue, GENERAL),
+        GeneralNode(int tokenIndex, std::string nodeValue, GeneralType generalType):
+            PTNode(tokenIndex, nodeValue, GENERAL),
             m_generalType(generalType) {};
         virtual ~GeneralNode() {}; 
         GeneralNode(const GeneralNode&) = delete;
@@ -100,8 +103,8 @@ class GeneralNode: public PTNode {
 class OperandNode: public PTNode {
     public:
         //Constructor/Destructor
-        OperandNode(std::string nodeValue, OperandType operandType):
-            PTNode(nodeValue, OPERAND),
+        OperandNode(int tokenIndex, std::string nodeValue, OperandType operandType):
+            PTNode(tokenIndex, nodeValue, OPERAND),
             m_operandType(operandType) {};
         virtual ~OperandNode() {};  
         OperandNode(const OperandNode&) = delete;
@@ -122,6 +125,8 @@ class PT {
         ~PT() {
             delete m_root;
         }
+        PTNode* getRoot() {return m_root;};
+        
     private:
         PTNode* m_root;
 };
