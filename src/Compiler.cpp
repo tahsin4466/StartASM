@@ -90,7 +90,6 @@ void Compiler::tokenizeCode() {
         {
             lineMap[i] = tempTokens;
         }
-        tempTokens.clear();
     }
 
     for (const auto& pair : lineMap) {

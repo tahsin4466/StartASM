@@ -33,7 +33,6 @@ Lexer::Lexer() {
     m_tokenDictionary.emplace("return", INSTRUCTION);
     m_tokenDictionary.emplace("stop", INSTRUCTION);
     m_tokenDictionary.emplace("label", INSTRUCTION);
-    m_tokenDictionary.emplace("comment", INSTRUCTION);
     //Add conjunctions to dictionary
     m_tokenDictionary.emplace("from", CONJUNCTION);
     m_tokenDictionary.emplace("with", CONJUNCTION);
@@ -66,33 +65,63 @@ Lexer::Lexer() {
     m_operandDictionary.push_back(make_pair(regex("true|false|1|0"), BOOLEAN));
     m_operandDictionary.push_back(make_pair(regex("."), CHARACTER));
     m_operandDictionary.push_back(make_pair(regex("'([^']+)'"), LABEL));
-    m_operandDictionary.push_back(make_pair(regex(R"(comment ".+")"), COMMENT));
 }
 
 vector<pair<string, TokenType>> Lexer::tokenizeLine(string line) {
+    //Create a stringstream for the line, a temporary token string, and the return vector
     stringstream ss(line);
     string token;
     vector<pair<string, TokenType>> tokenizedLine;
 
+    //Loop through every token
     while (ss >> token) {
-        auto itr = m_tokenDictionary.find(token);
-        if (itr != m_tokenDictionary.end()) {
-            tokenizedLine.push_back(make_pair(token, itr->second));
-        }
-        else {
-            bool matched = false;
-            for (int i=0; i<m_operandDictionary.size(); i++) {
-                if (regex_match(token, m_operandDictionary[i].first)) {
-                    tokenizedLine.push_back(make_pair(token, m_operandDictionary[i].second));
-                    i = m_operandDictionary.size();
-                    matched = true;
-                }
+        //Special case for comments. Comments are the only instructions not seperating operands by whitespace alone
+        if (token == "comment") {
+            //Push back comment as an instruction
+            tokenizedLine.push_back(make_pair(token, INSTRUCTION));
+            //Temporary string to hold the comment and a regex template to check for validity
+            string comment;
+            regex commentTemplate("^\".*\"$");
+            //Get rest of the line
+            getline(ss, comment);
+            comment.erase(0, 1);
+            //If matching regex template, denote string as "comment"
+            if (regex_match(comment, commentTemplate)) {
+                tokenizedLine.push_back(make_pair(comment, COMMENT));
             }
-            if (!matched) {
-                tokenizedLine.push_back(make_pair(token, UNKNOWN));
+            //Denote string unknown otherwise
+            else {
+                tokenizedLine.push_back(make_pair(comment, UNKNOWN));
+            }
+            //Return vector instantly
+            return tokenizedLine;
+        }
+        //Case for not comments (everything else)
+        else {
+            //Attempt to find the token in the dictionary
+            auto itr = m_tokenDictionary.find(token);
+            //If found in the token dictionary (instructions, conjunctions, descriptors, conditions) push it back
+            if (itr != m_tokenDictionary.end()) {
+                tokenizedLine.push_back(make_pair(token, itr->second));
+            }
+            //If not, check if it is an operand using regex
+            else {
+                int i;
+                //Loop through vector of operand regex templates, checking every one
+                for (i=0; i<m_operandDictionary.size(); i++) {
+                    if (regex_match(token, m_operandDictionary[i].first)) {
+                        //If matching, push with corresponding operand type
+                        tokenizedLine.push_back(make_pair(token, m_operandDictionary[i].second));
+                        break;
+                    }
+                }
+                if (i == m_operandDictionary.size()) {
+                    //If not either, push as unknown
+                    tokenizedLine.push_back(make_pair(token, UNKNOWN));
+                }
             }
         }
     }
-
+    
     return tokenizedLine;
 }
