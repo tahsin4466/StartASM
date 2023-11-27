@@ -1,14 +1,16 @@
 #ifndef COMPILER_H
 #define COMPILER_H
 
+#include "Lexer.h"
+
 #include <string>
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
 
-class InstructionSet;
-class AST;
+class Lexer;
+class Parser;
 
 class Compiler {
     public:
@@ -62,14 +64,14 @@ class Compiler {
         void generateCode();
 
         //Semantic checking helper functions
-        
+
 
         //Private variables
         //Data structures
         //Vector containing code lines
         std::vector<std::string> m_codeLines;
-        //Vector containing code tokens
-        std::vector<std::vector<std::string>> m_codeTokens;
+        //Vector containing code tokens and tags
+        std::vector<std::vector<std::pair<std::string, LexerConstants::TokenType>>> m_codeTokens;
         //Hash table for symbol resolution, mapping labels to instruction addresses
         std::unordered_map<std::string, std::string> m_labelTable;
 
@@ -82,10 +84,12 @@ class Compiler {
         std::string m_statusMessage;
         //Int containing current line index
         int m_lineIndex;
-        //Instruction set
-        InstructionSet* m_instructionSet;
-        //Abstract Syntax Tree
-        AST* m_AST;
+        //Lexer
+        Lexer* m_lexer;
+        //Parser
+        //Parser* m_parser;
+
+        
     
         
 };

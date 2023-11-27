@@ -5,9 +5,11 @@
 #include <algorithm>
 #include <string>
 
-enum SemanticType {NONE, FROM, TO, SELF, FROMTO, SELFWITH, SELFBY, FROMWITHTO};
-enum OperandType {REGISTER, INSTRUCTION, MEMORY, INT, FLOAT, CHAR, BOOL};
-enum NumOperands {NULLARY, UNARY, BINARY, TERNARY};
+namespace ASTConstants {
+    enum SemanticType {NONE, FROM, TO, SELF, FROMTO, SELFWITH, SELFBY, FROMWITHTO};
+    enum OperandType {REGISTER, INSTRUCTION, MEMORY, INT, FLOAT, CHAR, BOOL};
+    enum NumOperands {NULLARY, UNARY, BINARY, TERNARY};
+};
 
 //Broad ASTNode
 class ASTNode { 
@@ -27,17 +29,17 @@ class ASTNode {
 //Level 2 instruction and operand nodes for the AST
 class InstructionNode: public ASTNode {
     public:
-        virtual NumOperands getNumOperands() {return m_numOperands;};
-        virtual SemanticType getSemanticType() {return m_semanticStructure;};
+        virtual ASTConstants::NumOperands getNumOperands() {return m_numOperands;};
+        virtual ASTConstants::SemanticType getSemanticType() {return m_semanticStructure;};
 
     protected:
-        InstructionNode(std::string operation, NumOperands numOperands, SemanticType semantic):
+        InstructionNode(std::string operation, ASTConstants::NumOperands numOperands, ASTConstants::SemanticType semantic):
             ASTNode(operation),
             m_numOperands(numOperands),
             m_semanticStructure(semantic) {};
         
-        NumOperands m_numOperands;
-        SemanticType m_semanticStructure;
+        ASTConstants::NumOperands m_numOperands;
+        ASTConstants::SemanticType m_semanticStructure;
 };
 
 class OperandNode: public ASTNode {
@@ -46,15 +48,15 @@ class OperandNode: public ASTNode {
     friend class TernaryNode;
 
     public:
-        virtual OperandType getOperandType() {return m_operandType;};
+        virtual ASTConstants::OperandType getOperandType() {return m_operandType;};
 
     protected:
-        OperandNode(std::string operand, OperandType type):
+        OperandNode(std::string operand, ASTConstants::OperandType type):
             ASTNode(operand),
             m_operandType(type) {};
     
     private: 
-        OperandType m_operandType;
+        ASTConstants::OperandType m_operandType;
 };
 
 
@@ -65,7 +67,7 @@ class NullaryNode: public InstructionNode {
 
     protected:
         NullaryNode(std::string operation):
-            InstructionNode(operation, NULLARY, NONE) {};
+            InstructionNode(operation, ASTConstants::NULLARY, ASTConstants::NONE) {};
 };
 
 class UnaryNode: public InstructionNode {
@@ -75,8 +77,8 @@ class UnaryNode: public InstructionNode {
         OperandNode* getOperandNode1() {return m_operand1;};
 
     protected:
-        UnaryNode(std::string operation, std::string operand1Value, OperandType operand1Type, SemanticType semantic):
-            InstructionNode(operation, UNARY, semantic),
+        UnaryNode(std::string operation, std::string operand1Value, ASTConstants::OperandType operand1Type, ASTConstants::SemanticType semantic):
+            InstructionNode(operation, ASTConstants::UNARY, semantic),
             m_operand1(new OperandNode(operand1Value, operand1Type)) {};
         virtual ~UnaryNode() {
             delete m_operand1;
@@ -94,8 +96,8 @@ class BinaryNode: public InstructionNode {
         OperandNode* getOperandNode2() {return m_operand2;};
 
     protected:
-        BinaryNode(std::string operation, std::string operand1Value, OperandType operand1Type, std::string operand2Value, OperandType operand2Type, SemanticType semantic):
-            InstructionNode(operation, BINARY, semantic),
+        BinaryNode(std::string operation, std::string operand1Value, ASTConstants::OperandType operand1Type, std::string operand2Value, ASTConstants::OperandType operand2Type, ASTConstants::SemanticType semantic):
+            InstructionNode(operation, ASTConstants::BINARY, semantic),
             m_operand1(new OperandNode(operand1Value, operand1Type)),
             m_operand2(new OperandNode(operand2Value, operand2Type)) {};
         virtual ~BinaryNode() {
@@ -117,8 +119,8 @@ class TernaryNode: public InstructionNode {
         OperandNode* getOperandNode3() {return m_operand3;};
 
     protected:
-        TernaryNode(std::string operation, std::string operand1Value, OperandType operand1Type, std::string operand2Value, OperandType operand2Type, std::string operand3Value, OperandType operand3Type, SemanticType semantic):
-            InstructionNode(operation, TERNARY, semantic),
+        TernaryNode(std::string operation, std::string operand1Value, ASTConstants::OperandType operand1Type, std::string operand2Value, ASTConstants::OperandType operand2Type, std::string operand3Value, ASTConstants::OperandType operand3Type, ASTConstants::SemanticType semantic):
+            InstructionNode(operation, ASTConstants::TERNARY, semantic),
             m_operand1(new OperandNode(operand1Value, operand1Type)),
             m_operand2(new OperandNode(operand2Value, operand2Type)),
             m_operand3(new OperandNode(operand3Value, operand3Type)) {};
@@ -151,13 +153,13 @@ class AST {
         void createInstructionNode(int line, std::string operation) {
             instructionNodes[line] = new NullaryNode(operation);
         };
-        void createInstructionNode(int line, std::string operation, std::string operand1Value, OperandType operand1Type, SemanticType semantic) {
+        void createInstructionNode(int line, std::string operation, std::string operand1Value, ASTConstants::OperandType operand1Type, ASTConstants::SemanticType semantic) {
             instructionNodes[line] = new UnaryNode(operation, operand1Value, operand1Type, semantic);
         };
-        void createInstructionNode(int line, std::string operation, std::string operand1Value, OperandType operand1Type, std::string operand2Value, OperandType operand2Type, SemanticType semantic) {
+        void createInstructionNode(int line, std::string operation, std::string operand1Value, ASTConstants::OperandType operand1Type, std::string operand2Value, ASTConstants::OperandType operand2Type, ASTConstants::SemanticType semantic) {
             instructionNodes[line] = new BinaryNode(operation, operand1Value, operand1Type, operand2Value, operand2Type, semantic);
         };
-        void createInstructionNode(int line, std::string operation, std::string operand1Value, OperandType operand1Type, std::string operand2Value, OperandType operand2Type, std::string operand3Value, OperandType operand3Type, SemanticType semantic) {
+        void createInstructionNode(int line, std::string operation, std::string operand1Value, ASTConstants::OperandType operand1Type, std::string operand2Value, ASTConstants::OperandType operand2Type, std::string operand3Value, ASTConstants::OperandType operand3Type, ASTConstants::SemanticType semantic) {
             instructionNodes[line] = new TernaryNode(operation, operand1Value, operand1Type, operand2Value, operand2Type, operand3Value, operand3Type, semantic);
         };
 

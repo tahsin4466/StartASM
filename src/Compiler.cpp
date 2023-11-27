@@ -1,6 +1,5 @@
 #include "include/Compiler.h"
-#include "include/InstructionSet.h"
-#include "include/AbstractSyntaxTree.h"
+#include "include/Lexer.h"
 
 #include <iostream>
 #include <vector>
@@ -18,14 +17,14 @@ Compiler::Compiler(std::string pathname):
     m_pathname(pathname),
     m_statusMessage(""),
     m_lineIndex(0),
-    m_instructionSet(new InstructionSet()),
-    m_AST(new AST()) {
+    //m_parser(new Parser()),
+    m_lexer(new Lexer()) {
 
 };
 
 Compiler::~Compiler() {
-    delete m_instructionSet;
-    delete m_AST;
+    //delete m_parser;
+    delete m_lexer;
 }
 
 bool Compiler::compileCode() {
@@ -78,23 +77,31 @@ bool Compiler::loadFile() {
 }
 
 void Compiler::tokenizeCode() {
-    //split each line into individual tokens
-    //Do NOT leverage OMP as order must be maintained
+    //Map to temporarily sort each line through parallelization
+    map<long unsigned int, vector<pair<string, LexerConstants::TokenType>>> lineMap;
+    //Temporary private variable to store result of lexer when parallelized
+    vector<pair<string, LexerConstants::TokenType>> tempTokens;
+
+    //Call the lexer to tokenize and label each token
+    #pragma omp parallel for private(tempTokens)
     for (long unsigned int i = 0; i < m_codeLines.size(); i++) {
-        stringstream ss(m_codeLines[i]);
-        string token;
-        vector<string> tokenizedLine;
-
-        while (ss >> token) {
-            tokenizedLine.push_back(token);
+        tempTokens = m_lexer->tokenizeLine(m_codeLines[i]);
+        #pragma omp critical 
+        {
+            lineMap[i] = tempTokens;
         }
+        tempTokens.clear();
+    }
 
-        m_codeTokens.push_back(tokenizedLine);
+    for (const auto& pair : lineMap) {
+        // pair.first is the int key, pair.second is the vector<string>
+        m_codeTokens.push_back(pair.second);
     }
 }
 
 bool Compiler::validateSyntax() {
-    int numLines = m_codeLines.size();
+    return true;
+    /*int numLines = m_codeLines.size();
     //Create an ordered map that links an integer (line number) to an erorr message
     //This is to leverage OMP parallelization while maintaining the order of errors as they appear in the code
     map<int, string> invalidLines;
@@ -123,7 +130,7 @@ bool Compiler::validateSyntax() {
         return false;
     }
 
-    return true;
+    return true; */
 }
 
 bool Compiler::resolveSymbols() {

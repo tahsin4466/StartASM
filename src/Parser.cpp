@@ -7,11 +7,12 @@
 #include <utility>
 
 using namespace std;
+using namespace PTConstants;
 
 //Constructor - Initialize all data structure values
 Parser::Parser() { 
     m_instructionMap.emplace("move", instructionMove);
-    m_instructionMap.emplace("load", instructionLoad);
+    /*m_instructionMap.emplace("load", instructionLoad);
     m_instructionMap.emplace("store", instructionStore);
     m_instructionMap.emplace("create", instructionCreate);
     m_instructionMap.emplace("cast", instructionCast);
@@ -31,45 +32,30 @@ Parser::Parser() {
     m_instructionMap.emplace("return", instructionReturn);
     m_instructionMap.emplace("stop", instructionStop);
     m_instructionMap.emplace("comment", instructionComment);
-    m_instructionMap.emplace("label", instructionLabel);
-
-    m_operandList.push_back(regex("r[0-9]"));
-    m_operandList.push_back(regex("m<[0-9]{1,9}>"));
-    m_operandList.push_back(regex("i\\[[0-9]{1,9}\\]"));
-    m_operandList.push_back(regex("-?[1-9][0-9]{0,9}|0"));
-    m_operandList.push_back(regex("-?\\d+\\.\\d+"));
-    m_operandList.push_back(regex("true|false|1|0"));
-    m_operandList.push_back(regex("."));
-
-    m_descriptorSet.emplace("logically");
-    m_descriptorSet.emplace("arithmetically");
-    m_descriptorSet.emplace("greater");
-    m_descriptorSet.emplace("less");
-    m_descriptorSet.emplace("equal");
-    m_descriptorSet.emplace("integer");
-    m_descriptorSet.emplace("float");
-    m_descriptorSet.emplace("boolean");
-    m_descriptorSet.emplace("character");
-    m_descriptorSet.emplace("address");
+    m_instructionMap.emplace("label", instructionLabel);*/
 
     m_parseTree = new PT();
 }
 
-string Parser::validateInstruction(int line, vector<string> tokens) {
+string Parser::validateInstruction(int line, vector<pair<string, LexerConstants::TokenType>> tokens) {
     //If keyword doesn't match, return error no instruction found
-    auto itr = m_instructionMap.find(tokens[0]);
-    if (itr == m_instructionMap.end()) {
-        return "Unknown instruction '" + tokens[0] + "'";
+    if (tokens[0].second != LexerConstants::INSTRUCTION) {
+        return "Unknown instruction '" + tokens[0].first + "'";
     }
-
+    auto itr = m_instructionMap.find(tokens[0].first);
     //If found, go to instruction method and add new child node to root
-    return itr->second((m_parseTree->getRoot()->insertChild(line, (new GeneralNode(0, tokens[0], INSTRUCTION)))), tokens);
+    if (itr!= m_instructionMap.end()) {
+        return itr->second((m_parseTree->getRoot()->insertChild(line, (new GeneralNode(0, tokens[0].first, INSTRUCTION)))), tokens);
+    }
+    else {
+        return "Compiler error for '" + tokens[0].first + "'. Could not find instruction parsing method.";
+    }
 }
 
 
 //LEVEL 1 - INSTRUCTION METHODS
 //Parse move instruction
-string Parser::instructionMove(PTNode* node, vector<string> tokens) {
+string Parser::instructionMove(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens) {
     string returnString = "";
     //Parse from segment
     if (true) {
@@ -87,8 +73,8 @@ string Parser::instructionMove(PTNode* node, vector<string> tokens) {
         return "Missing conjunction. Expected 'to'";
     }
     //Check if to keyword is valid
-    else if (tokens[2] != "to") {
-        return "Unknown conjunction " + tokens[2] + ". Expected 'to'";
+    else if (tokens[2].first != "to") {
+        return "Unknown conjunction " + tokens[2].first + ". Expected 'to'";
     }
     //If passed, add to keyword as child
     //Rewrite returnString if L2 analysis returns an error
@@ -104,7 +90,7 @@ string Parser::instructionMove(PTNode* node, vector<string> tokens) {
 
 
 //LEVEL 2 - CONJUNCTION AND CONDITION METHODS
-string Parser::conjunctionFrom(PTNode* node, vector<string> tokens) {
+string Parser::conjunctionFrom(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens) {
     string returnString;
     //Check if operand exists
     if (tokens.size()<2) {
@@ -112,19 +98,19 @@ string Parser::conjunctionFrom(PTNode* node, vector<string> tokens) {
     }
     //Check if operand is valid
     else if (!isOperand(tokens[1])) {
-        return "Unknown first operand " + tokens[1];
+        return "Unknown first operand " + tokens[1].first;
     }
     //Add child if passed
     else {
-        node->insertChild(1, (new OperandNode(1, tokens[1], REGISTER)));
+        node->insertChild(1, (new OperandNode(1, tokens[1].first, returnPTOperand(tokens[1].second))));
         return "";
     }
 }
 
-string Parser::conjunctionTo(PTNode* node, vector<string> tokens) {
+string Parser::conjunctionTo(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens) {
     string returnString;
     int i = 0;
-    while (tokens[i] != "to") {
+    while (tokens[i].first != "to") {
         i++;
     }
     i++;
@@ -132,10 +118,10 @@ string Parser::conjunctionTo(PTNode* node, vector<string> tokens) {
         return "Missing operand after 'to'";
     }
     else if (!isOperand(tokens[i])) {
-        return "Unknown operand " + tokens[i] + " after 'to'";
+        return "Unknown operand " + tokens[i].first + " after 'to'";
     }
     else {
-        node->insertChild(2, (new OperandNode(1, tokens[i], REGISTER)));
+        node->insertChild(2, (new OperandNode(i, tokens[i].first, returnPTOperand(tokens[i].second))));
         return "";
     }
 }
@@ -143,25 +129,64 @@ string Parser::conjunctionTo(PTNode* node, vector<string> tokens) {
 
 
 //LEVEL 3 - OPERANDS AND DESCRIPTORS
-bool Parser::isOperand(string token) {
-    //regex match every template in list
-    for (int i=0; i<m_operandList.size(); i++) {
-        if (regex_match(token, m_operandList[i])) {
-            //Return true if match found
+bool Parser::isOperand(pair<string, LexerConstants::TokenType> token) {
+    switch (token.second) {
+        case LexerConstants::TokenType::REGISTER:
             return true;
-        }
+        case LexerConstants::TokenType::INSTRUCTIONADDRESS:
+            return true;
+        case LexerConstants::TokenType::MEMORYADDRESS:
+            return true;
+        case LexerConstants::TokenType::FLOAT:
+            return true;
+        case LexerConstants::TokenType::INTEGER:
+            return true;
+        case LexerConstants::TokenType::BOOLEAN:
+            return true;
+        case LexerConstants::TokenType::CHARACTER:
+            return true;
+        case LexerConstants::TokenType::LABEL:
+            return true;
+        case LexerConstants::TokenType::COMMENT:
+            return true;
+        default:
+            return false;
     }
-    return false;
 }
 
-bool Parser::isDescriptor(string token) {
-    //Hash search descriptor
-    auto itr = m_descriptorSet.find(token);
-    if (itr == m_descriptorSet.end()) {
-        return false;
+bool Parser::isDescriptor(pair<string, LexerConstants::TokenType> token) {
+    if (token.second == LexerConstants::TokenType::DESCRIPTOR) {
+        return true;
     }
     else {
-        return true;
+        return false;
+    }
+}
+
+PTConstants::OperandType Parser::returnPTOperand(LexerConstants::TokenType tokenType) {
+    switch (tokenType) {
+        case LexerConstants::TokenType::REGISTER:
+            return PTConstants::OperandType::REGISTER;
+        case LexerConstants::TokenType::INSTRUCTIONADDRESS:
+            return PTConstants::OperandType::INSTRUCTIONADDRESS;
+        case LexerConstants::TokenType::MEMORYADDRESS:
+            return PTConstants::OperandType::MEMORYADDRESS;
+        case LexerConstants::TokenType::FLOAT:
+            return PTConstants::OperandType::FLOAT;
+        case LexerConstants::TokenType::INTEGER:
+            return PTConstants::OperandType::INTEGER;
+        case LexerConstants::TokenType::BOOLEAN:
+            return PTConstants::OperandType::BOOLEAN;
+        case LexerConstants::TokenType::CHARACTER:
+            return PTConstants::OperandType::CHARACTER;
+        case LexerConstants::TokenType::LABEL:
+            return PTConstants::OperandType::LABEL;
+        case LexerConstants::TokenType::COMMENT:
+            return PTConstants::OperandType::COMMENT;
+        case LexerConstants::TokenType::UNKNOWN:
+            return PTConstants::OperandType::UNKNOWN;
+        default:
+            return PTConstants::OperandType::UNKNOWN;
     }
 }
 
