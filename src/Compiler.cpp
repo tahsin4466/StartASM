@@ -1,5 +1,6 @@
 #include "include/Compiler.h"
 #include "include/Lexer.h"
+#include "include/Parser.h"
 
 #include <iostream>
 #include <vector>
@@ -18,21 +19,23 @@ Compiler::Compiler(std::string pathname):
     m_statusMessage(""),
     m_lineIndex(0),
     //m_parser(new Parser()),
-    m_lexer(new Lexer()) {
+    m_lexer(new Lexer()),
+    m_parser(new Parser()) {
 
 };
 
 Compiler::~Compiler() {
     //delete m_parser;
     delete m_lexer;
+    delete m_parser;
 }
 
 bool Compiler::compileCode() {
     if(!loadFile()) {
         return false;
     }
-    tokenizeCode();
-    if(!validateSyntax()) {
+    lexCode();
+    if(!parseCode()) {
         return false;
     }
     if(!resolveSymbols()) {
@@ -76,7 +79,7 @@ bool Compiler::loadFile() {
         
 }
 
-void Compiler::tokenizeCode() {
+void Compiler::lexCode() {
     //Map to temporarily sort each line through parallelization
     map<long unsigned int, vector<pair<string, LexerConstants::TokenType>>> lineMap;
     //Temporary private variable to store result of lexer when parallelized
@@ -98,9 +101,7 @@ void Compiler::tokenizeCode() {
     }
 }
 
-bool Compiler::validateSyntax() {
-    return true;
-    /*int numLines = m_codeLines.size();
+bool Compiler::parseCode() {
     //Create an ordered map that links an integer (line number) to an erorr message
     //This is to leverage OMP parallelization while maintaining the order of errors as they appear in the code
     map<int, string> invalidLines;
@@ -109,9 +110,9 @@ bool Compiler::validateSyntax() {
     string error;
     //Parallelize error checking as it is more resource intensive
     #pragma omp parallel for private(error)
-    for (int i=0; i<numLines; i++) {
+    for (int i=0; i<m_codeTokens.size(); i++) {
         //Call validateInstruction in InstructionSet
-        error = m_instructionSet->validateInstruction(m_codeLines[i], m_codeTokens[i]);
+        error = m_parser->validateInstruction(i, m_codeTokens[i]);
         //If an error is present
         if (error != "") {
             //Print the excepted line and the syntax error returned from validateInstruction()
@@ -129,7 +130,7 @@ bool Compiler::validateSyntax() {
         return false;
     }
 
-    return true; */
+    return true; 
 }
 
 bool Compiler::resolveSymbols() {

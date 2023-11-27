@@ -1,4 +1,4 @@
-move r1 to r2
+sicko mode
 load m<435> to r2
 store r6 to m<0234>
 add r1 with r2 to r2

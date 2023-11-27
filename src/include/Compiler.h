@@ -51,9 +51,9 @@ class Compiler {
         //File loading
         bool loadFile();
         //Code Tokenizing
-        void tokenizeCode();
+        void lexCode();
         //Validate the syntax using regex matching
-        bool validateSyntax();
+        bool parseCode();
         //Resolve symbols and labels
         bool resolveSymbols();
         //Build the AST
@@ -87,7 +87,7 @@ class Compiler {
         //Lexer
         Lexer* m_lexer;
         //Parser
-        //Parser* m_parser;
+        Parser* m_parser;
 
         
     

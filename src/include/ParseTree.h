@@ -10,7 +10,9 @@ namespace PTConstants {
     enum NodeType {ROOT, GENERAL, OPERAND};
     enum GeneralType {INSTRUCTION, CONJUNCTION, CONDITION};
     enum OperandType {REGISTER, INSTRUCTIONADDRESS, MEMORYADDRESS, INTEGER, FLOAT, BOOLEAN, CHARACTER, LABEL, COMMENT, UNKNOWN};
-    int NULLINDEX = -1;
+    enum Constants {
+        NULLINDEX = -1
+    };
 };
 
 //Broad PTNode
@@ -78,7 +80,7 @@ class RootNode: public PTNode {
     public:
         //Constructor/Destructor
         RootNode():
-            PTNode(PTConstants::NULLINDEX, "", PTConstants::ROOT) {};
+            PTNode(PTConstants::Constants::NULLINDEX, "", PTConstants::ROOT) {};
         virtual ~RootNode() {}; 
         RootNode(const RootNode&) = delete;
         RootNode& operator=(const RootNode&) = delete; 
