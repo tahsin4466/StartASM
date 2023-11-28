@@ -37,7 +37,7 @@ class Parser {
         //LEVEL 1 - INSTRUCTION PARSERS
         //Instruction Parsing Functions
         static std::string instructionMove(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens);
-       /* static std::string instructionLoad(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens);
+    /*  static std::string instructionLoad(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens);
         static std::string instructionStore(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens);
         static std::string instructionCreate(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens);
         static std::string instructionCast(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens);
@@ -61,25 +61,15 @@ class Parser {
 
 
         //LEVEL 2 - CONJUNCTION AND CONDITION PARSERS
-        //Conjunction Parsing Functions
-        static std::string conjunctionFrom(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens);
-        //static std::string conjunctionWith(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens);
-        //static std::string conjunctionSelf(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens);
-        static std::string conjunctionTo(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens);
-        //static std::string conjunctionBy(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens);
-
-        //Condition Parsing Functions
-        /*static std::string conditionLeft(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens);
-        static std::string conditionRight(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens);
-        static std::string conditionIf(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens);
-        static std::string conditionExcept(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens); */
-
+        static std::string parseImplicit(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::string keyword);
+        static std::string parseConjunction(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::string keyword);
+        static std::string parseCondition(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::string keyword);
 
         //LEVEL 3 - OPERAND AND DESCRIPTOR CHECKERS
         static bool isOperand(std::pair<std::string, LexerConstants::TokenType> token);
         static bool isDescriptor(std::pair<std::string, LexerConstants::TokenType> token);
 
-        //Conversion helper function;
+        //Constants helper function
         static PTConstants::OperandType returnPTOperand(LexerConstants::TokenType tokenType);
 };
 

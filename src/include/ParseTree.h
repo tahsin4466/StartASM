@@ -11,7 +11,7 @@ namespace PTConstants {
     enum GeneralType {INSTRUCTION, CONJUNCTION, CONDITION};
     enum OperandType {REGISTER, INSTRUCTIONADDRESS, MEMORYADDRESS, INTEGER, FLOAT, BOOLEAN, CHARACTER, LABEL, COMMENT, UNKNOWN};
     enum Constants {
-        NULLINDEX = -1
+        NULL_INDEX = -1
     };
 };
 

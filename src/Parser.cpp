@@ -9,6 +9,8 @@
 using namespace std;
 using namespace PTConstants;
 
+const int FIRST_OPERAND_POSITION = 1;
+
 //Constructor - Initialize all data structure values
 Parser::Parser() { 
     m_instructionMap.emplace("move", instructionMove);
@@ -56,7 +58,6 @@ string Parser::validateInstruction(int line, vector<pair<string, LexerConstants:
 //LEVEL 1 - INSTRUCTION METHODS
 //Parse move instruction
 string Parser::instructionMove(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens) {
-    cout << "Called instruction Move" << endl;
     string returnString = "";
     //Check first if line is too long
     if (tokens.size()>4) {
@@ -68,7 +69,7 @@ string Parser::instructionMove(PTNode* node, vector<pair<string, LexerConstants:
         //From node is implicit, so always exists
         //Add keyword as child
         //Rewrite returnString if L2 analysis returns an error
-        returnString = conjunctionFrom(node->insertChild(1, (new GeneralNode(Constants::NULLINDEX, "from", CONJUNCTION))), tokens);
+        returnString = parseImplicit(node->insertChild(1, (new GeneralNode(Constants::NULL_INDEX, "from", CONJUNCTION))), tokens, "from");
         if (returnString!="") {
                 return returnString;
         }
@@ -85,7 +86,7 @@ string Parser::instructionMove(PTNode* node, vector<pair<string, LexerConstants:
     //If passed, add to keyword as child
     //Rewrite returnString if L2 analysis returns an error
     else {
-        returnString = conjunctionTo(node->insertChild(2, (new GeneralNode(2, "to", CONJUNCTION))), tokens);
+        returnString = parseConjunction(node->insertChild(2, (new GeneralNode(2, "to", CONJUNCTION))), tokens, "to");
         if (returnString!="") {
             return returnString;
         }
@@ -96,45 +97,71 @@ string Parser::instructionMove(PTNode* node, vector<pair<string, LexerConstants:
 
 
 //LEVEL 2 - CONJUNCTION AND CONDITION METHODS
-string Parser::conjunctionFrom(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens) {
-    cout << "Called conjunction from" << endl;
+string Parser::parseImplicit(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword) {
+    //Create a temporary return string to return errors
     string returnString;
-    //Check if operand exists
-    if (tokens.size()<2) {
+    //Check if the first operand exissts
+    if (tokens.size()<FIRST_OPERAND_POSITION+1) {
         return "Missing first operand";
     }
-    //Check if operand is valid
-    else if (!isOperand(tokens[1])) {
-        return "Unknown first operand " + tokens[1].first;
+    //Check if the token is an operand
+    else if (!isOperand(tokens[FIRST_OPERAND_POSITION])) {
+        return "Unknown first operand " + tokens[FIRST_OPERAND_POSITION].first;
     }
-    //Add child if passed
     else {
+        //Insert a new child as the operand
         node->insertChild(1, (new OperandNode(1, tokens[1].first, returnPTOperand(tokens[1].second))));
         return "";
     }
 }
 
-string Parser::conjunctionTo(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens) {
-    cout << "Called conjunction to" << endl;
+string Parser::parseConjunction(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword) {
+    //Create temporary return string
     string returnString;
+    //Iterate over the vector to find the keyword position (guaranteed in tokens)
     int i = 0;
-    while (tokens[i].first != "to") {
+    while (tokens[i].first != keyword) {
         i++;
     }
     i++;
-    if(tokens.size()<i+1) {
-        return "Missing operand after 'to'";
+    //If the operand does not exist after the keyword, return an error
+    if(tokens.size()<i) {
+        return "Missing operand after '" + keyword + "'";
     }
+    //If the token in the operand position is not an operad, return an error
     else if (!isOperand(tokens[i])) {
-        return "Unknown operand " + tokens[i].first + " after 'to'";
+        return "Unknown operand " + tokens[i].first + " after '" + keyword + "'";
     }
     else {
+        //Insert a new child as the operand
         node->insertChild(i, (new OperandNode(i, tokens[i].first, returnPTOperand(tokens[i].second))));
         return "";
     }
 }
 
-
+string Parser::parseCondition(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword) {
+    //Create temporary return string
+    string returnString;
+    //Iterate over tokens until keyword is found (guaranteed in tokens)
+    int i = 0;
+    while (tokens[i].first != keyword) {
+        i++;
+    }
+    i++;
+    //If the operand after keyword does not exist
+    if(tokens.size()<i) {
+        return "Missing operand after '" + keyword + "'";
+    }
+    //If the token after keyword does not match as a descriptor
+    else if (!isDescriptor(tokens[i])) {
+        return "Unknown descriptor " + tokens[i].first + " after '" + keyword + "'";
+    }
+    else {
+        //Insert a new child as the operand
+        node->insertChild(i, (new OperandNode(i, tokens[i].first, returnPTOperand(tokens[i].second))));
+        return "";
+    } 
+}
 
 //LEVEL 3 - OPERANDS AND DESCRIPTORS
 bool Parser::isOperand(pair<string, LexerConstants::TokenType> token) {
@@ -173,6 +200,7 @@ bool Parser::isDescriptor(pair<string, LexerConstants::TokenType> token) {
     }
 }
 
+//Helper function converting constants
 PTConstants::OperandType Parser::returnPTOperand(LexerConstants::TokenType tokenType) {
     switch (tokenType) {
         case LexerConstants::TokenType::REGISTER:
