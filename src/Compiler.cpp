@@ -62,10 +62,9 @@ bool Compiler::loadFile() {
     {
         //While line exists
         while (getline(codeFile,currentLine)) {
-            if (!currentLine.empty()) {
-                //Ignore empty lines, push back non empty lines
-                m_codeLines.push_back(currentLine);
-            }
+            //Push back current lines (including empty)
+            //This is to keep accurate track of line numners
+            m_codeLines.push_back(currentLine);
         }
         codeFile.close();
  
@@ -127,7 +126,6 @@ bool Compiler::parseCode() {
     else {
         return false;
     }
-
 }
 
 bool Compiler::resolveSymbols() {

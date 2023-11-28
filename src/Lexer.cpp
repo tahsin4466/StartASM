@@ -28,6 +28,7 @@ Lexer::Lexer() {
     m_tokenDictionary.emplace("shift", INSTRUCTION);
     m_tokenDictionary.emplace("compare", INSTRUCTION);
     m_tokenDictionary.emplace("jump", INSTRUCTION);
+    m_tokenDictionary.emplace("call", INSTRUCTION);
     m_tokenDictionary.emplace("push", INSTRUCTION);
     m_tokenDictionary.emplace("pop", INSTRUCTION);
     m_tokenDictionary.emplace("return", INSTRUCTION);
@@ -40,16 +41,17 @@ Lexer::Lexer() {
     m_tokenDictionary.emplace("to", CONJUNCTION);
     m_tokenDictionary.emplace("by", CONJUNCTION);
     //Add conditions to dictionary
-    m_tokenDictionary.emplace("left", CONDITION);
-    m_tokenDictionary.emplace("right", CONDITION);
     m_tokenDictionary.emplace("if", CONDITION);
-    m_tokenDictionary.emplace("except", CONDITION);
     //Add descriptors to dictionary
-    m_tokenDictionary.emplace("logically", DESCRIPTOR);
-    m_tokenDictionary.emplace("arithmetically", DESCRIPTOR);
+    m_tokenDictionary.emplace("left", DESCRIPTOR);
+    m_tokenDictionary.emplace("right", DESCRIPTOR);
     m_tokenDictionary.emplace("greater", DESCRIPTOR);
     m_tokenDictionary.emplace("less", DESCRIPTOR);
     m_tokenDictionary.emplace("equal", DESCRIPTOR);
+    m_tokenDictionary.emplace("unequal", DESCRIPTOR);
+    m_tokenDictionary.emplace("zero", DESCRIPTOR);
+    m_tokenDictionary.emplace("nonzero", DESCRIPTOR);
+    m_tokenDictionary.emplace("unconditional", DESCRIPTOR);
     m_tokenDictionary.emplace("integer", DESCRIPTOR);
     m_tokenDictionary.emplace("float", DESCRIPTOR);
     m_tokenDictionary.emplace("boolean", DESCRIPTOR);
@@ -72,6 +74,11 @@ vector<pair<string, TokenType>> Lexer::tokenizeLine(string line) {
     stringstream ss(line);
     string token;
     vector<pair<string, TokenType>> tokenizedLine;
+
+    //Zero case, return instantly
+    if (line.empty()) {
+        return tokenizedLine;
+    }
 
     //Loop through every token
     while (ss >> token) {

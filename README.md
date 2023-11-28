@@ -23,7 +23,7 @@ The language is based on a load-store model, with seperate program and insructio
 - cast (register)
 - arithmetic (add, sub, multiply, divide)
 - bitwise operations (and, or, not)
-- bitwise shift (left/right, logical/arithmetic)
+- bitwise shift (left/right)
 - comparison (between registers, numerical)
 - jump (conditional and unconditional)
 - call (unconditional)
@@ -86,12 +86,9 @@ Here are all possible instruction combinations as of now:
 - `or (register) with (register)`
 - `and (register) with (register)`
 - `not (register)`
-- `shift left logically/arithmetically (register) by (register)`
-- `shift right logically/arithmetically (register) by (register)`
+- `shift left/right (register) by (register)`
 - `compare (register) with (register)`
-- `jump unconditionally to (instruction/label)`
-- `jump if (greater/less/equal/zero) to (instruction/label)`
-- `jump if not (equal/zero) to (instruction/label)`
+- `jump if (unconditional/greater/less/equal/zero/unequal/nonzero) to (instruction/label)`
 - `call to (instruction/label)`
 - `push (register)`
 - `pop to (register)`
@@ -116,11 +113,11 @@ load m<435> to r2
 move r2 to r1
 store r1 to m<0234>
 or r1 with r2
-shift right logically r2 by r1
+shift right r2 by r1
 not r1
 compare r2 with r1
 jump if greater to i[0]
-jump to 'overHere!'
+jump if unconditional to 'overHere!'
 add r1 with r2 to r3
 divide r3 with r2 to r1
 pop to r3
@@ -133,7 +130,7 @@ comment "EndASM! get it? haha"
 ```
 The compiler will also return syntax and symbol/scope error messages that show the excepted line, token and what the compiler expected if applicable. For example, submitting this invalid code:
 ``` 
-shift right logically r2 with r1
+shift right r2 with r1
 junk r1
 move m<1> to r6
 ```
@@ -156,11 +153,11 @@ StartASM is, as of now, fully developed in C++. The intent is for the compiler a
 ## Progress
 **Please note that StartASM is still in early development, and as such many critical features are yet to be implemented. This is a personal project by a student, and as such is being developed incrementally.**
 
-*Last updated: November 11, 2023*
+*Last updated: November 28, 2023*
 
-**State:** StartASM currently only consists of a compiler that validates syntax, resolves symbols and builds an AST. The provided program will tell the user whether the given code adheres to the language's syntax, scope bounds and will build an AST if adhering to the language's grammar.
+**State:** StartASM currently only consists of a compiler that validates syntax through recursive descent parsing and builds a parse tree. Current focus is on implementing effective symbol resolution and semantic analysis, hopefully finishing the compiler by year's end.
 
-**Progress:** Currently working on implementing semantic analysis and code generation via the generated AST.
+**Progress:** Currently working on implementing semantic analysis and symbol resolution, building out an AST.
 
 **Current Goal:** Finish the compiler by the end of the year.
 

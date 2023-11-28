@@ -31,12 +31,14 @@ class Parser {
         //Pointer to PT
         PT* m_parseTree;
         //Hash map containing a keyword linked to an instruction parsing function
-        std::unordered_map<std::string, std::vector<std::pair<std::pair<std::string, int>, std::function<std::string(PTNode*, std::vector<std::pair<std::string, LexerConstants::TokenType>>, std::string, int)>>>> m_instructionMap;
+        std::unordered_map<std::string, std::vector<std::pair<std::pair<std::string, int>, std::function<std::string(PTNode*, std::vector<std::pair<std::string, LexerConstants::TokenType>>, std::string, int)>>>> m_templateMap;
+        //Hash map containing instructions with tempate info
+        std::unordered_map<std::string, int> m_instructionMap;
 
 
 
         //LEVEL 1 - INSTRUCTION PARSERS
-        static std::string parseInstruction(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::vector<std::pair<std::pair<std::string, int>, std::function<std::string(PTNode*, std::vector<std::pair<std::string, LexerConstants::TokenType>>, std::string, int)>>> parsingTemplate);
+        std::string parseInstruction(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::vector<std::pair<std::pair<std::string, int>, std::function<std::string(PTNode*, std::vector<std::pair<std::string, LexerConstants::TokenType>>, std::string, int)>>> parsingTemplate);
 
 
 
