@@ -31,22 +31,22 @@ class Parser {
         //Pointer to PT
         PT* m_parseTree;
         //Hash map containing a keyword linked to an instruction parsing function
-        std::unordered_map<std::string, std::vector<std::pair<std::string, std::function<std::string(PTNode*, std::vector<std::pair<std::string, LexerConstants::TokenType>>, std::string, int)>>>> m_instructionMap;
+        std::unordered_map<std::string, std::vector<std::pair<std::pair<std::string, int>, std::function<std::string(PTNode*, std::vector<std::pair<std::string, LexerConstants::TokenType>>, std::string, int)>>>> m_instructionMap;
 
 
 
         //LEVEL 1 - INSTRUCTION PARSERS
-        static std::string parseInstruction(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::vector<std::pair<std::string, std::function<std::string(PTNode*, std::vector<std::pair<std::string, LexerConstants::TokenType>>, std::string, int)>>> parsingTemplate);
+        static std::string parseInstruction(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::vector<std::pair<std::pair<std::string, int>, std::function<std::string(PTNode*, std::vector<std::pair<std::string, LexerConstants::TokenType>>, std::string, int)>>> parsingTemplate);
 
 
 
-        //LEVEL 2 - IMPLICIT, CONJUNCTION AND CONDITION CHECKERS
-        static std::string checkImplicit(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::string keyword, int index);
-        static std::string checkConjunction(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::string keyword, int index);
-        static std::string checkCondition(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::string keyword, int index);
+        //LEVEL 2 - IMPLICIT AND EXPLICIT CONJUNCTION AND CONDITION CHECKERS
+        static std::string checkImplicitConjunction(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::string keyword, int index);
+        static std::string checkImplicitCondition(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::string keyword, int index);
+        static std::string checkExplicitConjunction(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::string keyword, int index);
+        static std::string checkExplicitCondition(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::string keyword, int index);
 
-        //LEVEL 2 - IMPLICIT, CONJUNCTION AND CONDITION PARSERS
-        static std::string parseImplicit(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::string keyword, int index);
+        //LEVEL 2 - CONJUNCTION AND CONDITION PARSERS
         static std::string parseConjunction(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::string keyword, int index);
         static std::string parseCondition(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::string keyword, int index);
 

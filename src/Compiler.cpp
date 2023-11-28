@@ -86,6 +86,7 @@ void Compiler::lexCode() {
     vector<pair<string, LexerConstants::TokenType>> tempTokens;
 
     //Call the lexer to tokenize and label each token
+    //Leverage OpenMP for lexing as the lexer involves minimal recursion and is thread-safe
     #pragma omp parallel for private(tempTokens)
     for (long unsigned int i = 0; i < m_codeLines.size(); i++) {
         tempTokens = m_lexer->tokenizeLine(m_codeLines[i]);
@@ -102,38 +103,31 @@ void Compiler::lexCode() {
 }
 
 bool Compiler::parseCode() {
-    //Create an ordered map that links an integer (line number) to an erorr message
-    //This is to leverage OMP parallelization while maintaining the order of errors as they appear in the code
-    map<int, string> invalidLines;
+    //The parser relies on top-down recursive descent parsing
+    //Implementing parallelization is a NIGHTMARE, and very easily involves race-conditions and stack overflows
+    //Hence, parsing will remain sequential
+    m_statusMessage.clear();
 
     //Create error string
     string error;
-    //Parallelize error checking as it is more resource intensive
-    #pragma omp parallel for private(error)
     for (int i=0; i<m_codeTokens.size(); i++) {
         //Call validateInstruction in InstructionSet
         error = m_parser->checkInstruction(i, m_codeTokens[i]);
         //If an error is present
         if (error != "") {
-            #pragma omp critical
-            {
-            //Print the excepted line and the syntax error returned from validateInstruction()
-            invalidLines[i] = "\nInvalid syntax at line " + to_string(i + 1) + ": " + m_codeLines[i] + "\n" + error + "\n";
-            }
+            m_statusMessage += "\nInvalid syntax at line " + to_string(i + 1) + ": " + m_codeLines[i] + "\n" + error + "\n";
         }
         error.clear();
     }
 
     //Concatenate the statusMessage string from the map (which should be ordered already)
-    if (!invalidLines.empty()) {
-        m_statusMessage.clear();
-        for (const auto& line : invalidLines) {
-            m_statusMessage += line.second;
-        }
+    if (m_statusMessage.empty()) {
+        return true; 
+    }
+    else {
         return false;
     }
 
-    return true; 
 }
 
 bool Compiler::resolveSymbols() {

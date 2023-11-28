@@ -9,15 +9,17 @@
 using namespace std;
 using namespace PTConstants;
 
-const int FIRST_OPERAND_POSITION = 1;
-
 //Constructor - Initialize all data structure values
 Parser::Parser() { 
     //Initialise the root pointer for the parse tree
     m_parseTree = new PT();
 
-    m_instructionMap["move"].push_back(make_pair("from", checkImplicit));
-    m_instructionMap["move"].push_back(make_pair("to", checkConjunction));
+    //Move instruction template
+    m_instructionMap["move"].push_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
+    m_instructionMap["move"].push_back(make_pair(make_pair("to", 2), checkExplicitConjunction));
+
+
+   
     
 }
 
@@ -40,14 +42,14 @@ string Parser::checkInstruction(int line, vector<pair<string, LexerConstants::To
     }
 }
 
-string Parser::parseInstruction(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::vector<std::pair<std::string, std::function<std::string(PTNode*, std::vector<std::pair<std::string, LexerConstants::TokenType>>, std::string, int)>>> parsingTemplate) {
+string Parser::parseInstruction(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::vector<std::pair<std::pair<std::string, int>, std::function<std::string(PTNode*, std::vector<std::pair<std::string, LexerConstants::TokenType>>, std::string, int)>>> parsingTemplate) {
     //Temporary return string
     string returnString;
     //Loop through all templates
     //NOTE - if the instruction is a no operand (i.e. empty parsingTemplate) loop will not run and will go straight to final check
     for (int i=0; i<parsingTemplate.size(); i++) {
         //Access the parsing function, passing the index expected in the token sequence
-        returnString = parsingTemplate[i].second(node, tokens, parsingTemplate[i].first, (i*2));
+        returnString = parsingTemplate[i].second(node, tokens, parsingTemplate[i].first.first, parsingTemplate[i].first.second);
         //If an error arises, return instantly
         if (returnString != "") {
             return returnString;
@@ -70,7 +72,7 @@ string Parser::parseInstruction(PTNode* node, std::vector<std::pair<std::string,
     //General case
     else {
         if (tokens.size()>(parsingTemplate.size()*2)) {
-        return "Excess token at and past'" + tokens[parsingTemplate.size()*2].first + "' found.";
+            return "Excess token at and past'" + tokens[parsingTemplate.size()*2].first + "' found.";
         }
         //Return empty (correct syntax) if passing all tests
         else {
@@ -82,16 +84,25 @@ string Parser::parseInstruction(PTNode* node, std::vector<std::pair<std::string,
 
 
 //LEVEL 2 - CONJUNCTION AND CONDITION CHECKERS / PARSER HELPERS
-string Parser::checkImplicit(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
+string Parser::checkImplicitConjunction(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
     string returnString;
     //Implicit node is implicit, so always exists
     //Add keyword as child
     //Rewrite returnString if L2 analysis returns an error
-    returnString = parseImplicit(node->insertChild(NULL_INDEX, (new GeneralNode(Constants::NULL_INDEX, keyword, CONJUNCTION))), tokens, keyword, index);
+    returnString = parseConjunction(node->insertChild(NULL_INDEX, (new GeneralNode(Constants::NULL_INDEX, keyword, CONJUNCTION))), tokens, keyword, index);
     return returnString;
 }
 
-string Parser::checkConjunction(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
+string Parser::checkImplicitCondition(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
+    string returnString;
+    //Implicit node is implicit, so always exists
+    //Add keyword as child
+    //Rewrite returnString if L2 analysis returns an error
+    returnString = parseCondition(node->insertChild(NULL_INDEX, (new GeneralNode(Constants::NULL_INDEX, keyword, CONJUNCTION))), tokens, keyword, index);
+    return returnString;
+}
+
+string Parser::checkExplicitConjunction(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
     string returnString;
     //Check if a conjunction exists by comparing size
     if (tokens.size()<=index) {
@@ -109,7 +120,7 @@ string Parser::checkConjunction(PTNode* node, vector<pair<string, LexerConstants
     }
 }
 
-string Parser::checkCondition(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
+string Parser::checkExplicitCondition(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
     string returnString;
     //Check if a condition exists by comparing size
     if (tokens.size()<=index) {
@@ -127,26 +138,7 @@ string Parser::checkCondition(PTNode* node, vector<pair<string, LexerConstants::
     }
 }
 
-string Parser::parseImplicit(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
-    //Create a temporary return string to return errors
-    string returnString;
-    //Check if the first operand exissts
-    if (tokens.size()<FIRST_OPERAND_POSITION+1) {
-        return "Missing first operand";
-    }
-    //Check if the token is an operand
-    else if (!isOperand(tokens[FIRST_OPERAND_POSITION])) {
-        return "Unknown first operand '" + tokens[FIRST_OPERAND_POSITION].first + "'";
-    }
-    else {
-        //Insert a new child as the operand
-        node->insertChild(1, (new OperandNode(FIRST_OPERAND_POSITION, tokens[FIRST_OPERAND_POSITION].first, returnPTOperand(tokens[FIRST_OPERAND_POSITION].second))));
-        return "";
-    }
-}
-
 string Parser::parseConjunction(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
-    cout << "parsing conjunction " << endl;
     //Create temporary return string
     string returnString;
     //Increment index by one to now point to where the operand should be
