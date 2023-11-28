@@ -112,11 +112,14 @@ bool Compiler::parseCode() {
     #pragma omp parallel for private(error)
     for (int i=0; i<m_codeTokens.size(); i++) {
         //Call validateInstruction in InstructionSet
-        error = m_parser->validateInstruction(i, m_codeTokens[i]);
+        error = m_parser->checkInstruction(i, m_codeTokens[i]);
         //If an error is present
         if (error != "") {
+            #pragma omp critical
+            {
             //Print the excepted line and the syntax error returned from validateInstruction()
             invalidLines[i] = "\nInvalid syntax at line " + to_string(i + 1) + ": " + m_codeLines[i] + "\n" + error + "\n";
+            }
         }
         error.clear();
     }

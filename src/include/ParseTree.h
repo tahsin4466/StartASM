@@ -80,7 +80,7 @@ class RootNode: public PTNode {
     public:
         //Constructor/Destructor
         RootNode():
-            PTNode(PTConstants::Constants::NULLINDEX, "", PTConstants::ROOT) {};
+            PTNode(PTConstants::Constants::NULL_INDEX, "", PTConstants::ROOT) {};
         virtual ~RootNode() {}; 
         RootNode(const RootNode&) = delete;
         RootNode& operator=(const RootNode&) = delete; 
