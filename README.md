@@ -48,9 +48,9 @@ StartASM is designed to be as close to plain English as possible. The syntax tra
 
 For a more complex example:
 
-`shift right logically r1 with r2`
+`shift right y r1 with r2`
 - Denotes the instruction first `shift`
-- Provides direction and type, always after the base instruction `right logically`
+- Provides direction after the base instruction `right`
 - States implicitly self operand `r1`
 - Provides a transitional conjunction to show relationship as attribute of instruction `by`
 - Sates explicitly the attribute operand `r2`
