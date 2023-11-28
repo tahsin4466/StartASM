@@ -48,7 +48,7 @@ StartASM is designed to be as close to plain English as possible. The syntax tra
 
 For a more complex example:
 
-`shift right y r1 with r2`
+`shift right r1 with r2`
 - Denotes the instruction first `shift`
 - Provides direction after the base instruction `right`
 - States implicitly self operand `r1`
@@ -137,7 +137,7 @@ move m<1> to r6
 
 Will return the following errors:
 ```
-Invalid syntax at line 1: 'shift right logically r2 with r1'
+Invalid syntax at line 1: 'shift right r2 with r1'
 Unknown conjunction 'with'. Expected 'by'
 
 Invalid syntax at line 2: 'junk r1'
