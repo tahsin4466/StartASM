@@ -1,7 +1,6 @@
 #ifndef PARSETREE_H
 #define PARSETREE_H
 
-#include <map>
 #include <vector>
 #include <algorithm>
 #include <string>
@@ -13,7 +12,7 @@ namespace PTConstants {
     enum GeneralType {INSTRUCTION, CONJUNCTION, CONDITION, BLANK};
     enum OperandType {REGISTER, INSTRUCTIONADDRESS, MEMORYADDRESS, INTEGER, FLOAT, BOOLEAN, CHARACTER, LABEL, COMMENT, UNKNOWN};
     enum Constants {
-        NULL_INDEX = -1
+        IMPLICIT_INDEX = -1
     };
 };
 
@@ -26,8 +25,8 @@ class PTNode {
             m_nodeValue(nodeValue),
             m_nodeType(nodeType) {};
         virtual ~PTNode() {
-            for(auto itr = m_children.begin(); itr!=m_children.end(); itr++) {
-                delete itr->second;
+            for(int i =0; i<m_children.size(); i++) {
+                delete m_children[i];
             }
             m_children.clear();
         };
@@ -37,41 +36,31 @@ class PTNode {
         //Getters
         const virtual std::string getNodeValue() const {return m_nodeValue;};
         const virtual PTConstants::NodeType getNodeType() const {return m_nodeType;};
+        const virtual int getIndex() const {return m_tokenIndex;};
         const virtual int getNumChildren() const {return m_children.size();};
-
-        //Child iteration
-        void forEachChild(std::function<void(PTNode*, int)> func) const {
-            for (const auto& pair : m_children) {
-                func(pair.second, pair.first);
-            }
+        const std::vector<PTNode*>& getChildren() const {
+            return m_children;
         }
 
         //Child insertion and manipulation
-        PTNode* insertChild(int index, PTNode* childNode) {
+        PTNode* insertChild(PTNode* childNode) {
             if(childNode!=nullptr) {
-                m_children[index] = childNode;
+                m_children.push_back(childNode);
                 return childNode;
             }
             else {
                 return nullptr;
             }
         };
-        bool deleteChild(int index) {
-            if(m_children.find(index) != m_children.end()) {
-                delete m_children[index];
-                m_children.erase(index);
-                return true;
-            }
-            else {
-                return false;
-            }
+        void deleteLastChild() {
+            m_children.pop_back();
         }
         PTNode* childAt(int index) {
-            if(m_children.find(index) != m_children.end()) {
-                return m_children[index];
+            if(index >= m_children.size()) {
+                return nullptr;
             }
             else {
-                return nullptr;
+                return m_children[index];
             }
         }
 
@@ -79,7 +68,7 @@ class PTNode {
         int m_tokenIndex;
         std::string m_nodeValue;
         PTConstants::NodeType m_nodeType;
-        std::map<int, PTNode*> m_children;
+        std::vector<PTNode*> m_children;
 };
 
 //Specialized PTNode Classes
@@ -89,7 +78,7 @@ class RootNode: public PTNode {
     public:
         //Constructor/Destructor
         RootNode():
-            PTNode(PTConstants::Constants::NULL_INDEX, "", PTConstants::ROOT) {};
+            PTNode(PTConstants::Constants::IMPLICIT_INDEX, "", PTConstants::ROOT) {};
         virtual ~RootNode() {}; 
         RootNode(const RootNode&) = delete;
         RootNode& operator=(const RootNode&) = delete; 
@@ -146,19 +135,18 @@ class PT {
     private:
         PTNode* m_root;
 
-        void printNode(PTNode* node, int level = 0) const {
+        void printNode(const PTNode* node, int level = 0) const {
             if (node == nullptr) return;
 
-            // Print the current node details with indentation
             std::string indent(level * 4, ' '); // Increase indentation with each level
-            std::cout << indent << node->getNodeValue() << std::endl;
+            std::cout << indent << node->getNodeValue() << "(" << node->getIndex() << ")" << std::endl;
 
-            // Iterate over each child in the map and recursively print
-            node->forEachChild([this, level](PTNode* child, int index) {
+            // Iterate over each child in the vector and recursively print
+            for (const auto& child : node->getChildren()) {
                 if (child != nullptr) {
                     printNode(child, level + 1);
                 }
-            });
+            }
         }
 };
 

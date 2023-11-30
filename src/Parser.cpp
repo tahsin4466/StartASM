@@ -112,7 +112,7 @@ Parser::Parser() {
 string Parser::checkInstruction(int line, vector<pair<string, LexerConstants::TokenType>> tokens) {
     //Zero case, return instantly with valid syntax and no AST construction
     if (tokens[0].second == LexerConstants::TokenType::BLANK) {
-        m_parseTree->getRoot()->insertChild(line, (new GeneralNode(line, "", BLANK)));
+        m_parseTree->getRoot()->insertChild((new GeneralNode(0, "", BLANK)));
         return "";
     }
     //If keyword doesn't match, return error no instruction found
@@ -122,7 +122,7 @@ string Parser::checkInstruction(int line, vector<pair<string, LexerConstants::To
     auto itr = m_templateMap.find(tokens[0].first);
     //If found, go to parse instruction method creating a new instruction node
     if (itr!= m_templateMap.end()) {
-        return parseInstruction((m_parseTree->getRoot()->insertChild(line, (new GeneralNode(line, tokens[0].first, INSTRUCTION)))), tokens, itr->second);
+        return parseInstruction((m_parseTree->getRoot()->insertChild((new GeneralNode(0, tokens[0].first, INSTRUCTION)))), tokens, itr->second);
     }
     else {
         //Edge case, valid instruction with no method implemented (debug)
@@ -174,7 +174,7 @@ string Parser::checkImplicitConjunction(PTNode* node, vector<pair<string, LexerC
     //Implicit node is implicit, so always exists
     //Add keyword as child
     //Rewrite returnString if L2 analysis returns an error
-    returnString = parseConjunction(node->insertChild(NULL_INDEX, (new GeneralNode(Constants::NULL_INDEX, keyword, CONJUNCTION))), tokens, keyword, index);
+    returnString = parseConjunction(node->insertChild((new GeneralNode(Constants::IMPLICIT_INDEX, keyword, CONJUNCTION))), tokens, keyword, index);
     return returnString;
 }
 
@@ -183,7 +183,7 @@ string Parser::checkImplicitCondition(PTNode* node, vector<pair<string, LexerCon
     //Implicit node is implicit, so always exists
     //Add keyword as child
     //Rewrite returnString if L2 analysis returns an error
-    returnString = parseCondition(node->insertChild(NULL_INDEX, (new GeneralNode(Constants::NULL_INDEX, keyword, CONJUNCTION))), tokens, keyword, index);
+    returnString = parseCondition(node->insertChild((new GeneralNode(Constants::IMPLICIT_INDEX, keyword, CONJUNCTION))), tokens, keyword, index);
     return returnString;
 }
 
@@ -200,7 +200,7 @@ string Parser::checkExplicitConjunction(PTNode* node, vector<pair<string, LexerC
     //If passed, add to keyword as child
     //Rewrite returnString if L2 analysis returns an error
     else {
-        returnString = parseConjunction(node->insertChild(index, (new GeneralNode(index, keyword, CONJUNCTION))), tokens, keyword, index);
+        returnString = parseConjunction(node->insertChild((new GeneralNode(index, keyword, CONJUNCTION))), tokens, keyword, index);
         return returnString;
     }
 }
@@ -218,7 +218,7 @@ string Parser::checkExplicitCondition(PTNode* node, vector<pair<string, LexerCon
     //If passed, add to keyword as child
     //Rewrite returnString if L2 analysis returns an error
     else {
-        returnString = parseCondition(node->insertChild(index, (new GeneralNode(index, keyword, CONJUNCTION))), tokens, keyword, index);
+        returnString = parseCondition(node->insertChild((new GeneralNode(index, keyword, CONJUNCTION))), tokens, keyword, index);
         return returnString;
     }
 }
@@ -238,7 +238,7 @@ string Parser::parseConjunction(PTNode* node, vector<pair<string, LexerConstants
     }
     else {
         //Insert a new child as the operand
-        node->insertChild(index, (new OperandNode(index, tokens[index].first, returnPTOperand(tokens[index].second))));
+        node->insertChild((new OperandNode(index, tokens[index].first, returnPTOperand(tokens[index].second))));
         return "";
     }
 }
@@ -258,7 +258,7 @@ string Parser::parseCondition(PTNode* node, vector<pair<string, LexerConstants::
     }
     else {
         //Insert a new child as the operand
-        node->insertChild(index, (new OperandNode(index, tokens[index].first, returnPTOperand(tokens[index].second))));
+        node->insertChild((new OperandNode(index, tokens[index].first, returnPTOperand(tokens[index].second))));
         return "";
     } 
 }
