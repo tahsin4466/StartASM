@@ -5,10 +5,12 @@
 #include <vector>
 #include <algorithm>
 #include <string>
+#include <iostream>
+#include <functional>
 
 namespace PTConstants {
     enum NodeType {ROOT, GENERAL, OPERAND};
-    enum GeneralType {INSTRUCTION, CONJUNCTION, CONDITION};
+    enum GeneralType {INSTRUCTION, CONJUNCTION, CONDITION, BLANK};
     enum OperandType {REGISTER, INSTRUCTIONADDRESS, MEMORYADDRESS, INTEGER, FLOAT, BOOLEAN, CHARACTER, LABEL, COMMENT, UNKNOWN};
     enum Constants {
         NULL_INDEX = -1
@@ -36,6 +38,13 @@ class PTNode {
         const virtual std::string getNodeValue() const {return m_nodeValue;};
         const virtual PTConstants::NodeType getNodeType() const {return m_nodeType;};
         const virtual int getNumChildren() const {return m_children.size();};
+
+        //Child iteration
+        void forEachChild(std::function<void(PTNode*, int)> func) const {
+            for (const auto& pair : m_children) {
+                func(pair.second, pair.first);
+            }
+        }
 
         //Child insertion and manipulation
         PTNode* insertChild(int index, PTNode* childNode) {
@@ -130,8 +139,27 @@ class PT {
         }
         PTNode* getRoot() {return m_root;};
 
+        void printTree() const {
+            printNode(m_root);
+        }
+
     private:
         PTNode* m_root;
+
+        void printNode(PTNode* node, int level = 0) const {
+            if (node == nullptr) return;
+
+            // Print the current node details with indentation
+            std::string indent(level * 4, ' '); // Increase indentation with each level
+            std::cout << indent << node->getNodeValue() << std::endl;
+
+            // Iterate over each child in the map and recursively print
+            node->forEachChild([this, level](PTNode* child, int index) {
+                if (child != nullptr) {
+                    printNode(child, level + 1);
+                }
+            });
+        }
 };
 
 #endif

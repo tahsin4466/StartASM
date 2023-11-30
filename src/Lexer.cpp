@@ -77,6 +77,7 @@ vector<pair<string, TokenType>> Lexer::tokenizeLine(string line) {
 
     //Zero case, return instantly
     if (line.empty()) {
+        tokenizedLine.push_back(make_pair("", BLANK));
         return tokenizedLine;
     }
 

@@ -111,17 +111,18 @@ Parser::Parser() {
 //LEVEL 1 - INSTRUCTION PARSER AND CHECKER
 string Parser::checkInstruction(int line, vector<pair<string, LexerConstants::TokenType>> tokens) {
     //Zero case, return instantly with valid syntax and no AST construction
-    if (tokens.empty()) {
+    if (tokens[0].second == LexerConstants::TokenType::BLANK) {
+        m_parseTree->getRoot()->insertChild(line, (new GeneralNode(line, "", BLANK)));
         return "";
     }
     //If keyword doesn't match, return error no instruction found
-    if (tokens[0].second != LexerConstants::INSTRUCTION) {
+    if (tokens[0].second != LexerConstants::TokenType::INSTRUCTION) {
         return "Unknown instruction '" + tokens[0].first + "'";
     }
     auto itr = m_templateMap.find(tokens[0].first);
     //If found, go to parse instruction method creating a new instruction node
     if (itr!= m_templateMap.end()) {
-        return parseInstruction((m_parseTree->getRoot()->insertChild(line, (new GeneralNode(0, tokens[0].first, INSTRUCTION)))), tokens, itr->second);
+        return parseInstruction((m_parseTree->getRoot()->insertChild(line, (new GeneralNode(line, tokens[0].first, INSTRUCTION)))), tokens, itr->second);
     }
     else {
         //Edge case, valid instruction with no method implemented (debug)
@@ -330,5 +331,9 @@ PTConstants::OperandType Parser::returnPTOperand(LexerConstants::TokenType token
         default:
             return PTConstants::OperandType::UNKNOWN;
     }
+}
+
+void Parser::printTree() {
+    m_parseTree->printTree();
 }
 

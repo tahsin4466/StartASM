@@ -121,6 +121,7 @@ bool Compiler::parseCode() {
 
     //Concatenate the statusMessage string from the map (which should be ordered already)
     if (m_statusMessage.empty()) {
+        m_parser->printTree();
         return true; 
     }
     else {

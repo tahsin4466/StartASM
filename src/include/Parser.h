@@ -22,6 +22,9 @@ class Parser {
         Parser(const Parser&) = delete;
         Parser& operator=(const Parser&) = delete;
 
+        //Print debugging method
+        void printTree();
+
         //LEVEL 1 - INSTRUCTION CHECKER (PUBLIC)
         std::string checkInstruction(int line, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens);
         //Get pointer to parse tree
