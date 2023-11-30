@@ -4,6 +4,7 @@
 #include "Lexer.h"
 
 #include <string>
+#include <utility>
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
@@ -73,7 +74,7 @@ class Compiler {
         //Vector containing code tokens and tags
         std::vector<std::vector<std::pair<std::string, LexerConstants::TokenType>>> m_codeTokens;
         //Hash table for symbol resolution, mapping labels to instruction addresses
-        std::unordered_map<std::string, std::string> m_labelTable;
+        std::unordered_map<std::string, std::pair<std::string, int>> m_symbolTable;
 
  
 

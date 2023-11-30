@@ -34,13 +34,16 @@ class PTNode {
         PTNode& operator=(const PTNode&) = delete;
 
         //Getters
-        const virtual std::string getNodeValue() const {return m_nodeValue;};
-        const virtual PTConstants::NodeType getNodeType() const {return m_nodeType;};
-        const virtual int getIndex() const {return m_tokenIndex;};
-        const virtual int getNumChildren() const {return m_children.size();};
+        const std::string getNodeValue() const {return m_nodeValue;};
+        const PTConstants::NodeType getNodeType() const {return m_nodeType;};
+        const int getIndex() const {return m_tokenIndex;};
+        const int getNumChildren() const {return m_children.size();};
         const std::vector<PTNode*>& getChildren() const {
             return m_children;
         }
+
+        //Setters
+        void setNodeValue(std::string value) {m_nodeValue = value;};
 
         //Child insertion and manipulation
         PTNode* insertChild(PTNode* childNode) {
@@ -94,8 +97,9 @@ class GeneralNode: public PTNode {
         GeneralNode(const GeneralNode&) = delete;
         GeneralNode& operator=(const GeneralNode&) = delete; 
 
-        //Getter
+        //Getters and setters
         const PTConstants::GeneralType getGeneralType() const {return m_generalType;};
+        void setGeneralType(PTConstants::GeneralType type) {m_generalType = type;};
     
     private:
         PTConstants::GeneralType m_generalType;
@@ -111,8 +115,9 @@ class OperandNode: public PTNode {
         OperandNode(const OperandNode&) = delete;
         OperandNode& operator=(const OperandNode&) = delete;
 
-        //Getter
+        //Getters and setters
         const PTConstants::OperandType getOperandType() const {return m_operandType;};
+        void setOperandType(PTConstants::OperandType type) {m_operandType = type;};
     
     private:
         PTConstants::OperandType m_operandType;
@@ -128,6 +133,7 @@ class PT {
         }
         PTNode* getRoot() {return m_root;};
 
+        //Print tree function
         void printTree() const {
             printNode(m_root);
         }
@@ -135,6 +141,7 @@ class PT {
     private:
         PTNode* m_root;
 
+        //Debugging - printNode called recursively
         void printNode(const PTNode* node, int level = 0) const {
             if (node == nullptr) return;
 

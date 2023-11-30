@@ -59,9 +59,9 @@ Lexer::Lexer() {
     m_tokenDictionary.emplace("address", DESCRIPTOR);
 
     //Add operand regex templates to vector
-    m_operandDictionary.push_back(make_pair(regex("r[0-9]"), REGISTER));
-    m_operandDictionary.push_back(make_pair(regex("m<[0-9]{1,9}>"), MEMORYADDRESS));
-    m_operandDictionary.push_back(make_pair(regex("i\\[[0-9]{1,9}\\]"), INSTRUCTIONADDRESS));
+    m_operandDictionary.push_back(make_pair(regex("r[0-9]+"), REGISTER));
+    m_operandDictionary.push_back(make_pair(regex("m<[0-9]+>"), MEMORYADDRESS));
+    m_operandDictionary.push_back(make_pair(regex("i\\[[0-9]+\\]"), INSTRUCTIONADDRESS));
     m_operandDictionary.push_back(make_pair(regex("-?[1-9][0-9]{0,9}|0"), INTEGER));
     m_operandDictionary.push_back(make_pair(regex("-?\\d+\\.\\d+"), FLOAT));
     m_operandDictionary.push_back(make_pair(regex("true|false|1|0"), BOOLEAN));

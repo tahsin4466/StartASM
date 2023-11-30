@@ -22,7 +22,6 @@ push r8
 pop to r6
 return
 stop
-label 'myFunc'
 comment "This is a comment"
 
 label 'start'
@@ -32,16 +31,18 @@ create integer 8 to r8
 create integer 8 to r8
 create float 3.555553 to r9
 create character a to r5
-create address m<0000> to r4
+create address m<0009999999999999990> to r4
 create boolean 0 to r6
 create boolean false to r6
 jump if unconditional to 'myFunc'
+label 'hehohi'
 
 label 'myFunc'
 compare r1 with r2
 jump if greater to 'comparison'
 store r1 to m<1>
 stop
+
 
 label 'comparison'
 comment "This is just to see if r1 is greater than r2"
