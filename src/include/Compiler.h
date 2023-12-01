@@ -2,6 +2,7 @@
 #define COMPILER_H
 
 #include "Lexer.h"
+#include "AbstractSyntaxTree.h"
 
 #include <string>
 #include <utility>
@@ -10,7 +11,6 @@
 #include <unordered_set>
 #include <utility>
 
-class Lexer;
 class Parser;
 
 class Compiler {
@@ -64,9 +64,6 @@ class Compiler {
         //Generate the code
         void generateCode();
 
-        //Semantic checking helper functions
-
-
         //Private variables
         //Data structures
         //Vector containing code lines
@@ -75,8 +72,6 @@ class Compiler {
         std::vector<std::vector<std::pair<std::string, LexerConstants::TokenType>>> m_codeTokens;
         //Hash table for symbol resolution, mapping labels to instruction addresses
         std::unordered_map<std::string, std::pair<std::string, int>> m_symbolTable;
-
- 
 
         //Variables
         //Pathname
@@ -87,12 +82,10 @@ class Compiler {
         int m_lineIndex;
         //Lexer
         Lexer* m_lexer;
-        //Parser
+        //Parser (PT nested inside parser)
         Parser* m_parser;
-
-        
-    
-        
+        //Pointer to AST (used directly by the compiler at multiple stages)
+        AST::AbstractSyntaxTree* m_AST;    
 };
 
 #endif

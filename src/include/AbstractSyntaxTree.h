@@ -1,169 +1,143 @@
 #ifndef ABSTRACTSYNTAXTREE_H
 #define ABSTRACTSYNTAXTREE_H
 
-#include <map>
+#include <vector>
 #include <algorithm>
 #include <string>
+#include <iostream>
 
 namespace ASTConstants {
-    enum SemanticType {NONE, FROM, TO, SELF, FROMTO, SELFWITH, SELFBY, FROMWITHTO};
-    enum OperandType {REGISTER, INSTRUCTION, MEMORY, INT, FLOAT, CHAR, BOOL};
-    enum NumOperands {NULLARY, UNARY, BINARY, TERNARY};
+    enum NodeType {ROOT, INSTRUCTION, OPERAND};
+    enum InstructionType {MOVE, LOAD, STORE, CREATE, CAST, ADD, SUB, MULTIPLY, DIVIDE, OR, AND, NOT, SHIFT, COMPARE, JUMP, CALL, PUSH, POP, RETURN, STOP, INPUT, OUTPUT, PRINT, LABEL, COMMENT};
+    enum OperandType {REGISTER, INSTRUCTIONADDRESS, MEMORYADDRESS, INTEGER, FLOAT, BOOLEAN, CHARACTER, STRING, NEWLINE, UNKNOWN};
+    enum NumOperands {NULLARY, UNARY, BINARY, TERNARY, INVALID};
 };
 
-//Broad ASTNode
-class ASTNode { 
-    public:
-        virtual std::string getNodeValue() {return m_nodeValue;};
-
-    protected:
-        ASTNode(std::string nodeValue):
-            m_nodeValue(nodeValue) {};
-        virtual ~ASTNode() {};
-
-        std::string m_nodeValue;
-};
-
-
-
-//Level 2 instruction and operand nodes for the AST
-class InstructionNode: public ASTNode {
-    public:
-        virtual ASTConstants::NumOperands getNumOperands() {return m_numOperands;};
-        virtual ASTConstants::SemanticType getSemanticType() {return m_semanticStructure;};
-
-    protected:
-        InstructionNode(std::string operation, ASTConstants::NumOperands numOperands, ASTConstants::SemanticType semantic):
-            ASTNode(operation),
-            m_numOperands(numOperands),
-            m_semanticStructure(semantic) {};
-        
-        ASTConstants::NumOperands m_numOperands;
-        ASTConstants::SemanticType m_semanticStructure;
-};
-
-class OperandNode: public ASTNode {
-    friend class UnaryNode;
-    friend class BinaryNode;
-    friend class TernaryNode;
-
-    public:
-        virtual ASTConstants::OperandType getOperandType() {return m_operandType;};
-
-    protected:
-        OperandNode(std::string operand, ASTConstants::OperandType type):
-            ASTNode(operand),
-            m_operandType(type) {};
-    
-    private: 
-        ASTConstants::OperandType m_operandType;
-};
-
-
-
-//Level 3 specific instruction nodes (nullary, unary, binary, ternary)
-class NullaryNode: public InstructionNode {
-    friend class AST;
-
-    protected:
-        NullaryNode(std::string operation):
-            InstructionNode(operation, ASTConstants::NULLARY, ASTConstants::NONE) {};
-};
-
-class UnaryNode: public InstructionNode {
-    friend class AST;
-
-    public:
-        OperandNode* getOperandNode1() {return m_operand1;};
-
-    protected:
-        UnaryNode(std::string operation, std::string operand1Value, ASTConstants::OperandType operand1Type, ASTConstants::SemanticType semantic):
-            InstructionNode(operation, ASTConstants::UNARY, semantic),
-            m_operand1(new OperandNode(operand1Value, operand1Type)) {};
-        virtual ~UnaryNode() {
-            delete m_operand1;
-        };
-
-    private:
-        OperandNode* m_operand1; 
-};
-
-class BinaryNode: public InstructionNode {
-    friend class AST;
-
-    public:
-        OperandNode* getOperandNode1() {return m_operand1;};
-        OperandNode* getOperandNode2() {return m_operand2;};
-
-    protected:
-        BinaryNode(std::string operation, std::string operand1Value, ASTConstants::OperandType operand1Type, std::string operand2Value, ASTConstants::OperandType operand2Type, ASTConstants::SemanticType semantic):
-            InstructionNode(operation, ASTConstants::BINARY, semantic),
-            m_operand1(new OperandNode(operand1Value, operand1Type)),
-            m_operand2(new OperandNode(operand2Value, operand2Type)) {};
-        virtual ~BinaryNode() {
-            delete m_operand1;
-            delete m_operand2;
-        };
-        
-    private:
-        OperandNode* m_operand1; 
-        OperandNode* m_operand2;
-};
-
-class TernaryNode: public InstructionNode {
-    friend class AST;
-
-    public:
-        OperandNode* getOperandNode1() {return m_operand1;};
-        OperandNode* getOperandNode2() {return m_operand2;};
-        OperandNode* getOperandNode3() {return m_operand3;};
-
-    protected:
-        TernaryNode(std::string operation, std::string operand1Value, ASTConstants::OperandType operand1Type, std::string operand2Value, ASTConstants::OperandType operand2Type, std::string operand3Value, ASTConstants::OperandType operand3Type, ASTConstants::SemanticType semantic):
-            InstructionNode(operation, ASTConstants::TERNARY, semantic),
-            m_operand1(new OperandNode(operand1Value, operand1Type)),
-            m_operand2(new OperandNode(operand2Value, operand2Type)),
-            m_operand3(new OperandNode(operand3Value, operand3Type)) {};
-        virtual ~TernaryNode() {
-            delete m_operand1;
-            delete m_operand2;
-            delete m_operand3;
-        };
-
-    private:
-        OperandNode* m_operand1; 
-        OperandNode* m_operand2;
-        OperandNode* m_operand3;
-};
-
-//AST class to handle AST nodes
-class AST {
-    public:
-        AST() {};
-        ~AST() {
-            for(long unsigned int i=0; i<instructionNodes.size(); i++) {
-                delete instructionNodes[i];
+namespace AST {
+    class ASTNode {
+        public:
+            //Constructor/destructor
+            ASTNode(ASTConstants::NodeType type, std::string value):
+                m_nodeType(type),
+                m_nodeValue(value) {};
+            virtual ~ASTNode() {
+                for (int i=0; i<m_children.size(); i++) {
+                    delete m_children[i];
+                }
+                m_children.clear();
             }
-        };
-        AST(const AST&) = delete;
-        AST& operator=(const AST&) = delete;
+            ASTNode(const ASTNode&) = delete;
+            ASTNode& operator=(const ASTNode&) = delete;
 
-        int numInstructionNodes() {return instructionNodes.size();};
+            //Getters
+            const std::string getNodeValue() const {return m_nodeValue;};
+            const ASTConstants::NodeType getNodeType() const {return m_nodeType;};
+            const int getNumChildren() const {return m_children.size();};
+            const std::vector<ASTNode*>& getChildren() const {
+                return m_children;
+            }
 
-        void createInstructionNode(int line, std::string operation) {
-            instructionNodes[line] = new NullaryNode(operation);
-        };
-        void createInstructionNode(int line, std::string operation, std::string operand1Value, ASTConstants::OperandType operand1Type, ASTConstants::SemanticType semantic) {
-            instructionNodes[line] = new UnaryNode(operation, operand1Value, operand1Type, semantic);
-        };
-        void createInstructionNode(int line, std::string operation, std::string operand1Value, ASTConstants::OperandType operand1Type, std::string operand2Value, ASTConstants::OperandType operand2Type, ASTConstants::SemanticType semantic) {
-            instructionNodes[line] = new BinaryNode(operation, operand1Value, operand1Type, operand2Value, operand2Type, semantic);
-        };
-        void createInstructionNode(int line, std::string operation, std::string operand1Value, ASTConstants::OperandType operand1Type, std::string operand2Value, ASTConstants::OperandType operand2Type, std::string operand3Value, ASTConstants::OperandType operand3Type, ASTConstants::SemanticType semantic) {
-            instructionNodes[line] = new TernaryNode(operation, operand1Value, operand1Type, operand2Value, operand2Type, operand3Value, operand3Type, semantic);
-        };
+            //Setters
+            void setNodeValue(std::string value) {m_nodeValue = value;};
 
-        std::map<int, InstructionNode*> instructionNodes;
-};
 
+            //Child insertion and manipulation
+            ASTNode* insertChild(ASTNode* childNode) {
+                if(childNode!=nullptr) {
+                    m_children.push_back(childNode);
+                    return childNode;
+                }
+                else {
+                    return nullptr;
+                }
+            };
+            void deleteLastChild() {
+                delete m_children.back();
+                m_children.pop_back();
+            }
+            ASTNode* childAt(int index) {
+                if(index >= m_children.size()) {
+                    return nullptr;
+                }
+                else {
+                    return m_children[index];
+                }
+            }
+            
+        protected:
+            ASTConstants::NodeType m_nodeType;
+            std::string m_nodeValue;
+            std::vector<ASTNode*> m_children;
+    };
+
+    //Specialized ASTNode Classes
+    class RootNode: public ASTNode {
+        friend class AST;
+
+        public:
+            //Constructor/Destructor
+            RootNode():
+                ASTNode(ASTConstants::NodeType::ROOT, "") {};
+            virtual ~RootNode() {}; 
+            RootNode(const RootNode&) = delete;
+            RootNode& operator=(const RootNode&) = delete; 
+    };
+
+    //Instruction Node Class
+    class InstructionNode: public ASTNode {
+        public:
+            //Constructor/Destructor
+            InstructionNode(std::string nodeValue, ASTConstants::InstructionType instructionType, ASTConstants::NumOperands numOperands):
+                ASTNode(ASTConstants::NodeType::INSTRUCTION, nodeValue),
+                m_instructionType(instructionType),
+                m_numOperands(numOperands) {};
+            virtual ~InstructionNode() {}; 
+            InstructionNode(const InstructionNode&) = delete;
+            InstructionNode& operator=(const InstructionNode&) = delete; 
+
+            //Getters and setters
+            const ASTConstants::InstructionType getInstructionType() const {return m_instructionType;};
+            const ASTConstants::NumOperands getNumOperands() const {return m_numOperands;};
+            void setInstructionType(ASTConstants::InstructionType type) {m_instructionType = type;};
+            void setNumOperands(ASTConstants::NumOperands num) {m_numOperands = num;};
+        
+        private:
+            ASTConstants::InstructionType m_instructionType;
+            ASTConstants::NumOperands m_numOperands;
+    };
+
+    //Instruction Node Class
+    class OperandNode: public ASTNode {
+        public:
+            //Constructor/Destructor
+            OperandNode(std::string nodeValue, ASTConstants::OperandType operandType):
+                ASTNode(ASTConstants::NodeType::OPERAND, nodeValue),
+                m_operandType(operandType) {};
+            virtual ~OperandNode() {}; 
+            OperandNode(const OperandNode&) = delete;
+            OperandNode& operator=(const OperandNode&) = delete; 
+
+            //Getters and setters
+            const ASTConstants::OperandType getOperandType() const {return m_operandType;};
+            void setOperandType(ASTConstants::OperandType type) {m_operandType = type;};
+        
+        private:
+            ASTConstants::OperandType m_operandType;
+    };
+
+    class AbstractSyntaxTree {
+        public:
+            AbstractSyntaxTree() {
+                m_root = new RootNode();
+            }
+            ~AbstractSyntaxTree() {
+                delete m_root;
+            }
+            ASTNode* getRoot() {return m_root;};
+
+        private:
+            ASTNode* m_root;
+
+    };
+}
 #endif

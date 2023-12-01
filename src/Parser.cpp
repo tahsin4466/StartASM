@@ -8,11 +8,12 @@
 
 using namespace std;
 using namespace PTConstants;
+using namespace PT;
 
 //Constructor - Initialize all data structure values and parsing templates
 Parser::Parser() { 
     //Initialise the root pointer for the parse tree
-    m_parseTree = new PT();
+    m_parseTree = new ParseTree();
 
     //Initialise the instructionMap with expected lengths of each instruction
     m_instructionMap.emplace("move", 4);
