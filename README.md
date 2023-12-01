@@ -28,6 +28,8 @@ The language is based on a load-store model, with seperate program and insructio
 - jump (conditional and unconditional)
 - call (unconditional)
 - stack manipulation (push and pop)
+- inputs and outputs (to registers)
+- prints (for comments)
 - labels (Denoted with ' ')
 - comments (Denoted with " ")
 
@@ -35,6 +37,7 @@ One of the main features of StartASM is its abstraction to reduce barrier of ent
 - Datatypes (ints, floats, bools, chars, addresses) that eliminates the need to interpret hex directly
 - A static type system with enforced type safety while allowing users to 'cast' data (interpret the byte sequence differently) 
 - Simplified memory model aligned to 32 bits for every datatype
+- Simplified I/O and terminal
 
 
 ## Syntax
@@ -94,6 +97,9 @@ Here are all possible instruction combinations as of now:
 - `pop to (register)`
 - `return`
 - `stop`
+- `input integer/float/boolean/character to (register)`
+- `output (register)`
+- `print ("comment"/newline)`
 - `label '(label)'`
 - `comment "(comment)"`
 
@@ -104,30 +110,46 @@ Where:
 - Labels are any word within single quotes *'likeThis'*
 - Comments are any string within double quotes *"Like this"*
 
-Check the 'code' folder for examples. 'ExampleCode' is a file that provides no syntax errors, whereas the other files are test cases for the compiler. The 'Long' examples are for benchmarking the compiler and it's efficiency/ Here is a general example of valid StartASM code:
+StartASM contains a simple terminal, akin to higher-level languages. Methods `input` and `output` work strictly with dynamic data stored in registers, whereas there's a seperate `print` statement to allow easy user prompts and debugging. All outputs and inputs are on the same line unless expressly preceded by a `print newline`.
+
+Check the 'code' folder for examples. 'ExampleCode' is a file that provides no syntax errors, whereas the other files are test cases for the compiler. The 'Long' examples are for benchmarking the compiler and it's efficiency/ Here is a simple StartASM program that calculates how long the user has left till drinking age.
 
 ```
-comment "StartASM!"
-
-load m<435> to r2
-move r2 to r1
-store r1 to m<0234>
-or r1 with r2
-shift right r2 by r1
-not r1
+comment "Let's set a constant 21 and ask the user for their age"
+create integer 21 to r1
+print "How long till you're 21? Let's find out!"
+print newline
+print "Enter your age: "
+input integer to r2
+print newline
 compare r2 with r1
-jump if greater to i[0]
-jump if unconditional to 'overHere!'
-add r1 with r2 to r3
-divide r3 with r2 to r1
-pop to r3
+jump if equal to 'is21'
+jump if greater to 'past21'
+jump if less to 'not21'
 stop
 
-label 'overHere!'
+comment "Case - if the user is exactly 21"
+label 'is21'
+print "You're just barely 21! Yay!"
 stop
 
-comment "EndASM! get it? haha"
+comment "Case - if the user is past 21, we'll print their age back to them"
+label 'past21'
+print "Wow, you're "
+output r2
+print " and you're using this calculator? Scram!"
+stop
+
+comment "Case - if the user is yet to be 21, we'll output the number of years left"
+label 'not21'
+sub r1 with r2 to r3
+print " *sigh* you still have "
+output r3
+print " years to go till you're 21."
+stop
 ```
+The above program demonstrates numerous features of StartASM, including I/O, initializing values, arithmetic operations and conditional jumps.
+
 The compiler will also return syntax and symbol/scope error messages that show the excepted line, token and what the compiler expected if applicable. For example, submitting this invalid code:
 ``` 
 shift right r2 with r1
@@ -153,11 +175,11 @@ StartASM is, as of now, fully developed in C++. The intent is for the compiler a
 ## Progress
 **Please note that StartASM is still in early development, and as such many critical features are yet to be implemented. This is a personal project by a student, and as such is being developed incrementally.**
 
-*Last updated: November 28, 2023*
+*Last updated: November 30, 2023*
 
 **State:** StartASM currently only consists of a compiler that validates syntax through recursive descent parsing and builds a parse tree. Current focus is on implementing effective symbol resolution and semantic analysis, hopefully finishing the compiler by year's end.
 
-**Progress:** Currently working on implementing semantic analysis and symbol resolution, building out an AST.
+**Progress:** Currently working on implementing semantic analysis and building out an AST.
 
 **Current Goal:** Finish the compiler by the end of the year.
 

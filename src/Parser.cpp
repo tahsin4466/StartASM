@@ -35,6 +35,9 @@ Parser::Parser() {
     m_instructionMap.emplace("pop", 3);
     m_instructionMap.emplace("return", 1);
     m_instructionMap.emplace("stop", 1);
+    m_instructionMap.emplace("input", 4);
+    m_instructionMap.emplace("output", 2);
+    m_instructionMap.emplace("print", 2);
     m_instructionMap.emplace("label", 2);
     m_instructionMap.emplace("comment", 2);
 
@@ -99,10 +102,17 @@ Parser::Parser() {
     m_templateMap["return"];
     //Stop instruction
     m_templateMap["stop"];
+    //Input instruction
+    m_templateMap["input"].push_back(make_pair(make_pair("type", 0), checkImplicitCondition));
+    m_templateMap["input"].push_back(make_pair(make_pair("to", 2), checkExplicitConjunction));
+    //Output instruction template
+    m_templateMap["output"].push_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
+    //Print instruction
+    m_templateMap["print"].push_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
     //Comment instruction
-    m_templateMap["comment"].push_back(make_pair(make_pair("self", 0), checkImplicitConjunction));
+    m_templateMap["comment"].push_back(make_pair(make_pair("static", 0), checkImplicitConjunction));
     //Label instruction
-    m_templateMap["label"].push_back(make_pair(make_pair("self", 0), checkImplicitConjunction));
+    m_templateMap["label"].push_back(make_pair(make_pair("static", 0), checkImplicitConjunction));
 
 }
 
@@ -234,7 +244,7 @@ string Parser::parseConjunction(PTNode* node, vector<pair<string, LexerConstants
     }
     //If the token in the operand position is not an operad, return an error
     else if (!isOperand(tokens[index])) {
-        return "Unknown operand '" + tokens[index].first + "' after '" + keyword + "'";
+        return "Unknown operand '" + tokens[index].first + "' after '" + tokens[index-1].first + "'";
     }
     else {
         //Insert a new child as the operand
@@ -254,7 +264,7 @@ string Parser::parseCondition(PTNode* node, vector<pair<string, LexerConstants::
     }
     //If the token after keyword does not match as a descriptor
     else if (!isDescriptor(tokens[index])) {
-        return "Unknown descriptor '" + tokens[index].first + "' after '" + keyword + "'";
+        return "Unknown descriptor '" + tokens[index].first + "' after '" + tokens[index-1].first + "'";
     }
     else {
         //Insert a new child as the operand
@@ -285,7 +295,9 @@ bool Parser::isOperand(pair<string, LexerConstants::TokenType> token) {
             return true;
         case LexerConstants::TokenType::LABEL:
             return true;
-        case LexerConstants::TokenType::COMMENT:
+        case LexerConstants::TokenType::STRING:
+            return true;
+        case LexerConstants::TokenType::NEWLINE:
             return true;
         default:
             return false;
@@ -324,8 +336,10 @@ PTConstants::OperandType Parser::returnPTOperand(LexerConstants::TokenType token
             return PTConstants::OperandType::CHARACTER;
         case LexerConstants::TokenType::LABEL:
             return PTConstants::OperandType::LABEL;
-        case LexerConstants::TokenType::COMMENT:
-            return PTConstants::OperandType::COMMENT;
+        case LexerConstants::TokenType::STRING:
+            return PTConstants::OperandType::STRING;
+        case LexerConstants::TokenType::NEWLINE:
+            return PTConstants::OperandType::NEWLINE;
         case LexerConstants::TokenType::UNKNOWN:
             return PTConstants::OperandType::UNKNOWN;
         default:

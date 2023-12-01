@@ -33,6 +33,9 @@ Lexer::Lexer() {
     m_tokenDictionary.emplace("pop", INSTRUCTION);
     m_tokenDictionary.emplace("return", INSTRUCTION);
     m_tokenDictionary.emplace("stop", INSTRUCTION);
+     m_tokenDictionary.emplace("input", INSTRUCTION);
+      m_tokenDictionary.emplace("output", INSTRUCTION);
+       m_tokenDictionary.emplace("print", INSTRUCTION);
     m_tokenDictionary.emplace("label", INSTRUCTION);
     //Add conjunctions to dictionary
     m_tokenDictionary.emplace("from", CONJUNCTION);
@@ -83,28 +86,32 @@ vector<pair<string, TokenType>> Lexer::tokenizeLine(string line) {
 
     //Loop through every token
     while (ss >> token) {
-        //Special case for comments. Comments are the only instructions not seperating operands by whitespace alone
-        if (token == "comment") {
-            //Push back comment as an instruction
+        //Special case for comments and prints. These are the only instructions not seperating operands by whitespace alone
+        if (token == "comment" || token == "print") {
+            //Push back string as an instruction
             tokenizedLine.push_back(make_pair(token, INSTRUCTION));
             //Temporary string to hold the comment and a regex template to check for validity
-            string comment;
-            regex commentTemplate("^\".*\"$");
+            string operandString;
+            regex stringTemplate("^\".*\"$");
             //Get rest of the line
-            getline(ss, comment);
-            comment.erase(0, 1);
-            //If matching regex template, denote string as "comment"
-            if (regex_match(comment, commentTemplate)) {
-                tokenizedLine.push_back(make_pair(comment, COMMENT));
+            getline(ss, operandString);
+            operandString.erase(0, 1);
+            //First we need to determine if the next token is a newline - special case
+            if (operandString == "newline") {
+                tokenizedLine.push_back(make_pair(operandString, NEWLINE));
+            }
+            //If matching regex template, denote string as "string"
+            else if (regex_match(operandString, stringTemplate)) {
+                tokenizedLine.push_back(make_pair(operandString, STRING));
             }
             //Denote string unknown otherwise
             else {
-                tokenizedLine.push_back(make_pair(comment, UNKNOWN));
+                tokenizedLine.push_back(make_pair(operandString, UNKNOWN));
             }
             //Return vector instantly
             return tokenizedLine;
         }
-        //Case for not comments (everything else)
+        //Case for not comments and strings (everything else)
         else {
             //Attempt to find the token in the dictionary
             auto itr = m_tokenDictionary.find(token);
