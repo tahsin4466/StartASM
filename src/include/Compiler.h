@@ -1,14 +1,17 @@
 #ifndef COMPILER_H
 #define COMPILER_H
 
+#include "Lexer.h"
+#include "AbstractSyntaxTree.h"
+
 #include <string>
+#include <utility>
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
 
-class InstructionSet;
-class AST;
+class Parser;
 
 class Compiler {
     public:
@@ -49,9 +52,9 @@ class Compiler {
         //File loading
         bool loadFile();
         //Code Tokenizing
-        void tokenizeCode();
+        void lexCode();
         //Validate the syntax using regex matching
-        bool validateSyntax();
+        bool parseCode();
         //Resolve symbols and labels
         bool resolveSymbols();
         //Build the AST
@@ -65,12 +68,10 @@ class Compiler {
         //Data structures
         //Vector containing code lines
         std::vector<std::string> m_codeLines;
-        //Vector containing code tokens
-        std::vector<std::vector<std::string>> m_codeTokens;
+        //Vector containing code tokens and tags
+        std::vector<std::vector<std::pair<std::string, LexerConstants::TokenType>>> m_codeTokens;
         //Hash table for symbol resolution, mapping labels to instruction addresses
-        std::unordered_map<std::string, std::string> m_labelTable;
-
-
+        std::unordered_map<std::string, std::pair<std::string, int>> m_symbolTable;
 
         //Variables
         //Pathname
@@ -79,12 +80,12 @@ class Compiler {
         std::string m_statusMessage;
         //Int containing current line index
         int m_lineIndex;
-        //Instruction set
-        InstructionSet* m_instructionSet;
-        //Abstract Syntax Tree
-        AST* m_AST;
-    
-        
+        //Lexer
+        Lexer* m_lexer;
+        //Parser (PT nested inside parser)
+        Parser* m_parser;
+        //Pointer to AST (used directly by the compiler at multiple stages)
+        AST::AbstractSyntaxTree* m_AST;    
 };
 
 #endif

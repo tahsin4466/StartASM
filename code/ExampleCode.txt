@@ -1,4 +1,3 @@
-move r1 to r2
 load m<435> to r2
 store r6 to m<0234>
 add r1 with r2 to r2
@@ -8,24 +7,21 @@ divide r8 with r8 to r1
 or r4 with r2
 and r1 with r2
 not r6
-shift left arithmetically r4 by r1
-shift left logically r8 by r2
-shift right arithmetically r2 by r4
-shift right logically r2 by r6
+shift left r4 by r1
+shift right r2 by r4
 compare r2 with r3
-jump unconditionally to i[3]
+jump if unconditional to i[3]
 jump if greater to i[8]
 jump if less to i[0]
 jump if equal to 'myFunc'
-jump if not equal to 'myFunc'
+jump if unequal to 'myFunc'
 jump if zero to i[7]
-jump if not zero to i[000008]
+jump if nonzero to i[000008]
 call to 'myFunc'
 push r8
 pop to r6
 return
 stop
-label 'myFunc'
 comment "This is a comment"
 
 label 'start'
@@ -35,10 +31,11 @@ create integer 8 to r8
 create integer 8 to r8
 create float 3.555553 to r9
 create character a to r5
-create address m<0000> to r4
+create address m<0009999999999999990> to r4
 create boolean 0 to r6
 create boolean false to r6
-jump unconditionally to 'myFunc'
+jump if unconditional to 'myFunc'
+label 'hehohi'
 
 label 'myFunc'
 compare r1 with r2
@@ -46,11 +43,12 @@ jump if greater to 'comparison'
 store r1 to m<1>
 stop
 
+
 label 'comparison'
 comment "This is just to see if r1 is greater than r2"
 cast float r1
 cast float r2
 add r1 with r2 to r7
 compare r2 with r7
-jump if not zero to 'comparison'
+jump if nonzero to 'comparison'
 stop
