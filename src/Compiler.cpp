@@ -215,7 +215,37 @@ bool Compiler::resolveSymbols() {
 }
 
 void Compiler::buildAST() {
-    
+    //Get the root node of the parse tree and it's size (frequent access)
+    PT::PTNode* PTRoot = m_parser->getParseTree()->getRoot();
+    int PTSize = PTRoot->getNumChildren();
+    //Get the AST root node
+    AST::ASTNode* ASTRoot = m_AST->getRoot();
+
+    //Iterate over all children (instructions) in the parse tree
+    //Do NOT parallelize this as tree construction is inherently sequential! Each node has dependencies to each other, and the AST
+    //class is not thread safe!
+    for (int i=0; i<PTSize; i++) {
+        //Get the pointer to the instruction node from the PT
+        PT::PTNode* PTInstructionNode = PTRoot->childAt(i);
+        //The AST is not concerned about syntactic sugar, so discard lines that are empty
+        if (PTInstructionNode->getNodeValue() != "") {
+            //Initialize a new AST instruction node, using built in conversion methods found in the AST class
+            AST::InstructionNode* ASTInstructionNode = new AST::InstructionNode(PTInstructionNode->getNodeValue(), m_AST->getInstructionType(PTInstructionNode->getNodeValue()), m_AST->getNumOperands(PTInstructionNode->getNumChildren()), i+1);
+            //Insert into the AST
+            ASTRoot->insertChild(ASTInstructionNode);
+            //Next add all operands from the PT for the AST
+            for (int j=0; j<PTInstructionNode->getNumChildren(); j++) {
+                //Get the operand node from the PT and cast to an OperandNode (parser guarantees this)
+                PT::OperandNode* PTOperandNode = dynamic_cast<PT::OperandNode*>(PTInstructionNode->childAt(j)->childAt(0));
+                //Do a check anyway to make sure dynamic cast was successful
+                if (PTOperandNode != nullptr) {
+                    //Add a child for the instruction node in the AST, using conversion functions from the AST as necessary
+                    ASTInstructionNode->insertChild((new AST::OperandNode(PTOperandNode->getNodeValue(), m_AST->convertOperandType(PTOperandNode->getOperandType()))));
+                }
+            }
+        }
+    }
+
 }
 
 bool Compiler::analyzeSemantics() {

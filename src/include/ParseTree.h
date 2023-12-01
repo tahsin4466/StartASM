@@ -26,11 +26,14 @@ namespace PT {
                 m_nodeValue(nodeValue),
                 m_nodeType(nodeType) {};
             virtual ~PTNode() {
+                //Delete all dynamically allocated children from the vector
                 for(int i =0; i<m_children.size(); i++) {
                     delete m_children[i];
                 }
+                //Clear all dangling references
                 m_children.clear();
             };
+            //Remove copy and assignment operators
             PTNode(const PTNode&) = delete;
             PTNode& operator=(const PTNode&) = delete;
 
@@ -39,6 +42,7 @@ namespace PT {
             const PTConstants::NodeType getNodeType() const {return m_nodeType;};
             const int getIndex() const {return m_tokenIndex;};
             const int getNumChildren() const {return m_children.size();};
+            //Get children method (for recursive methods)
             const std::vector<PTNode*>& getChildren() const {
                 return m_children;
             }
@@ -48,6 +52,7 @@ namespace PT {
 
             //Child insertion and manipulation
             PTNode* insertChild(PTNode* childNode) {
+                //Insert child if not nullptr
                 if(childNode!=nullptr) {
                     m_children.push_back(childNode);
                     return childNode;
@@ -57,10 +62,13 @@ namespace PT {
                 }
             };
             void deleteLastChild() {
+                //Delete child then remove dangling pointer
+                delete m_children.back();
                 m_children.pop_back();
             }
             PTNode* childAt(int index) {
                 if(index >= m_children.size()) {
+                    //Return nullptr if out of bounds
                     return nullptr;
                 }
                 else {
@@ -69,6 +77,7 @@ namespace PT {
             }
 
         protected:
+            //Variables to be inhereted by derived methods
             int m_tokenIndex;
             std::string m_nodeValue;
             PTConstants::NodeType m_nodeType;
@@ -77,6 +86,7 @@ namespace PT {
 
     //Specialized PTNode Classes
     class RootNode: public PTNode {
+        //Friend class allows only PT to construct a Root Node
         friend class PT;
 
         public:
@@ -88,6 +98,7 @@ namespace PT {
             RootNode& operator=(const RootNode&) = delete; 
     };
 
+    //General node for non-operands
     class GeneralNode: public PTNode {
         public:
             //Constructor/Destructor
@@ -103,9 +114,11 @@ namespace PT {
             void setGeneralType(PTConstants::GeneralType type) {m_generalType = type;};
         
         private:
+            //Store the type of general node
             PTConstants::GeneralType m_generalType;
     };
 
+    //Operand node for operands
     class OperandNode: public PTNode {
         public:
             //Constructor/Destructor
@@ -121,20 +134,23 @@ namespace PT {
             void setOperandType(PTConstants::OperandType type) {m_operandType = type;};
         
         private:
+            //Store the type of operand
             PTConstants::OperandType m_operandType;
     };
 
     class ParseTree {
         public:
+            //Create a new root node to initialise tree
             ParseTree() {
                 m_root = new RootNode();
             }
+            //Delete root, which will recursively delete whole tree
             ~ParseTree() {
                 delete m_root;
             }
             PTNode* getRoot() {return m_root;};
 
-            //Print tree function
+            //Print tree function, which calls recursively
             void printTree() const {
                 printNode(m_root);
             }
