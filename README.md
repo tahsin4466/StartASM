@@ -1,21 +1,21 @@
 # StartASM
 
 ## Overview
-StartASM is a personal project that aims to create a simple, beginner friendly assembly language. Its main goals are:
+StartASM is a personal project that aims to create a simple, beginner-friendly assembly language. Its main goals are:
 - Create a readable, English-like syntax with greater verbosity and clarity
 - Abstract many complicated facets of assembly programming to reduce complexity
-- Introduce assembly programming concepts in a straightforward, simplfied manner
+- Introduce assembly programming concepts in a straightforward, simplified manner
 
-StartASM was created after personally struggling learning x86 as a complete newcomer to assembly programming. I want this project to be a simpler, more intuitive introduction to assembly concepts that could act as an effective stepping stone towards learning industry standard languages. It is also a personal excercise in self learning, and is my first time engaging with many of these concepts myself.
+StartASM was created after personally struggling to learn x86 as a complete newcomer to assembly programming. I want this project to be a simpler, more intuitive introduction to assembly concepts that could be an effective stepping stone toward learning industry-standard languages. It is also a personal exercise in self-learning and is my first time engaging with many of these concepts myself.
 
 
 ## Features
 StartASM will be composed of three parts:
 - A custom compiler, written in C++, that validates and compiles StartASM code into intermediate instruction objects
-- A full 32 bit simulator and runtime environment written in C++ - complete with registers and memory data structures - capable of executing StartASM instructions
+- A full 32-bit simulator and runtime environment written in C++ - complete with registers and memory data structures - capable of executing StartASM instructions
 - A custom IDE - built using Electron - to provide a visual development environment
 
-The language is based on a load-store model, with seperate program and insruction memory (Harvard) in a big-endian layout. The runtime environment will also feature 10 registers, 32 bit addressable memory and instruction pools as well as a simple stack. The following operations will be supported:
+The language is based on a load-store model, with separate program and instruction memory (Harvard) in a big-endian layout. The runtime environment will also feature 10 registers, 32 bit addressable memory and instruction pools as well as a simple stack. The following operations will be supported:
 - move (between registers)
 - load (memory to register)
 - store (register to memory)
@@ -33,15 +33,15 @@ The language is based on a load-store model, with seperate program and insructio
 - labels (Denoted with ' ')
 - comments (Denoted with " ")
 
-One of the main features of StartASM is its abstraction to reduce barrier of entry. This includes:
-- Datatypes (ints, floats, bools, chars, addresses) that eliminates the need to interpret hex directly
+One of the main features of StartASM is its abstraction to reduce the barrier of entry. This includes:
+- Datatypes (ints, floats, bools, chars, addresses) that eliminate the need to interpret hex directly
 - A static type system with enforced type safety while allowing users to 'cast' data (interpret the byte sequence differently) 
 - Simplified memory model aligned to 32 bits for every datatype
 - Simplified I/O and terminal
 
 
 ## Syntax
-StartASM is designed to be as close to plain English as possible. The syntax trades away traditional opcode mnemonics used in most ASM's in favor of readable syntax closer to high-level languages. This includes the use of full-word instructions, transitional conjunctions to demonstrate operand relationships, and clearly denoted register (`r0`-`r9`), memory (`m<0>`-`m<999999999>`) and instruction memory (`i[0]`-`i[999999999]`) operands. For example:
+StartASM is designed to be as close to plain English as possible. The syntax trades away traditional opcode mnemonics used in most ASMs in favor of readable syntax closer to high-level languages. This includes the use of full-word instructions, transitional conjunctions to demonstrate operand relationships, and clearly denoted register (`r0`-`r9`), memory (`m<0>`-`m<999999999>`) and instruction memory (`i[0]`-`i[999999999]`) operands. For example:
 
 `move r1 to r2`
 - Denotes the instruction first `move`
@@ -55,26 +55,26 @@ For a more complex example:
 - Denotes the instruction first `shift`
 - Provides direction after the base instruction `right`
 - States implicitly self operand `r1`
-- Provides a transitional conjunction to show relationship as attribute of instruction `by`
-- Sates explicitly the attribute operand `r2`
+- Provides transitional conjunction to show the relationship as an attribute of instruction `by`
+- States explicitly the attribute operand `r2`
 
 StartASM will enforce type safety as checked at compile time. For example:
 
 `add r1 with r2 to r3`
 
 - Will throw an exception if r1 and r2 are not tracked to be of the same datatype
-- Will cast r3 into the datatype of the result
+- Will cast r3 into the data type of the result
 - Will perform the correct addition operation for the given datatypes (integer arithmetic, floating point arithmetic, etc.)
 
 In summary:
-- Transitional conjunctions are used to show operand relationships (except for source/self operands, in which it is implicit for a natural language feel). e.g. `from`, `to`, `with`, `by`. Conditionals are denoted by `if`
+- Transitional conjunctions are used to show operand relationships (except for source/self operands, which are implicit for a natural language feel). e.g. `from`, `to`, `with`, `by`. Conditionals are denoted by `if`
 - Operands are stated explicitly and numerically. e.g. `r0`, `m<39>`
 - Base instructions are stated in full, with all instruction conditions also stated in full (no mnemonics). e.g. `move`, `shift left logically`
-- Types are stated and enforced, but flexibile in allowing reinterpretations of the same byte value
+- Types are stated and enforced but flexible in allowing reinterpretations of the same byte value
 
 
 ## Usage
-Download the repository and open in a code editor. Run the StartASM executable, and ensure a C++ compiler that supports OpenMP is installed (preferably g++). Create a text file with StartASM code and place it into the 'code' folder, then run the executable. When running the executable and providng a filename, omit the `.txt` part. `ExampleCode.txt` should become `ExampleCode`.
+Download the repository and open it in a code editor. Run the StartASM executable, and install a C++ compiler that supports OpenMP (preferably g++). Create a text file with StartASM code and place it into the 'code' folder, then run the executable. When running the executable and providing a filename, omit the `.txt` part. `ExampleCode.txt` should become `ExampleCode`.
 
 Here are all possible instruction combinations as of now:
 - `move (register) to (register)`
@@ -110,9 +110,9 @@ Where:
 - Labels are any word within single quotes *'likeThis'*
 - Comments are any string within double quotes *"Like this"*
 
-StartASM contains a simple terminal, akin to higher-level languages. Methods `input` and `output` work strictly with dynamic data stored in registers, whereas there's a seperate `print` statement to allow easy user prompts and debugging. All outputs and inputs are on the same line unless expressly preceded by a `print newline`.
+StartASM contains a simple terminal akin to higher-level languages. Methods `input` and `output` work strictly with dynamic data stored in registers, whereas there's a seperate `print` statement to allow easy user prompts and debugging. All outputs and inputs are on the same line unless expressly preceded by a `print newline`.
 
-Check the 'code' folder for examples. 'ExampleCode' is a file that provides no syntax errors, whereas the other files are test cases for the compiler. The 'Long' examples are for benchmarking the compiler and it's efficiency/ Here is a simple StartASM program that calculates how long the user has left till drinking age.
+Check the 'code' folder for examples. 'ExampleCode' is a file that provides no syntax errors, whereas the other files are test cases for the compiler. The 'Long' examples are for benchmarking the compiler and its efficiency/ Here is a simple StartASM program that calculates how long the user has left till the legal drinking age.
 
 ```
 comment "Let's set a constant 21 and ask the user for their age"
@@ -148,9 +148,9 @@ output r3
 print " years to go till you're 21."
 stop
 ```
-The above program demonstrates numerous features of StartASM, including I/O, initializing values, arithmetic operations and conditional jumps.
+The above program demonstrates numerous features of StartASM, including I/O, initializing values, arithmetic operations, and conditional jumps.
 
-The compiler will also return syntax and symbol/scope error messages that show the excepted line, token and what the compiler expected if applicable. For example, submitting this invalid code:
+The compiler will also return syntax and symbol/scope error messages that show the excepted line, token, and what the compiler expected, if applicable. For example, submitting this invalid code:
 ``` 
 shift right r2 with r1
 junk r1
@@ -173,11 +173,11 @@ Unknown source 'm<1>'. Expected register r0-r9
 StartASM is, as of now, fully developed in C++. The intent is for the compiler and runtime environment to be built using C++, while the front end will be built using Electron and node.js. This project also uses OpenMP multithreading to improve performance.
 
 ## Progress
-**Please note that StartASM is still in early development, and as such many critical features are yet to be implemented. This is a personal project by a student, and as such is being developed incrementally.**
+**Please note that StartASM is still in early development, so many critical features have yet to be implemented. This is a personal project by a student and, as such, is being developed incrementally.**
 
 *Last updated: December 1, 2023*
 
-**State:** StartASM currently only consists of a compiler that validates syntax through recursive descent parsing, builds a parse tree, resolves symbols then builds an AST. Current focus is on implementing effective semantic analysis, hopefully finishing the compiler by year's end.
+**State:** StartASM currently only consists of a compiler that validates syntax through recursive descent parsing, builds a parse tree, resolves symbols, and then builds an AST. The current focus is on implementing effective semantic analysis, hopefully finishing the compiler by year's end.
 
 **Progress:** Currently working on implementing semantic analysis.
 
@@ -186,7 +186,9 @@ StartASM is, as of now, fully developed in C++. The intent is for the compiler a
 
 ## Last Major Milestone
 **From December 1, 2023**
+
 *Reworked Lexer, Parser and AST | Value Creation, Type Systems and I/O | Performance Overhaul*
+
 The entire StartASM compiler was fully upended, moving from regex-based parsing logic to recursive descent. I've implemented numerous changes, including abolishing the InstructionSet.cpp class with a new Parser.cpp class that more closely aligns with industry-standard practices. Created a new ParseTree class to store syntactic information and completely reworked the AST class to represent StartASM syntax better. I also instituted a significant overhaul to the lexer, which now categorizes tokens based on enum constants. Furthermore, I've removed problematic OpenMP parallelized sections (particularly those with unstable access/writing in non-thread-safe containers) while ensuring that currently parallelized segments are thread-safe. SIGNIFICANT performance increases can be found (up to 390x); here is a sample:
 
 Regex (single threaded):
