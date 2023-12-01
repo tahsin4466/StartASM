@@ -28,8 +28,8 @@ The language is based on a load-store model, with separate program and instructi
 - jump (conditional and unconditional)
 - call (unconditional)
 - stack manipulation (push and pop)
-- inputs and outputs (to registers)
-- prints (for comments)
+- inputs and outputs (using registers)
+- prints (Denoted with " ")
 - labels (Denoted with ' ')
 - comments (Denoted with " ")
 
@@ -58,7 +58,7 @@ For a more complex example:
 - Provides transitional conjunction to show the relationship as an attribute of instruction `by`
 - States explicitly the attribute operand `r2`
 
-StartASM will enforce type safety as checked at compile time. For example:
+StartASM will enforce type safety as checked at runtime time. For example:
 
 `add r1 with r2 to r3`
 
@@ -69,7 +69,7 @@ StartASM will enforce type safety as checked at compile time. For example:
 In summary:
 - Transitional conjunctions are used to show operand relationships (except for source/self operands, which are implicit for a natural language feel). e.g. `from`, `to`, `with`, `by`. Conditionals are denoted by `if`
 - Operands are stated explicitly and numerically. e.g. `r0`, `m<39>`
-- Base instructions are stated in full, with all instruction conditions also stated in full (no mnemonics). e.g. `move`, `shift left logically`
+- Base instructions are stated in full, with all instruction conditions also stated in full (no mnemonics). e.g. `move`, `shift left`
 - Types are stated and enforced but flexible in allowing reinterpretations of the same byte value
 
 
