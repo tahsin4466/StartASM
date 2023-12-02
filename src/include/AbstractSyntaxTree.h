@@ -11,7 +11,7 @@
 namespace ASTConstants {
     enum NodeType {ROOT, INSTRUCTION, OPERAND};
     enum InstructionType {MOVE, LOAD, STORE, CREATE, CAST, ADD, SUB, MULTIPLY, DIVIDE, OR, AND, NOT, SHIFT, COMPARE, JUMP, CALL, PUSH, POP, RETURN, STOP, INPUT, OUTPUT, PRINT, LABEL, COMMENT, NONE};
-    enum OperandType {REGISTER, INSTRUCTIONADDRESS, MEMORYADDRESS, INTEGER, FLOAT, BOOLEAN, CHARACTER, STRING, NEWLINE, UNKNOWN};
+    enum OperandType {REGISTER, INSTRUCTIONADDRESS, MEMORYADDRESS, INTEGER, FLOAT, BOOLEAN, CHARACTER, STRING, NEWLINE, CONDITION, UNKNOWN};
     enum NumOperands {NULLARY, UNARY, BINARY, TERNARY, INVALID};
 };
 
@@ -226,6 +226,8 @@ namespace AST {
                         return ASTConstants::OperandType::STRING;
                     case PTConstants::OperandType::NEWLINE:
                         return ASTConstants::OperandType::NEWLINE;
+                    case PTConstants::OperandType::CONDITION:
+                        return ASTConstants::OperandType::CONDITION;
                     case PTConstants::OperandType::UNKNOWN:
                         return ASTConstants::OperandType::UNKNOWN;
                     default:
@@ -248,7 +250,17 @@ namespace AST {
                 if (node == nullptr) return;
 
                 std::string indent(level * 4, ' '); // 4 spaces per level of indentation
-                std::cout << indent << node->getNodeValue() << " (" << node->getNumChildren() << " children)" << std::endl;
+
+                // Check if the node is an OperandNode and cast it if so
+                const AST::OperandNode* operandNode = dynamic_cast<const AST::OperandNode*>(node);
+
+                if (operandNode != nullptr) {
+                    // If it's an OperandNode, print its value and operand type
+                    std::cout << indent << node->getNodeValue() << " - OperandType: " << operandNode->getOperandType() << std::endl;
+                } else {
+                    // For other node types, just print the value
+                    std::cout << indent << node->getNodeValue() << " (" << node->getNumChildren() << " children)" << std::endl;
+                }
 
                 // Recursively print each child
                 for (const auto& child : node->getChildren()) {

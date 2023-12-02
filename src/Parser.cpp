@@ -307,7 +307,7 @@ bool Parser::isOperand(pair<string, LexerConstants::TokenType> token) {
 
 bool Parser::isDescriptor(pair<string, LexerConstants::TokenType> token) {
     //Check if token is a descriptor (classified by lexer)
-    if (token.second == LexerConstants::TokenType::DESCRIPTOR) {
+    if (token.second == LexerConstants::TokenType::CONDITION) {
         return true;
     }
     else {
@@ -341,6 +341,8 @@ PTConstants::OperandType Parser::returnPTOperand(LexerConstants::TokenType token
             return PTConstants::OperandType::STRING;
         case LexerConstants::TokenType::NEWLINE:
             return PTConstants::OperandType::NEWLINE;
+        case LexerConstants::TokenType::CONDITION:
+            return PTConstants::OperandType::CONDITION;
         case LexerConstants::TokenType::UNKNOWN:
             return PTConstants::OperandType::UNKNOWN;
         default:

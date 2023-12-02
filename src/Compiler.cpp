@@ -246,6 +246,8 @@ void Compiler::buildAST() {
         }
     }
 
+    m_AST->printTree();
+
 }
 
 bool Compiler::analyzeSemantics() {

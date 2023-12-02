@@ -43,23 +43,22 @@ Lexer::Lexer() {
     m_tokenDictionary.emplace("self", CONJUNCTION);
     m_tokenDictionary.emplace("to", CONJUNCTION);
     m_tokenDictionary.emplace("by", CONJUNCTION);
+    m_tokenDictionary.emplace("if", CONJUNCTION);
     //Add conditions to dictionary
-    m_tokenDictionary.emplace("if", CONDITION);
-    //Add descriptors to dictionary
-    m_tokenDictionary.emplace("left", DESCRIPTOR);
-    m_tokenDictionary.emplace("right", DESCRIPTOR);
-    m_tokenDictionary.emplace("greater", DESCRIPTOR);
-    m_tokenDictionary.emplace("less", DESCRIPTOR);
-    m_tokenDictionary.emplace("equal", DESCRIPTOR);
-    m_tokenDictionary.emplace("unequal", DESCRIPTOR);
-    m_tokenDictionary.emplace("zero", DESCRIPTOR);
-    m_tokenDictionary.emplace("nonzero", DESCRIPTOR);
-    m_tokenDictionary.emplace("unconditional", DESCRIPTOR);
-    m_tokenDictionary.emplace("integer", DESCRIPTOR);
-    m_tokenDictionary.emplace("float", DESCRIPTOR);
-    m_tokenDictionary.emplace("boolean", DESCRIPTOR);
-    m_tokenDictionary.emplace("character", DESCRIPTOR);
-    m_tokenDictionary.emplace("address", DESCRIPTOR);
+    m_tokenDictionary.emplace("left", CONDITION);
+    m_tokenDictionary.emplace("right", CONDITION);
+    m_tokenDictionary.emplace("greater", CONDITION);
+    m_tokenDictionary.emplace("less", CONDITION);
+    m_tokenDictionary.emplace("equal", CONDITION);
+    m_tokenDictionary.emplace("unequal", CONDITION);
+    m_tokenDictionary.emplace("zero", CONDITION);
+    m_tokenDictionary.emplace("nonzero", CONDITION);
+    m_tokenDictionary.emplace("unconditional", CONDITION);
+    m_tokenDictionary.emplace("integer", CONDITION);
+    m_tokenDictionary.emplace("float", CONDITION);
+    m_tokenDictionary.emplace("boolean", CONDITION);
+    m_tokenDictionary.emplace("character", CONDITION);
+    m_tokenDictionary.emplace("address", CONDITION);
 
     //Add operand regex templates to vector
     m_operandDictionary.push_back(make_pair(regex("r[0-9]+"), REGISTER));
