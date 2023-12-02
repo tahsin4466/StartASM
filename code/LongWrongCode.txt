@@ -1,3 +1,4 @@
+comment "This is 10000 lines of wrong code to test error reporting and handling"
 move r1 to r2
 load m<435> to r2
 store r6 to m<0234>

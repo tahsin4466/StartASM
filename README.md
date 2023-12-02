@@ -80,7 +80,7 @@ Here are all possible instruction combinations as of now:
 - `move (register) to (register)`
 - `load (memory) to (register)`
 - `store (register) to (memory)`
-- `create integer/float/boolean/character (value) to (register)`
+- `create integer/float/boolean/character/address (value) to (register)`
 - `cast integer/float/boolean/character/address (register)`
 - `add (register) with (register) to (register)`
 - `sub (register) with (register) to (register)`
@@ -112,7 +112,7 @@ Where:
 
 StartASM contains a simple terminal akin to higher-level languages. Methods `input` and `output` work strictly with dynamic data stored in registers, whereas there's a seperate `print` statement to allow easy user prompts and debugging. All outputs and inputs are on the same line unless expressly preceded by a `print newline`.
 
-Check the 'code' folder for examples. 'ExampleCode' is a file that provides no syntax errors, whereas the other files are test cases for the compiler. The 'Long' examples are for benchmarking the compiler and its efficiency/ Here is a simple StartASM program that calculates how long the user has left till the legal drinking age.
+Check the 'code' folder for examples. Each code file contains a comment explaning it's purpose. Be careful about running LongCode, it's 1 million+ lines!
 
 ```
 comment "Let's set a constant 21 and ask the user for their age"
@@ -175,11 +175,11 @@ StartASM is, as of now, fully developed in C++. The intent is for the compiler a
 ## Progress
 **Please note that StartASM is still in early development, so many critical features have yet to be implemented. This is a personal project by a student and, as such, is being developed incrementally.**
 
-*Last updated: December 1, 2023*
+*Last updated: December 2, 2023*
 
-**State:** StartASM currently only consists of a compiler that validates syntax through recursive descent parsing, builds a parse tree, resolves symbols, and then builds an AST. The current focus is on implementing effective semantic analysis, hopefully finishing the compiler by year's end.
+**State:** StartASM currently consists of a compiler that validates the grammar, including syntax, symbols and semantics. Currently missing features of the compiler include scope checking and code generation.
 
-**Progress:** Currently working on implementing semantic analysis.
+**Progress:** Currently working on implementing scope checking and code generation.
 
 **Current Goal:** Finish the compiler by the end of the year.
 
@@ -203,6 +203,18 @@ Time taken: 0.134222 seconds
 [For 10000 lines of incorrect code]
 
 Significant README updates and the introduction of major features, including the "create", "cast", "output", "input" and "print" methods, have been added. StartASM now contains critical features such as the creation of constant values, a fleshed-out type system, and I/O mechanisms. This is one of the most significant milestones in StartASM's development.
+
+## Performance
+Here are some test runs with various example files:
+
+Ten thousand Lines:
+Time taken: 0.134222 seconds
+
+One Million Lines:
+Time taken: 13.1573 seconds
+
+Ten Million Lines:
+Time taken: 133.811 seconds
 
 ## Contact
 If you want to contact me about this project, feel free to send an email to tahsinkalkie[at]gmail[dot]com

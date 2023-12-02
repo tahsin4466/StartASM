@@ -11,7 +11,7 @@
 namespace ASTConstants {
     enum NodeType {ROOT, INSTRUCTION, OPERAND};
     enum InstructionType {MOVE, LOAD, STORE, CREATE, CAST, ADD, SUB, MULTIPLY, DIVIDE, OR, AND, NOT, SHIFT, COMPARE, JUMP, CALL, PUSH, POP, RETURN, STOP, INPUT, OUTPUT, PRINT, LABEL, COMMENT, NONE};
-    enum OperandType {REGISTER, INSTRUCTIONADDRESS, MEMORYADDRESS, INTEGER, FLOAT, BOOLEAN, CHARACTER, STRING, NEWLINE, CONDITION, UNKNOWN};
+    enum OperandType {REGISTER, INSTRUCTIONADDRESS, MEMORYADDRESS, INTEGER, FLOAT, BOOLEAN, CHARACTER, STRING, NEWLINE, TYPECONDITION, SHIFTCONDITION, JUMPCONDITION, UNKNOWN};
     enum NumOperands {NULLARY, UNARY, BINARY, TERNARY, INVALID};
 };
 
@@ -157,7 +157,7 @@ namespace AST {
                 m_instructionDictionary.emplace("sub", ASTConstants::InstructionType::SUB);
                 m_instructionDictionary.emplace("multiply", ASTConstants::InstructionType::MULTIPLY);
                 m_instructionDictionary.emplace("divide", ASTConstants::InstructionType::DIVIDE);
-                m_instructionDictionary.emplace("OR", ASTConstants::InstructionType::OR);
+                m_instructionDictionary.emplace("or", ASTConstants::InstructionType::OR);
                 m_instructionDictionary.emplace("and", ASTConstants::InstructionType::AND);
                 m_instructionDictionary.emplace("not", ASTConstants::InstructionType::NOT);
                 m_instructionDictionary.emplace("shift", ASTConstants::InstructionType::SHIFT);
@@ -226,8 +226,12 @@ namespace AST {
                         return ASTConstants::OperandType::STRING;
                     case PTConstants::OperandType::NEWLINE:
                         return ASTConstants::OperandType::NEWLINE;
-                    case PTConstants::OperandType::CONDITION:
-                        return ASTConstants::OperandType::CONDITION;
+                    case PTConstants::OperandType::JUMPCONDITION:
+                        return ASTConstants::OperandType::JUMPCONDITION;
+                    case PTConstants::OperandType::SHIFTCONDITION:
+                        return ASTConstants::OperandType::SHIFTCONDITION;
+                    case PTConstants::OperandType::TYPECONDITION:
+                        return ASTConstants::OperandType::TYPECONDITION;
                     case PTConstants::OperandType::UNKNOWN:
                         return ASTConstants::OperandType::UNKNOWN;
                     default:

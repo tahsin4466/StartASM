@@ -12,6 +12,7 @@
 #include <utility>
 
 class Parser;
+class SemanticAnalyzer;
 
 class Compiler {
     public:
@@ -61,6 +62,8 @@ class Compiler {
         void buildAST();
         //Analyze Semantics
         bool analyzeSemantics();
+        //Check address scope
+        bool checkAddressScopes();
         //Generate the code
         void generateCode();
 
@@ -85,7 +88,9 @@ class Compiler {
         //Parser (PT nested inside parser)
         Parser* m_parser;
         //Pointer to AST (used directly by the compiler at multiple stages)
-        AST::AbstractSyntaxTree* m_AST;    
+        AST::AbstractSyntaxTree* m_AST;   
+        //Pointer to semantic analyzer
+        SemanticAnalyzer* m_semanticAnalyzer;
 };
 
 #endif

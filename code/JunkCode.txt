@@ -1,3 +1,4 @@
+comment "This code is simply junk to test the compiler's basic syntax error handling"
 mp if greater to i8
 jump if less to i0
 jump if equal to i11

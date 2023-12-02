@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
-#include <unordered_set>
+#include <set>
 
 #include "AbstractSyntaxTree.h"
 
@@ -22,7 +22,10 @@ class SemanticAnalyzer {
         std::string analyzeSemantics(AST::InstructionNode* instructionNode);
 
     private:
-        std::unordered_map<ASTConstants::InstructionType, std::vector<std::unordered_set<ASTConstants::OperandType>>> m_semanticMap;
+        //Data structure to store semantic map
+        std::unordered_map<ASTConstants::InstructionType, std::vector<std::set<ASTConstants::OperandType>>> m_semanticMap;
+        //Method to convert AST enum to string
+        std::string enumToString(ASTConstants::OperandType type);
 
 };
 #endif

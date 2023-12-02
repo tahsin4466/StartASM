@@ -306,12 +306,17 @@ bool Parser::isOperand(pair<string, LexerConstants::TokenType> token) {
 }
 
 bool Parser::isDescriptor(pair<string, LexerConstants::TokenType> token) {
-    //Check if token is a descriptor (classified by lexer)
-    if (token.second == LexerConstants::TokenType::CONDITION) {
-        return true;
-    }
-    else {
-        return false;
+    //Check if token is a condition
+    //Switch statement
+    switch (token.second) {
+        case LexerConstants::TokenType::JUMPCONDITION:
+            return true;
+        case LexerConstants::TokenType::SHIFTCONDITION:
+            return true;
+        case LexerConstants::TokenType::TYPECONDITION:
+            return true;
+        default:
+            return false;
     }
 }
 
@@ -341,8 +346,12 @@ PTConstants::OperandType Parser::returnPTOperand(LexerConstants::TokenType token
             return PTConstants::OperandType::STRING;
         case LexerConstants::TokenType::NEWLINE:
             return PTConstants::OperandType::NEWLINE;
-        case LexerConstants::TokenType::CONDITION:
-            return PTConstants::OperandType::CONDITION;
+        case LexerConstants::TokenType::JUMPCONDITION:
+            return PTConstants::OperandType::JUMPCONDITION;
+        case LexerConstants::TokenType::TYPECONDITION:
+            return PTConstants::OperandType::TYPECONDITION;
+        case LexerConstants::TokenType::SHIFTCONDITION:
+            return PTConstants::OperandType::SHIFTCONDITION;
         case LexerConstants::TokenType::UNKNOWN:
             return PTConstants::OperandType::UNKNOWN;
         default:

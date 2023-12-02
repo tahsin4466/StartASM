@@ -1,3 +1,4 @@
+comment "Simple code is for basic testing"
 move r1 to r2
 load r1 and r2
 load r1 and r2

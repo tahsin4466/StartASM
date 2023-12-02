@@ -1,3 +1,4 @@
+comment "This is a few lines of valid StartASM code, albeit with no function"
 load m<435> to r2
 store r6 to m<0234>
 add r1 with r2 to r2
@@ -16,7 +17,7 @@ jump if less to i[0]
 jump if equal to 'myFunc'
 jump if unequal to 'myFunc'
 jump if zero to i[7]
-jump if nonzero to i[000008]
+jump if nonzero to i[08]
 call to 'myFunc'
 push r8
 pop to r6
@@ -31,7 +32,7 @@ create integer 8 to r8
 create integer 8 to r8
 create float 3.555553 to r9
 create character a to r5
-create address m<0009999999999999990> to r4
+create address m<090> to r4
 create boolean 0 to r6
 create boolean false to r6
 jump if unconditional to 'myFunc'

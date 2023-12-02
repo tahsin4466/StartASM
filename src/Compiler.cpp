@@ -2,6 +2,7 @@
 #include "include/Lexer.h"
 #include "include/Parser.h"
 #include "include/AbstractSyntaxTree.h"
+#include "include/SemanticAnalyzer.h"
 
 #include <iostream>
 #include <vector>
@@ -22,7 +23,8 @@ Compiler::Compiler(std::string pathname):
     //m_parser(new Parser()),
     m_lexer(new Lexer()),
     m_parser(new Parser()),
-    m_AST(new AST::AbstractSyntaxTree()) {
+    m_AST(new AST::AbstractSyntaxTree()),
+    m_semanticAnalyzer(new SemanticAnalyzer()) {
 
 };
 
@@ -31,6 +33,7 @@ Compiler::~Compiler() {
     delete m_lexer;
     delete m_parser;
     delete m_AST;
+    delete m_semanticAnalyzer;
 }
 
 bool Compiler::compileCode() {
@@ -42,7 +45,7 @@ bool Compiler::compileCode() {
         return false;
     }
     buildAST();
-    if(!analyzeSemantics()) {
+    if(!checkAddressScopes() || !analyzeSemantics()) {
         return false;
     }
     generateCode();
@@ -82,14 +85,13 @@ bool Compiler::loadFile() {
 void Compiler::lexCode() {
     //Map to temporarily sort each line through parallelization
     map<long unsigned int, vector<pair<string, LexerConstants::TokenType>>> lineMap;
-    //Temporary private variable to store result of lexer when parallelized
-    vector<pair<string, LexerConstants::TokenType>> tempTokens;
 
     //Call the lexer to tokenize and label each token
     //Leverage OpenMP for lexing as the lexer involves minimal recursion and is thread-safe
-    #pragma omp parallel for private(tempTokens)
+    #pragma omp parallel for
     for (long unsigned int i = 0; i < m_codeLines.size(); i++) {
-        tempTokens = m_lexer->tokenizeLine(m_codeLines[i]);
+        //Temporary private variable to store result of lexer when parallelized
+        vector<pair<string, LexerConstants::TokenType>> tempTokens = m_lexer->tokenizeLine(m_codeLines[i]);
         #pragma omp critical 
         {
             lineMap[i] = tempTokens;
@@ -107,16 +109,13 @@ bool Compiler::parseCode() {
     //Implementing parallelization is a NIGHTMARE, and very easily involves race-conditions and stack overflows
     //Hence, parsing will remain sequential
 
-    //Create error string
-    string error;
     for (int i=0; i<m_codeTokens.size(); i++) {
         //Call validateInstruction in InstructionSet
-        error = m_parser->checkInstruction(i, m_codeTokens[i]);
+        string error = m_parser->checkInstruction(i, m_codeTokens[i]);
         //If an error is present
         if (error != "") {
             m_statusMessage += "\nInvalid syntax at line " + to_string(i + 1) + ": " + m_codeLines[i] + "\n" + error + "\n";
         }
-        error.clear();
     }
 
     //Concatenate the statusMessage string from the map (which should be ordered already)
@@ -228,29 +227,66 @@ void Compiler::buildAST() {
         //Get the pointer to the instruction node from the PT
         PT::PTNode* PTInstructionNode = PTRoot->childAt(i);
         //The AST is not concerned about syntactic sugar, so discard lines that are empty
-        if (PTInstructionNode->getNodeValue() != "") {
-            //Initialize a new AST instruction node, using built in conversion methods found in the AST class
-            AST::InstructionNode* ASTInstructionNode = new AST::InstructionNode(PTInstructionNode->getNodeValue(), m_AST->getInstructionType(PTInstructionNode->getNodeValue()), m_AST->getNumOperands(PTInstructionNode->getNumChildren()), i+1);
-            //Insert into the AST
-            ASTRoot->insertChild(ASTInstructionNode);
-            //Next add all operands from the PT for the AST
-            for (int j=0; j<PTInstructionNode->getNumChildren(); j++) {
-                //Get the operand node from the PT and cast to an OperandNode (parser guarantees this)
-                PT::OperandNode* PTOperandNode = dynamic_cast<PT::OperandNode*>(PTInstructionNode->childAt(j)->childAt(0));
-                //Do a check anyway to make sure dynamic cast was successful
-                if (PTOperandNode != nullptr) {
-                    //Add a child for the instruction node in the AST, using conversion functions from the AST as necessary
-                    ASTInstructionNode->insertChild((new AST::OperandNode(PTOperandNode->getNodeValue(), m_AST->convertOperandType(PTOperandNode->getOperandType()))));
+        //Initialize a new AST instruction node, using built in conversion methods found in the AST class
+        AST::InstructionNode* ASTInstructionNode = new AST::InstructionNode(PTInstructionNode->getNodeValue(), m_AST->getInstructionType(PTInstructionNode->getNodeValue()), m_AST->getNumOperands(PTInstructionNode->getNumChildren()), i+1);
+        //Insert into the AST
+        ASTRoot->insertChild(ASTInstructionNode);
+        //Next add all operands from the PT for the AST
+        for (int j=0; j<PTInstructionNode->getNumChildren(); j++) {
+            //Get the operand node from the PT and cast to an OperandNode (parser guarantees this)
+            PT::OperandNode* PTOperandNode = dynamic_cast<PT::OperandNode*>(PTInstructionNode->childAt(j)->childAt(0));
+            //Do a check anyway to make sure dynamic cast was successful
+            if (PTOperandNode != nullptr) {
+                //Add a child for the instruction node in the AST, using conversion functions from the AST as necessary
+                ASTInstructionNode->insertChild((new AST::OperandNode(PTOperandNode->getNodeValue(), m_AST->convertOperandType(PTOperandNode->getOperandType()))));
+            }
+        }
+    }
+
+}
+
+bool Compiler::analyzeSemantics() {
+    //Create a map for parallelized error messages and the ASTRoot (reduce getter access)
+    map<int, string> errorMap;
+    AST::ASTNode* ASTRoot = m_AST->getRoot();
+
+    //Parallelize semantic analysis as each instruction is independant and AST is immutable in this state
+    #pragma omp parallel for
+    //Iterate over all children of the AST (instruction nodes)
+    for (int i=0; i<ASTRoot->getNumChildren(); i++) {
+        //Cast the ASTNode to an instruction node
+        AST::InstructionNode* instructionNode = dynamic_cast<AST::InstructionNode*>(ASTRoot->childAt(i));
+        //If not nullptr and if the node isn't empty
+        if (instructionNode != nullptr && instructionNode->getNodeValue()!="") {
+            //Call the semantic analyzer and analyze the given node
+            string error = m_semanticAnalyzer->analyzeSemantics(instructionNode);
+            if (error != "") {
+                //If error is present
+                //Critical section - STL manipulations are not thread safe
+                #pragma omp critical
+                {
+                //Add error to error map at index i
+                errorMap[i] = "\nInvalid syntax at line " + to_string(i + 1) + ": " + m_codeLines[i] + "\n" + error;
                 }
             }
         }
     }
 
-    m_AST->printTree();
+    //Concatenate status message string with all error messages
+    for (const auto& pair : errorMap) {
+        m_statusMessage += pair.second;
+    }
 
+    //Return true if no errors, false otherwise
+    if (m_statusMessage.empty()) {
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
-bool Compiler::analyzeSemantics() {
+bool Compiler::checkAddressScopes() {
     return true;
 }
 
