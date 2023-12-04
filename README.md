@@ -74,7 +74,7 @@ In summary:
 
 
 ## Usage
-Download the repository and open it in a code editor. Run the StartASM executable, and install a C++ compiler that supports OpenMP (preferably g++). Create a text file with StartASM code and place it into the 'code' folder, then run the executable. When running the executable and providing a filename, omit the `.txt` part. `ExampleCode.txt` should become `ExampleCode`.
+Download the repository and open it in a code editor. Run the StartASM executable, and install a C++ compiler that supports OpenMP (preferably g++). Create a text file with StartASM code and place it into the 'code' folder, then run the executable. StartASM uses the `.sasm` file extension. When running the executable and providing a filename, you can either include the `.sasm` extension or omit it, but don't append a different file extension (like .txt).
 
 Here are all possible instruction combinations as of now:
 - `move (register) to (register)`
@@ -172,6 +172,18 @@ Unknown source 'm<1>'. Expected register r0-r9
 ## Technologies
 StartASM is, as of now, fully developed in C++. The intent is for the compiler and runtime environment to be built using C++, while the front end will be built using Electron and node.js. This project also uses OpenMP multithreading to improve performance.
 
+## Performance
+Here are some test runs on the compiler with various example files:
+
+Ten thousand Lines:
+Time taken: 0.134222 seconds
+
+One Million Lines:
+Time taken: 13.1573 seconds
+
+Ten Million Lines:
+Time taken: 133.811 seconds
+
 ## Progress
 **Please note that StartASM is still in early development, so many critical features have yet to be implemented. This is a personal project by a student and, as such, is being developed incrementally.**
 
@@ -203,18 +215,6 @@ Time taken: 0.134222 seconds
 [For 10000 lines of incorrect code]
 
 Significant README updates and the introduction of major features, including the "create", "cast", "output", "input" and "print" methods, have been added. StartASM now contains critical features such as the creation of constant values, a fleshed-out type system, and I/O mechanisms. This is one of the most significant milestones in StartASM's development.
-
-## Performance
-Here are some test runs with various example files:
-
-Ten thousand Lines:
-Time taken: 0.134222 seconds
-
-One Million Lines:
-Time taken: 13.1573 seconds
-
-Ten Million Lines:
-Time taken: 133.811 seconds
 
 ## Contact
 If you want to contact me about this project, feel free to send an email to tahsinkalkie[at]gmail[dot]com

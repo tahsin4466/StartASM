@@ -12,7 +12,7 @@ int main() {
 
     double start = omp_get_wtime();
     double end;
-    Compiler StartASMCompiler("code/" + pathname + ".txt");
+    Compiler StartASMCompiler(pathname);
 
     if(!StartASMCompiler.compileCode()) {
         cout << StartASMCompiler.getStatus() << endl;

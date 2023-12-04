@@ -17,7 +17,6 @@
 using namespace std;
 
 Compiler::Compiler(std::string pathname):
-    m_pathname(pathname),
     m_statusMessage(""),
     m_lineIndex(0),
     //m_parser(new Parser()),
@@ -25,7 +24,19 @@ Compiler::Compiler(std::string pathname):
     m_parser(new Parser()),
     m_AST(new AST::AbstractSyntaxTree()),
     m_semanticAnalyzer(new SemanticAnalyzer()) {
-
+        string fileExtension;
+        //Check if the given path has the .sasm file extension
+        for (int i=pathname.size()-5; i<pathname.size(); i++){
+            fileExtension += pathname.at(i);
+        }
+        if (fileExtension == ".sasm") {
+            //If it does, set the pathname within the code folder
+            m_pathname = "code/" + pathname;
+        }
+        else {
+            //If not, append the .sasm file extension
+            m_pathname = "code/" + pathname + ".sasm";
+        }
 };
 
 Compiler::~Compiler() {
