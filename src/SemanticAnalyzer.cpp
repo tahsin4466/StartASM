@@ -166,9 +166,9 @@ string SemanticAnalyzer::enumToString(OperandType type) {
         case REGISTER:
             return "register r0-r9";
         case INSTRUCTIONADDRESS:
-            return "instruction address i[0]-i[999999999]";
+            return "instruction address i[...]";
         case MEMORYADDRESS:
-            return "memory address m<0>-m<999999999>";
+            return "memory address m<...>";
         case INTEGER:
             return "integer";
         case FLOAT:

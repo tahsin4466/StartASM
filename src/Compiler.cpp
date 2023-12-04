@@ -48,21 +48,35 @@ Compiler::~Compiler() {
 }
 
 bool Compiler::compileCode() {
+    double start = omp_get_wtime();
     if(!loadFile()) {
         return false;
     }
+    cout << "Compiler: Loaded files" << endl;
+    cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
+    start = omp_get_wtime();
     lexCode();
+    cout << "Compiler: Lexed code" << endl;
+    cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
+    start = omp_get_wtime();
     if(!parseCode() || !resolveSymbols()) {
         return false;
     }
+    cout << "Compiler: Parsed code and resolved symbols" << endl;
+    cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
+    start = omp_get_wtime();
     buildAST();
+    cout << "Compiler: Built AST" << endl;
+    cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
+    start = omp_get_wtime();
     if(!checkAddressScopes() || !analyzeSemantics()) {
         return false;
     }
+    cout << "Compiler: Analyzed semantics and checked address scopes" << endl;
+    cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
+    start = omp_get_wtime();
     generateCode();
     return true;
-
-    
 }
 
 bool Compiler::loadFile() {
@@ -94,24 +108,20 @@ bool Compiler::loadFile() {
 }
 
 void Compiler::lexCode() {
-    //Map to temporarily sort each line through parallelization
-    map<long unsigned int, vector<pair<string, LexerConstants::TokenType>>> lineMap;
+    // Vector of vectors to store tokens for each line
+    //Preallocate depending on the number of lines to allow sequential write
+    std::vector<std::vector<std::pair<string, LexerConstants::TokenType>>> tempTokens(m_codeLines.size());
 
-    //Call the lexer to tokenize and label each token
-    //Leverage OpenMP for lexing as the lexer involves minimal recursion and is thread-safe
+    // Parallelize lexing of each line
     #pragma omp parallel for
     for (long unsigned int i = 0; i < m_codeLines.size(); i++) {
-        //Temporary private variable to store result of lexer when parallelized
-        vector<pair<string, LexerConstants::TokenType>> tempTokens = m_lexer->tokenizeLine(m_codeLines[i]);
-        #pragma omp critical 
-        {
-            lineMap[i] = tempTokens;
-        }
+        // Each thread works on its own part of the vector
+        tempTokens[i] = m_lexer->tokenizeLine(m_codeLines[i]);
     }
 
-    for (const auto& pair : lineMap) {
-        // pair.first is the int key, pair.second is the vector<string>
-        m_codeTokens.push_back(pair.second);
+    // Flatten the results into m_codeTokens
+    for (const auto& lineTokens : tempTokens) {
+        m_codeTokens.push_back(lineTokens);
     }
 }
 
@@ -234,6 +244,7 @@ void Compiler::buildAST() {
     //Iterate over all children (instructions) in the parse tree
     //Do NOT parallelize this as tree construction is inherently sequential! Each node has dependencies to each other, and the AST
     //class is not thread safe!
+
     for (int i=0; i<PTSize; i++) {
         //Get the pointer to the instruction node from the PT
         PT::PTNode* PTInstructionNode = PTRoot->childAt(i);
@@ -298,7 +309,71 @@ bool Compiler::analyzeSemantics() {
 }
 
 bool Compiler::checkAddressScopes() {
-    return true;
+    //Declare temporary varaibles for error reporting and finding instruction address index
+    string errorString;
+    string instructionIndex;
+    //Declare three regex templates to determine correct scope
+    regex registerTemplate = regex("r[0-9]");
+    regex instructionTemplate = regex("i\\[[0-9]{1,9}\\]");
+    regex memoryTemplate = regex("m<[0-9]{1,9}>");
+
+    //Get AST root node
+    AST::ASTNode* ASTRoot = m_AST->getRoot();
+    //Loop through all child (instruction) nodes in AST
+    //Do NOT parallelize as AST access methods and stoi() are not thread safe
+    for (int i=0; i<ASTRoot->getNumChildren(); i++) {
+        AST::ASTNode* InstructionNode = ASTRoot->childAt(i);
+        //Loop through all operands in instruction parent
+        for (int j=0; j<InstructionNode->getNumChildren(); j++) {
+            //Get child node and cast dynamically to operand node
+            AST::OperandNode* operandNode = dynamic_cast<AST::OperandNode*>(InstructionNode->childAt(j));
+            if (operandNode != nullptr) {
+                //Switch checking based on operand type
+                ASTConstants::OperandType operandType = operandNode->getOperandType();
+                switch (operandType) {
+                    case ASTConstants::REGISTER:
+                        //Run a regex template (this one with explicit bounds) to determine if the operand is in scope
+                        if (!regex_match(operandNode->getNodeValue(), registerTemplate)) {
+                            errorString += "\nScope error at line " + to_string(i + 1) + ": " + m_codeLines[i] + "\n" + "Register '" + operandNode->getNodeValue() + "' is out of range. Max register is r9\n";
+                        }
+                        break;
+                    case ASTConstants::MEMORYADDRESS:
+                        if (!regex_match(operandNode->getNodeValue(), memoryTemplate)) {
+                            errorString += "\nScope error at line " + to_string(i + 1) + ": " + m_codeLines[i] + "\n" + "Memory address '" + operandNode->getNodeValue() + "' is out of range. Max address is m<999999999>\n";
+                        }
+                        break;
+                    case ASTConstants::INSTRUCTIONADDRESS:
+                        //Instruction address both has to adhere to StartASM bounds (4 byte address) and the number of instructions themselves
+                        //First get the actual instruction index
+                        for (int k=2; k<operandNode->getNodeValue().size()-1; k++) {
+                            instructionIndex+=operandNode->getNodeValue()[k];
+                        }
+                        //If the given instruction index is greater than the number of lines
+                        if ((stoi(instructionIndex) > m_codeLines.size())) {
+                            errorString += "\nScope error at line " + to_string(i + 1) + ": " + m_codeLines[i] + "\n" + "Instruction address '" + operandNode->getNodeValue() + "' is out of range. Expected i[0]-i[" + to_string(m_codeLines.size()) + "]\n";
+                        }
+                        //If the instruction index is larger than the StartASM limit
+                        else if (!regex_match(operandNode->getNodeValue(), instructionTemplate)) {
+                            errorString += "\nScope error at line " + to_string(i + 1) + ": " + m_codeLines[i] + "\n" + "Instruction address '" + operandNode->getNodeValue() + "' is out of range. Max address is i[999999999]\n";
+                        }
+                        instructionIndex.clear();
+                        break;
+                    //Base case - break
+                    default:
+                        break;
+                }
+            }
+        }       
+    }
+
+    //Return false if there are errors present in the string
+    if (!errorString.empty()) {
+        m_statusMessage += errorString;
+        return false;
+    }
+    else {
+        return true;
+    }
 }
 
 void Compiler::generateCode() {

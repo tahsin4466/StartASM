@@ -20,6 +20,6 @@ int main() {
 
     end = omp_get_wtime();
     cout << StartASMCompiler.getNumLines() << " lines" << endl;
-    cout << "Time taken: " << (end - start) << " seconds" << endl;
+    cout << "Total time taken: " << (end - start) << " seconds" << endl;
     return 0;
 }
