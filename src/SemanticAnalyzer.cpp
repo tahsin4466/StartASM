@@ -18,16 +18,16 @@ SemanticAnalyzer::SemanticAnalyzer() {
         {OperandType::REGISTER}
     };
     m_semanticMap[InstructionType::LOAD] = {
-        {OperandType::MEMORYADDRESS},
+        {OperandType::MEMORYADDRESS, OperandType::REGISTER},
         {OperandType::REGISTER}
     };
     m_semanticMap[InstructionType::STORE] = {
         {OperandType::REGISTER},
-        {OperandType::MEMORYADDRESS}
+        {OperandType::MEMORYADDRESS, OperandType::REGISTER}
     };
     m_semanticMap[InstructionType::CREATE] = {
         {OperandType::TYPECONDITION},
-        {OperandType::INTEGER, OperandType::CHARACTER, OperandType::BOOLEAN, OperandType::FLOAT, OperandType::MEMORYADDRESS},
+        {OperandType::INTEGER, OperandType::CHARACTER, OperandType::BOOLEAN, OperandType::FLOAT, OperandType::MEMORYADDRESS, OperandType::INSTRUCTIONADDRESS},
         {OperandType::REGISTER}
     };
     m_semanticMap[InstructionType::CAST] = {
@@ -76,10 +76,10 @@ SemanticAnalyzer::SemanticAnalyzer() {
     };
     m_semanticMap[InstructionType::JUMP] = {
         {OperandType::JUMPCONDITION},
-        {OperandType::INSTRUCTIONADDRESS}
+        {OperandType::INSTRUCTIONADDRESS, OperandType::REGISTER}
     };
     m_semanticMap[InstructionType::CALL] = {
-        {OperandType::INSTRUCTIONADDRESS}
+        {OperandType::INSTRUCTIONADDRESS, OperandType::REGISTER}
     };
     m_semanticMap[InstructionType::PUSH] = {
         {OperandType::REGISTER}
@@ -182,7 +182,7 @@ string SemanticAnalyzer::enumToString(OperandType type) {
         case NEWLINE:
             return "newline";
         case TYPECONDITION:
-            return "type condition: integer/float/boolean/character";
+            return "type condition: integer/float/boolean/character/memory/instruction";
         case SHIFTCONDITION:
             return "shift condition: left/right";
         case JUMPCONDITION:

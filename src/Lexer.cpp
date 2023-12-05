@@ -58,7 +58,8 @@ Lexer::Lexer() {
     m_tokenDictionary.emplace("float", TYPECONDITION);
     m_tokenDictionary.emplace("boolean", TYPECONDITION);
     m_tokenDictionary.emplace("character", TYPECONDITION);
-    m_tokenDictionary.emplace("address", TYPECONDITION);
+    m_tokenDictionary.emplace("memory", TYPECONDITION);
+    m_tokenDictionary.emplace("instruction", TYPECONDITION);
 
     //Add operand regex templates to vector
     m_operandDictionary.push_back(make_pair(regex("r[0-9]+"), REGISTER));
