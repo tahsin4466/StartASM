@@ -35,7 +35,7 @@ The language is based on a load-store model, with separate program and instructi
 
 One of the main features of StartASM is its abstraction to reduce the barrier of entry. This includes:
 - Datatypes (ints, floats, bools, chars, addresses) that eliminate the need to interpret hex directly
-- A static type system with enforced type safety while allowing users to 'cast' data (interpret the byte sequence differently) 
+- A dynamic type system with enforced type safety while allowing users to 'cast' data (interpret the byte sequence differently) 
 - Simplified memory model aligned to 32 bits for every datatype
 - Simplified I/O and terminal
 
@@ -78,10 +78,10 @@ Download the repository and open it in a code editor. Run the StartASM executabl
 
 Here are all possible instruction combinations as of now:
 - `move (register) to (register)`
-- `load (memory) to (register)`
-- `store (register) to (memory)`
-- `create integer/float/boolean/character/address (value) to (register)`
-- `cast integer/float/boolean/character/address (register)`
+- `load (memory/register) to (register)`
+- `store (register) to (memory/register)`
+- `create integer/float/boolean/character/memory/instruction (value) to (register)`
+- `cast integer/float/boolean/character/memory/instruction (register)`
 - `add (register) with (register) to (register)`
 - `sub (register) with (register) to (register)`
 - `multiply (register) with (register) to (register)`
@@ -91,8 +91,8 @@ Here are all possible instruction combinations as of now:
 - `not (register)`
 - `shift left/right (register) by (register)`
 - `compare (register) with (register)`
-- `jump if (unconditional/greater/less/equal/zero/unequal/nonzero) to (instruction/label)`
-- `call to (instruction/label)`
+- `jump if (unconditional/greater/less/equal/zero/unequal/nonzero) to (instruction/label/register)`
+- `call to (instruction/label/register)`
 - `push (register)`
 - `pop to (register)`
 - `return`
@@ -111,6 +111,8 @@ Where:
 - Comments are any string within double quotes *"Like this"*
 
 StartASM contains a simple terminal akin to higher-level languages. Methods `input` and `output` work strictly with dynamic data stored in registers, whereas there's a seperate `print` statement to allow easy user prompts and debugging. All outputs and inputs are on the same line unless expressly preceded by a `print newline`.
+
+StartASM also supports manipulating instruction and memory addresses, alowing basic pointer functionality and operations. This can be useful for creating contiguous data structures (such as arrays) or jump tables. Thus, address instructions such as `load`, `store`, `jump` and `call` allow both immediates and registers holding valid addresses (though this will be checked for type safety).
 
 Check the 'code' folder for examples. Each code file contains a comment explaning it's purpose. Be careful about running LongCode, it's 1 million+ lines!
 
@@ -149,6 +151,42 @@ print " years to go till you're 21."
 stop
 ```
 The above program demonstrates numerous features of StartASM, including I/O, initializing values, arithmetic operations, and conditional jumps.
+
+Here is a seperate example showing a way to input a string given individual character inputs. It terminates once the ~ is detected:
+```
+comment "First let's get the input string by looping until ~ is detected"
+comment "First create three memory addresses - our start index, our current index and our increment amount"
+create memory m<0> to r0
+create memory m<0> to r1
+create memory m<1> to r2
+comment "Next create our terminating character"
+create character ~ to r3
+
+comment "Prompt the user for input"
+print "Enter your string until you terminate with the ~ key"
+print newline
+
+comment "Loop the input until we detect the ~ key"
+label 'inputLoop'
+input character to r4
+compare r4 with r3
+jump if equal to 'outputLoop'
+store r4 to r1
+add r1 with r2 to r1
+jump if unconditional to 'inputLoop'
+
+comment "Now let's print the string back to them starting from our start index until it hit's our 'current' (or end) index"
+label 'outputLoop'
+load r0 to r4
+output r4
+add r0 with r2 to r0
+compare r0 with r1
+jump if greater to 'terminateProgram'
+jump if unconditional to 'outputLoop'
+
+label 'terminateProgram'
+stop
+```
 
 The compiler will also return syntax and symbol/scope error messages that show the excepted line, token, and what the compiler expected, if applicable. For example, submitting this invalid code:
 ``` 

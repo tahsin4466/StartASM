@@ -1,0 +1,32 @@
+comment "First let's get the input string by looping until ~ is detected"
+comment "First create three memory addresses - our start index, our current index and our increment amount"
+create memory m<0> to r0
+create memory m<0> to r1
+create memory m<1> to r2
+comment "Next create our terminating character"
+create character ~ to r3
+
+comment "Prompt the user for input"
+print "Enter your string until you terminate with the ~ key"
+print newline
+
+comment "Loop the input until we detect the ~ key"
+label 'inputLoop'
+input character to r4
+compare r4 with r3
+jump if equal to 'outputLoop'
+store r4 to r1
+add r1 with r2 to r1
+jump if unconditional to 'inputLoop'
+
+comment "Now let's print the string back to them starting from our start index until it hit's our 'current' (or end) index"
+label 'outputLoop'
+load r0 to r4
+output r4
+add r0 with r2 to r0
+compare r0 with r1
+jump if greater to 'terminateProgram'
+jump if unconditional to 'outputLoop'
+
+label 'terminateProgram'
+stop
