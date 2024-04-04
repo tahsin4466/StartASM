@@ -9,7 +9,7 @@
 #include <string>
 #include <fstream>
 #include <omp.h>
-#include <sstream>
+#include <future>
 #include <map>
 #include <regex>
 #include <utility>
@@ -50,17 +50,20 @@ Compiler::~Compiler() {
 bool Compiler::compileCode() {
     double start = omp_get_wtime();
 
+    //Load file
     if(!loadFile()) {
         return false;
     }
     cout << "Compiler: Loaded files" << endl;
     cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
 
+    //Lex code
     start = omp_get_wtime();
     lexCode();
     cout << "Compiler: Lexed code" << endl;
     cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
 
+    //Parse code, then resolve symbols
     start = omp_get_wtime();
     if(!parseCode() || !resolveSymbols()) {
         return false;
@@ -68,21 +71,37 @@ bool Compiler::compileCode() {
     cout << "Compiler: Parsed code and resolved symbols" << endl;
     cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
 
+    //Delete the lexer and build the AST concurrently
     start = omp_get_wtime();
+    //Delete the lexer after PT creation is finished! It's no longer needed
+    auto lexerDeletionFuture = std::async(std::launch::async, [this] {
+        delete m_lexer;
+        m_lexer = nullptr;
+    });
     buildAST();
-    cout << "Compiler: Built AST" << endl;
+    lexerDeletionFuture.get();
+    cout << "Compiler: Built AST and deleted lexer" << endl;
     cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
 
-    //Delete the parser after AST creation is finished! It's no longer needed
-    delete m_parser;
-    m_parser = nullptr;
+    //Check address scopes and analyze semantics while deleting the parse tree concurrently
     start = omp_get_wtime();
-    if(!checkAddressScopes() || !analyzeSemantics()) {
+    auto parserDeletionFuture = std::async(std::launch::async, [this] {
+        delete m_parser;
+        m_parser = nullptr;
+    });
+    auto checkAddressScopesFuture = std::async(&Compiler::checkAddressScopes, this);
+    auto analyzeSemanticsFuture = std::async(&Compiler::analyzeSemantics, this);
+    // Wait for all tasks to complete and retrieve function results
+    bool checkAddressScopesResult = checkAddressScopesFuture.get();
+    bool analyzeSemanticsResult = analyzeSemanticsFuture.get();
+    parserDeletionFuture.get();
+    if(!checkAddressScopesResult || !analyzeSemanticsResult) {
         return false;
     }
-    cout << "Compiler: Analyzed semantics and checked address scopes" << endl;
+    cout << "Compiler: Analyzed semantics, checked address scopes and deleted parse tree" << endl;
     cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
 
+    //Generate code
     start = omp_get_wtime();
     generateCode();
     return true;
@@ -101,7 +120,7 @@ bool Compiler::loadFile() {
         //While line exists
         while (getline(codeFile,currentLine)) {
             //Push back current lines (including empty)
-            //This is to keep accurate track of line numners
+            //This is to keep accurate track of line numbers
             m_codeLines.push_back(currentLine);
         }
         codeFile.close();
@@ -282,7 +301,7 @@ bool Compiler::analyzeSemantics() {
     map<int, string> errorMap;
     AST::ASTNode* ASTRoot = m_AST->getRoot();
 
-    //Parallelize semantic analysis as each instruction is independant and AST is immutable in this state
+    //Parallelize semantic analysis as each instruction is independent and AST is immutable in this state
     #pragma omp parallel for
     //Iterate over all children of the AST (instruction nodes)
     for (int i=0; i<ASTRoot->getNumChildren(); i++) {
