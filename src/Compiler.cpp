@@ -49,31 +49,40 @@ Compiler::~Compiler() {
 
 bool Compiler::compileCode() {
     double start = omp_get_wtime();
+
     if(!loadFile()) {
         return false;
     }
     cout << "Compiler: Loaded files" << endl;
     cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
+
     start = omp_get_wtime();
     lexCode();
     cout << "Compiler: Lexed code" << endl;
     cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
+
     start = omp_get_wtime();
     if(!parseCode() || !resolveSymbols()) {
         return false;
     }
     cout << "Compiler: Parsed code and resolved symbols" << endl;
     cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
+
     start = omp_get_wtime();
     buildAST();
     cout << "Compiler: Built AST" << endl;
     cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
+
+    //Delete the parser after AST creation is finished! It's no longer needed
+    delete m_parser;
+    m_parser = nullptr;
     start = omp_get_wtime();
     if(!checkAddressScopes() || !analyzeSemantics()) {
         return false;
     }
     cout << "Compiler: Analyzed semantics and checked address scopes" << endl;
     cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
+
     start = omp_get_wtime();
     generateCode();
     return true;
@@ -245,9 +254,10 @@ void Compiler::buildAST() {
     //Do NOT parallelize this as tree construction is inherently sequential! Each node has dependencies to each other, and the AST
     //class is not thread safe!
 
+    PT::PTNode* PTInstructionNode;
     for (int i=0; i<PTSize; i++) {
         //Get the pointer to the instruction node from the PT
-        PT::PTNode* PTInstructionNode = PTRoot->childAt(i);
+        PTInstructionNode = PTRoot->childAt(i);
         //The AST is not concerned about syntactic sugar, so discard lines that are empty
         //Initialize a new AST instruction node, using built in conversion methods found in the AST class
         AST::InstructionNode* ASTInstructionNode = new AST::InstructionNode(PTInstructionNode->getNodeValue(), m_AST->getInstructionType(PTInstructionNode->getNodeValue()), m_AST->getNumOperands(PTInstructionNode->getNumChildren()), i+1);
@@ -263,8 +273,8 @@ void Compiler::buildAST() {
                 ASTInstructionNode->insertChild((new AST::OperandNode(PTOperandNode->getNodeValue(), m_AST->convertOperandType(PTOperandNode->getOperandType()))));
             }
         }
-    }
-
+    };
+    PTInstructionNode = nullptr;
 }
 
 bool Compiler::analyzeSemantics() {
