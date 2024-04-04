@@ -1,6 +1,9 @@
 #Example Code
 code/StressTest.sasm
 
+#StartASM Executable
+/StartASMCompiler
+
 # Compiled Object files
 *.slo
 *.lo

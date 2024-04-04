@@ -1,5 +1,5 @@
+//StartASM Compiler entry function
 #include "include/Compiler.h"
-
 #include <iostream>
 #include <omp.h>
 #include <string>
@@ -21,5 +21,7 @@ int main() {
     end = omp_get_wtime();
     cout << StartASMCompiler.getNumLines() << " lines" << endl;
     cout << "Total time taken: " << (end - start) << " seconds" << endl;
+
+    cout << "END";
     return 0;
 }
