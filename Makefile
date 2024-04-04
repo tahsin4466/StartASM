@@ -3,7 +3,7 @@
 ########################################################################
 
 # Compiler settings - Can be customized.
-CC = g++-13
+CC = g++
 CXXFLAGS = -std=c++11 -Wall -Iinclude -fopenmp # Remove -Xpreprocessor flag
 LDFLAGS = -fopenmp -lgomp # Add OpenMP flags and library
 
