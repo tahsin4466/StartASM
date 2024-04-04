@@ -63,12 +63,20 @@ bool Compiler::compileCode() {
     cout << "Compiler: Lexed code" << endl;
     cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
 
-    //Parse code, then resolve symbols
+    //Parse code
     start = omp_get_wtime();
-    if(!parseCode() || !resolveSymbols()) {
+    if(!parseCode()) {
         return false;
     }
-    cout << "Compiler: Parsed code and resolved symbols" << endl;
+    cout << "Compiler: Parsed code" << endl;
+    cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
+
+    //Resolve symbols
+    start = omp_get_wtime();
+    if(!resolveSymbols()) {
+        return false;
+    }
+    cout << "Compiler: Resolved symbols" << endl;
     cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
 
     //Delete the lexer and build the AST concurrently

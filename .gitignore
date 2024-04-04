@@ -1,1 +1,130 @@
+#Example Code
 code/StressTest.sasm
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Kernel Module Compile Results
+*.ko
+*.mod*
+
+# Dependency directories
+.deps/
+
+# Auto-generated dependency files
+*.dep
+
+# Object files and archive files
+*.o
+*.a
+*.ar
+
+# Linker output
+*.ilk
+*.map
+*.exp
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+*.def
+*.exp
+
+# Binary and executable files
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Profile data files
+*.gcno
+*.gcda
+*.gcov
+
+# Coverage files
+*.info
+*.lcov
+
+# Temporary files
+*.tmp
+*.temp
+*.t
+
+# CLion/IntelliJ - Specific
+.idea/
+*.iml
+
+# CMake Files
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+*.cmake
+
+# Build directories
+bin/
+build/
+obj/
+
+# Benchmarking and testing
+*.gtest-*
+*.benchmark-*
+
+# pkg-config
+*.pc
+
+# Others
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+
+# Exclude user-specific files
+*.user
+*.user.*
+*.kdev4
+*.sublime-workspace
