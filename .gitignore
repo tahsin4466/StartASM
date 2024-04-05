@@ -3,6 +3,8 @@ code/StressTest.sasm
 
 #StartASM Executable
 /StartASMCompiler
+/StartASM
+/startasm
 
 # Compiled Object files
 *.slo

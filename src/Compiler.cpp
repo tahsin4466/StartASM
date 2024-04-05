@@ -16,28 +16,17 @@
 
 using namespace std;
 
-Compiler::Compiler(std::string pathname):
+Compiler::Compiler(std::string pathname, bool cmdSilent, bool cmdTimings, bool cmdTree):
+    cmd_silent(cmdSilent),
+    cmd_timings(cmdTimings),
+    cmd_tree(cmdTree),
     m_statusMessage(""),
     m_lineIndex(0),
-    //m_parser(new Parser()),
     m_lexer(new Lexer()),
     m_parser(new Parser()),
     m_AST(new AST::AbstractSyntaxTree()),
-    m_semanticAnalyzer(new SemanticAnalyzer()) {
-        string fileExtension;
-        //Check if the given path has the .sasm file extension
-        for (int i=pathname.size()-5; i<pathname.size(); i++){
-            fileExtension += pathname.at(i);
-        }
-        if (fileExtension == ".sasm") {
-            //If it does, set the pathname within the code folder
-            m_pathname = "code/" + pathname;
-        }
-        else {
-            //If not, append the .sasm file extension
-            m_pathname = "code/" + pathname + ".sasm";
-        }
-};
+    m_semanticAnalyzer(new SemanticAnalyzer()),
+    m_pathname(pathname){};
 
 Compiler::~Compiler() {
     //delete m_parser;
@@ -47,6 +36,18 @@ Compiler::~Compiler() {
     delete m_semanticAnalyzer;
 }
 
+void Compiler::cmdPrint(std::string message) {
+    if (!cmd_silent) {
+        cout << message;
+    }
+}
+
+void Compiler::cmdTimingPrint(std::string message) {
+    if (!cmd_silent && cmd_timings) {
+        cout << message;
+    }
+}
+
 bool Compiler::compileCode() {
     double start = omp_get_wtime();
 
@@ -54,30 +55,30 @@ bool Compiler::compileCode() {
     if(!loadFile()) {
         return false;
     }
-    cout << "Compiler: Loaded files" << endl;
-    cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
+    cmdTimingPrint("Compiler: Loaded files\n");
+    cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
 
     //Lex code
     start = omp_get_wtime();
     lexCode();
-    cout << "Compiler: Lexed code" << endl;
-    cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
+    cmdTimingPrint("Compiler: Lexed code\n");
+    cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
 
     //Parse code
     start = omp_get_wtime();
     if(!parseCode()) {
         return false;
     }
-    cout << "Compiler: Parsed code" << endl;
-    cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
+    cmdTimingPrint("Compiler: Parsed code\n");
+    cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
 
     //Resolve symbols
     start = omp_get_wtime();
     if(!resolveSymbols()) {
         return false;
     }
-    cout << "Compiler: Resolved symbols" << endl;
-    cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
+    cmdTimingPrint("Compiler: Resolved symbols\n");
+    cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
 
     //Delete the lexer and build the AST concurrently
     start = omp_get_wtime();
@@ -88,8 +89,8 @@ bool Compiler::compileCode() {
     });
     buildAST();
     lexerDeletionFuture.get();
-    cout << "Compiler: Built AST and deleted lexer" << endl;
-    cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
+    cmdTimingPrint("Compiler: Built AST\n");
+    cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
 
     //Check address scopes and analyze semantics while deleting the parse tree concurrently
     start = omp_get_wtime();
@@ -106,16 +107,19 @@ bool Compiler::compileCode() {
     if(!checkAddressScopesResult || !analyzeSemanticsResult) {
         return false;
     }
-    cout << "Compiler: Analyzed semantics, checked address scopes and deleted parse tree" << endl;
-    cout << "Time taken: " << to_string(omp_get_wtime()-start) << endl << endl;
+    cmdTimingPrint("Compiler: Analyzed semantics and checked address scopes\n");
+    cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
 
     //Generate code
     start = omp_get_wtime();
     generateCode();
 
-    /*cout << "Printing AST" << endl;
-    m_AST->printTree();
-    cout << endl;*/
+    if(cmd_tree && !cmd_silent) {
+        cout << endl;
+        cout << "Printing AST\n";
+        m_AST->printTree();
+        cout << endl;
+    }
     return true;
 }
 

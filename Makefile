@@ -8,7 +8,7 @@ CXXFLAGS = -std=c++11 -Wall -Iinclude -fopenmp # Remove -Xpreprocessor flag
 LDFLAGS = -fopenmp -lgomp # Add OpenMP flags and library
 
 # Makefile settings - Can be customized.
-APPNAME = StartASMCompiler
+APPNAME = startasm
 EXT = .cpp
 SRCDIR = src
 OBJDIR = obj

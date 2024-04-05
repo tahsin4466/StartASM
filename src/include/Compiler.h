@@ -17,7 +17,7 @@ class SemanticAnalyzer;
 class Compiler {
     public:
         //Constructors and Destructors
-        Compiler(std::string pathname);
+        Compiler(std::string pathname, bool cmdSilent, bool cmdTimings, bool cmdTree);
         ~Compiler();
 
         Compiler(const Compiler&) = delete;
@@ -42,6 +42,10 @@ class Compiler {
         void changePath(std::string pathname) {
             m_pathname = pathname;
         }
+
+        //Printers
+        void cmdPrint(std::string message);
+        void cmdTimingPrint(std::string message);
 
         //Public facing compile method
         //Code Compiling
@@ -91,6 +95,11 @@ class Compiler {
         AST::AbstractSyntaxTree* m_AST;   
         //Pointer to semantic analyzer
         SemanticAnalyzer* m_semanticAnalyzer;
+
+        //Terminal options
+        bool cmd_silent;
+        bool cmd_timings;
+        bool cmd_tree;
 };
 
 #endif
