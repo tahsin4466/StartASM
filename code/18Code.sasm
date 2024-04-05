@@ -1,4 +1,5 @@
 comment "This is the example program found on the readme."
+
 create integer 18 to r1
 print "How long till you're 18? Let's find out!"
 print newline

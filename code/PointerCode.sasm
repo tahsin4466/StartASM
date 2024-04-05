@@ -1,3 +1,5 @@
+comment "Pointer code is to test some basic pointer operations in StartASM"
+
 comment "First let's get the input string by looping until ~ is detected"
 comment "First create three memory addresses - our start index, our current index and our increment amount"
 create memory m<0> to r0

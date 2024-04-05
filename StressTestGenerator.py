@@ -7,7 +7,8 @@ operations = ['add', 'sub', 'multiply', 'divide', 'move', 'load', 'store']  # et
 datatypes = ['integer', 'float', 'boolean', 'character', 'memory', 'instruction']
 
 with open('code/StressTest.sasm', 'w') as file:
-    for _ in range(num_lines):
+    file.write("comment \"This is the automatically generated stress test script to test the front-end compilation performance of the compiler\"\n")
+    for _ in range(num_lines-1):
         reg1 = random.choice(registers)
         reg2 = random.choice(registers)
         operation = random.choice(operations)
@@ -27,6 +28,7 @@ with open('code/StressTest.sasm', 'w') as file:
 
         # Write the line to the file
         file.write(line + '\n')
+    file.write("stop")
 
 print("Generated sample stress test at " + str(num_lines) + " lines of code.")
 print("Make sure to select StressTest.sasm as the target when running the compiler!")

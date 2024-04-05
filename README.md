@@ -110,11 +110,11 @@ Where:
 - Labels are any word within single quotes *'likeThis'*
 - Comments are any string within double quotes *"Like this"*
 
-StartASM contains a simple terminal akin to higher-level languages. Methods `input` and `output` work strictly with dynamic data stored in registers, whereas there's a seperate `print` statement to allow easy user prompts and debugging. All outputs and inputs are on the same line unless expressly preceded by a `print newline`.
+StartASM interacts directly in the terminal akin to higher-level languages, no syscalls or kernel interactions necessary. Methods `input` and `output` work strictly with dynamic data stored in registers, whereas there's a seperate `print` statement to allow easy user prompts and debugging. All outputs and inputs are on the same line unless expressly preceded by a `print newline`.
 
 StartASM also supports manipulating instruction and memory addresses, alowing basic pointer functionality and operations. This can be useful for creating contiguous data structures (such as arrays) or jump tables. Thus, address instructions such as `load`, `store`, `jump` and `call` allow both immediates and registers holding valid addresses (though this will be checked for type safety).
 
-Check the 'code' folder for examples. Each code file contains a comment explaning it's purpose. Be careful about running LongCode, it's 1 million+ lines!
+Check the 'code' folder for examples. Each code file contains a comment explaning it's purpose. If you would like to stress test the compiler, you can run the included `StressTest.py` script to generate a random stress test file `StressTest.sasm`. Be careful about the size you decide for the stress test as millions of lines of code can easily exhaust RAM and system resources!
 
 ```
 comment "Let's set a constant 21 and ask the user for their age"

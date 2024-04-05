@@ -112,6 +112,10 @@ bool Compiler::compileCode() {
     //Generate code
     start = omp_get_wtime();
     generateCode();
+
+    /*cout << "Printing AST" << endl;
+    m_AST->printTree();
+    cout << endl;*/
     return true;
 }
 

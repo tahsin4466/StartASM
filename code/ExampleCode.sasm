@@ -32,7 +32,7 @@ create integer 8 to r8
 create integer 8 to r8
 create float 3.555553 to r9
 create character a to r5
-create address m<090> to r4
+create memory m<090> to r4
 create boolean 0 to r6
 create boolean false to r6
 jump if unconditional to 'myFunc'

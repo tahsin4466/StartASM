@@ -1,3 +1,5 @@
+comment "Math calculator is an example to demonstrate practical functionality"
+
 comment "Start by creating memory addresses for parsing the input string"
 create memory m<0> to r0
 create memory m<0> to r1
