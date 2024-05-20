@@ -133,3 +133,6 @@ Desktop.ini
 *.user.*
 *.kdev4
 *.sublime-workspace
+.DS_Store
+__pycache__/StressTestGenerator.cpython-312.pyc
+.DS_Store
