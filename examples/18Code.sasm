@@ -1,0 +1,30 @@
+comment "This is the example program found on the readme."
+
+create integer 18 to r1
+print "How long till you're 18? Let's find out!"
+print newline
+print "Enter your age: "
+input integer to r2
+print newline
+compare r2 with r1
+jump if equal to 'is18'
+jump if greater to 'past18'
+jump if less to 'not18'
+stop
+
+label 'is18'
+print "You're just barely 18! Yay!"
+stop
+
+label 'past18'
+print "Wow, you're "
+output r2
+print " and you're using this calculator? Scram!"
+stop
+
+label 'not18'
+sub r1 with r2 to r3
+print " *sigh* you still have "
+output r3
+print " years to go till you're an adult."
+stop

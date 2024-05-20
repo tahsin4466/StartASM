@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(StartASM)
+project(startasm)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -52,14 +52,19 @@ set(HEADERS
 )
 
 # Specify the executable target
-add_executable(StartASM ${SOURCES} ${HEADERS})
+add_executable(startasm ${SOURCES} ${HEADERS})
 
 # Include project headers
 include_directories(src/include)
 
 # Link against LLVM and OpenMP libraries
 llvm_map_components_to_libnames(LLVM_LIBS core support irreader)
-target_link_libraries(StartASM ${LLVM_LIBS} OpenMP::OpenMP_CXX)
+target_link_libraries(startasm ${LLVM_LIBS} OpenMP::OpenMP_CXX)
+
+# Set the output directory for the executable to the root folder
+set_target_properties(startasm PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
+)
 
 # Platform-specific settings
 if(APPLE)
@@ -68,7 +73,7 @@ if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
     find_library(LIBCXX_LIB c++)
     find_library(LIBCXXABI_LIB c++abi)
-    target_link_libraries(StartASM ${LIBCXX_LIB} ${LIBCXXABI_LIB})
+    target_link_libraries(startasm ${LIBCXX_LIB} ${LIBCXXABI_LIB})
 elseif(UNIX)
     message(STATUS "Configuring for Linux")
     # Linux-specific settings here
