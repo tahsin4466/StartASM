@@ -10,6 +10,7 @@
 #include <string>
 #include <fstream>
 #include <omp.h>
+#include <mutex>
 #include <future>
 #include <map>
 #include <regex>
@@ -280,37 +281,50 @@ bool Compiler::resolveSymbols() {
 }
 
 void Compiler::buildAST() {
-    //Get the root node of the parse tree and it's size (frequent access)
+    // Get the root node of the parse tree and its size (frequent access)
     PT::PTNode* PTRoot = m_parser->getParseTree()->getRoot();
     int PTSize = PTRoot->getNumChildren();
-    //Get the AST root node
+    // Get the AST root node
     AST::ASTNode* ASTRoot = m_AST->getRoot();
 
-    //Iterate over all children (instructions) in the parse tree
-    //Do NOT parallelize this as tree construction is inherently sequential! Each node has dependencies to each other, and the AST
-    //class is not thread safe!
+    // Vector to store AST instruction nodes
+    std::vector<AST::InstructionNode*> instructionNodes(PTSize);
 
-    PT::PTNode* PTInstructionNode;
-    for (int i=0; i<PTSize; i++) {
-        //Get the pointer to the instruction node from the PT
-        PTInstructionNode = PTRoot->childAt(i);
-        //The AST is not concerned about syntactic sugar, so discard lines that are empty
-        //Initialize a new AST instruction node, using built in conversion methods found in the AST class
-        AST::InstructionNode* ASTInstructionNode = new AST::InstructionNode(PTInstructionNode->getNodeValue(), m_AST->getInstructionType(PTInstructionNode->getNodeValue()), m_AST->getNumOperands(PTInstructionNode->getNumChildren()), i+1);
-        //Insert into the AST
-        ASTRoot->insertChild(ASTInstructionNode);
-        //Next add all operands from the PT for the AST
-        for (int j=0; j<PTInstructionNode->getNumChildren(); j++) {
-            //Get the operand node from the PT and cast to an OperandNode (parser guarantees this)
+    // Iterate over all children (instructions) in the parse tree
+    // Parallelize the creation of instruction nodes and their children
+    #pragma omp parallel for
+    for (int i = 0; i < PTSize; i++) {
+        // Get the pointer to the instruction node from the PT
+        PT::PTNode* PTInstructionNode = PTRoot->childAt(i);
+
+        // Initialize a new AST instruction node, using built-in conversion methods found in the AST class
+        AST::InstructionNode* ASTInstructionNode = new AST::InstructionNode(
+            PTInstructionNode->getNodeValue(),
+            m_AST->getInstructionType(PTInstructionNode->getNodeValue()),
+            m_AST->getNumOperands(PTInstructionNode->getNumChildren()),
+            i + 1
+        );
+
+        // Store the instruction node in the vector
+        instructionNodes[i] = ASTInstructionNode;
+
+        // Add all operands from the PT for the AST
+        for (int j = 0; j < PTInstructionNode->getNumChildren(); j++) {
+            // Get the operand node from the PT and cast to an OperandNode (parser guarantees this)
             PT::OperandNode* PTOperandNode = dynamic_cast<PT::OperandNode*>(PTInstructionNode->childAt(j)->childAt(0));
-            //Do a check anyway to make sure dynamic cast was successful
+
+            // Do a check anyway to make sure dynamic cast was successful
             if (PTOperandNode != nullptr) {
-                //Add a child for the instruction node in the AST, using conversion functions from the AST as necessary
-                ASTInstructionNode->insertChild((new AST::OperandNode(PTOperandNode->getNodeValue(), m_AST->convertOperandType(PTOperandNode->getOperandType()))));
+                // Add a child for the instruction node in the AST, using conversion functions from the AST as necessary
+                ASTInstructionNode->insertChild(new AST::OperandNode(PTOperandNode->getNodeValue(), m_AST->convertOperandType(PTOperandNode->getOperandType())));
             }
         }
-    };
-    PTInstructionNode = nullptr;
+    }
+
+    // Insert instruction nodes into the AST root node (sequential part to ensure thread safety)
+    for (int i = 0; i < PTSize; i++) {
+        ASTRoot->insertChild(instructionNodes[i]);
+    }
 }
 
 bool Compiler::analyzeSemantics() {
@@ -355,64 +369,78 @@ bool Compiler::analyzeSemantics() {
 }
 
 bool Compiler::checkAddressScopes() {
-    //Declare temporary varaibles for error reporting and finding instruction address index
-    string errorString;
-    string instructionIndex;
-    //Declare three regex templates to determine correct scope
-    regex registerTemplate = regex("r[0-9]");
-    regex instructionTemplate = regex("i\\[[0-9]{1,9}\\]");
-    regex memoryTemplate = regex("m<[0-9]{1,9}>");
+    // Declare temporary variables for error reporting and finding instruction address index
+    std::string errorString;
+    std::mutex errorMutex; // Mutex to protect errorString
+    std::string instructionIndex;
+    std::regex registerTemplate = std::regex("r[0-9]");
+    std::regex instructionTemplate = std::regex("i\\[[0-9]{1,9}\\]");
+    std::regex memoryTemplate = std::regex("m<[0-9]{1,9}>");
 
-    //Get AST root node
+    // Get AST root node
     AST::ASTNode* ASTRoot = m_AST->getRoot();
-    //Loop through all child (instruction) nodes in AST
-    //Do NOT parallelize as AST access methods and stoi() are not thread safe
-    for (int i=0; i<ASTRoot->getNumChildren(); i++) {
+    int numInstructions = ASTRoot->getNumChildren();
+
+    // Loop through all child (instruction) nodes in AST
+    // Use OpenMP to parallelize the loop
+    #pragma omp parallel for shared(errorString)
+    for (int i = 0; i < numInstructions; i++) {
         AST::ASTNode* InstructionNode = ASTRoot->childAt(i);
-        //Loop through all operands in instruction parent
-        for (int j=0; j<InstructionNode->getNumChildren(); j++) {
-            //Get child node and cast dynamically to operand node
+
+        // Local variable for collecting errors in the current iteration
+        std::string localErrorString;
+        std::string localInstructionIndex;
+
+        // Loop through all operands in instruction parent
+        for (int j = 0; j < InstructionNode->getNumChildren(); j++) {
+            // Get child node and cast dynamically to operand node
             AST::OperandNode* operandNode = dynamic_cast<AST::OperandNode*>(InstructionNode->childAt(j));
             if (operandNode != nullptr) {
-                //Switch checking based on operand type
+                // Switch checking based on operand type
                 ASTConstants::OperandType operandType = operandNode->getOperandType();
                 switch (operandType) {
                     case ASTConstants::REGISTER:
-                        //Run a regex template (this one with explicit bounds) to determine if the operand is in scope
-                        if (!regex_match(operandNode->getNodeValue(), registerTemplate)) {
-                            errorString += "\nScope error at line " + to_string(i + 1) + ": " + m_codeLines[i] + "\n" + "Register '" + operandNode->getNodeValue() + "' is out of range. Max register is r9\n";
+                        // Run a regex template (this one with explicit bounds) to determine if the operand is in scope
+                        if (!std::regex_match(operandNode->getNodeValue(), registerTemplate)) {
+                            localErrorString += "\nScope error at line " + std::to_string(i + 1) + ": " + m_codeLines[i] + "\n" + "Register '" + operandNode->getNodeValue() + "' is out of range. Max register is r9\n";
                         }
                         break;
                     case ASTConstants::MEMORYADDRESS:
-                        if (!regex_match(operandNode->getNodeValue(), memoryTemplate)) {
-                            errorString += "\nScope error at line " + to_string(i + 1) + ": " + m_codeLines[i] + "\n" + "Memory address '" + operandNode->getNodeValue() + "' is out of range. Max address is m<999999999>\n";
+                        if (!std::regex_match(operandNode->getNodeValue(), memoryTemplate)) {
+                            localErrorString += "\nScope error at line " + std::to_string(i + 1) + ": " + m_codeLines[i] + "\n" + "Memory address '" + operandNode->getNodeValue() + "' is out of range. Max address is m<999999999>\n";
                         }
                         break;
                     case ASTConstants::INSTRUCTIONADDRESS:
-                        //Instruction address both has to adhere to StartASM bounds (4 byte address) and the number of instructions themselves
-                        //First get the actual instruction index
-                        for (int k=2; k<operandNode->getNodeValue().size()-1; k++) {
-                            instructionIndex+=operandNode->getNodeValue()[k];
+                        // Instruction address both has to adhere to StartASM bounds (4 byte address) and the number of instructions themselves
+                        // First get the actual instruction index
+                        for (int k = 2; k < operandNode->getNodeValue().size() - 1; k++) {
+                            localInstructionIndex += operandNode->getNodeValue()[k];
                         }
-                        //If the given instruction index is greater than the number of lines
-                        if ((stoi(instructionIndex) > m_codeLines.size())) {
-                            errorString += "\nScope error at line " + to_string(i + 1) + ": " + m_codeLines[i] + "\n" + "Instruction address '" + operandNode->getNodeValue() + "' is out of range. Expected i[0]-i[" + to_string(m_codeLines.size()) + "]\n";
+                        // If the given instruction index is greater than the number of lines
+                        if ((std::stoi(localInstructionIndex) > m_codeLines.size())) {
+                            localErrorString += "\nScope error at line " + std::to_string(i + 1) + ": " + m_codeLines[i] + "\n" + "Instruction address '" + operandNode->getNodeValue() + "' is out of range. Expected i[0]-i[" + std::to_string(m_codeLines.size()) + "]\n";
                         }
-                        //If the instruction index is larger than the StartASM limit
-                        else if (!regex_match(operandNode->getNodeValue(), instructionTemplate)) {
-                            errorString += "\nScope error at line " + to_string(i + 1) + ": " + m_codeLines[i] + "\n" + "Instruction address '" + operandNode->getNodeValue() + "' is out of range. Max address is i[999999999]\n";
+                        // If the instruction index is larger than the StartASM limit
+                        else if (!std::regex_match(operandNode->getNodeValue(), instructionTemplate)) {
+                            localErrorString += "\nScope error at line " + std::to_string(i + 1) + ": " + m_codeLines[i] + "\n" + "Instruction address '" + operandNode->getNodeValue() + "' is out of range. Max address is i[999999999]\n";
                         }
-                        instructionIndex.clear();
+                        localInstructionIndex.clear();
                         break;
-                    //Base case - break
+                    // Base case - break
                     default:
                         break;
                 }
             }
-        }       
+        }
+
+        // Lock the mutex before modifying the shared errorString
+        if (!localErrorString.empty()) {
+            std::lock_guard<std::mutex> lock(errorMutex);
+            errorString += localErrorString;
+        }
     }
 
-    //Return false if there are errors present in the string
+    // Return false if there are errors present in the string
     if (!errorString.empty()) {
         m_statusMessage += errorString;
         return false;

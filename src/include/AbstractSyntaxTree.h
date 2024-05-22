@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <string>
 #include <iostream>
+#include <mutex>
 #include "ParseTree.h"
 
 namespace ASTConstants {
@@ -52,6 +53,7 @@ namespace AST {
             ASTNode* insertChild(ASTNode* childNode) {
                 //Insert a new child if not nullptr
                 if(childNode!=nullptr) {
+                    std::lock_guard<std::mutex> lock(m_mutex); // Lock the mutex
                     m_children.push_back(childNode);
                     return childNode;
                 }
@@ -61,11 +63,13 @@ namespace AST {
                 }
             };
             void deleteLastChild() {
+                std::lock_guard<std::mutex> lock(m_mutex); // Lock the mutex
                 //Delete child and remove dangling pointer
                 delete m_children.back();
                 m_children.pop_back();
             }
             ASTNode* childAt(int index) {
+                std::lock_guard<std::mutex> lock(m_mutex); // Lock the mutex
                 //Return nullptr if out of bounds
                 if(index >= m_children.size()) {
                     return nullptr;
@@ -76,15 +80,16 @@ namespace AST {
             }
             
         protected:
-            //Protected variables to be inhereted by derived classes
+            //Protected variables to be inherited by derived classes
             ASTConstants::NodeType m_nodeType;
             std::string m_nodeValue;
             std::vector<ASTNode*> m_children;
+            mutable std::mutex m_mutex; // Mutex to protect the node's children
     };
 
     //Specialized ASTNode Classes
     class RootNode: public ASTNode {
-        //Only AST can construdct RootNode
+        //Only AST can construct RootNode
         friend class AST;
 
         public:
@@ -178,9 +183,13 @@ namespace AST {
                 //Delete the root, which will recursively delete all nodes
                 delete m_root;
             }
-            ASTNode* getRoot() {return m_root;};
+            ASTNode* getRoot() { 
+                std::lock_guard<std::mutex> lock(m_mutex); // Lock the mutex
+                return m_root; 
+            }
             ASTConstants::InstructionType getInstructionType(std::string instruction) {
                 //Search the dictionary and return the constant type if found, NONE otherwise
+                std::lock_guard<std::mutex> lock(m_mutex); // Lock the mutex
                 auto itr = m_instructionDictionary.find(instruction);
                 if (itr != m_instructionDictionary.end()) {
                     return itr->second;
@@ -248,6 +257,7 @@ namespace AST {
             ASTNode* m_root;
             //Dictionary stores in an unordered map for O(1) lookup
             std::unordered_map<std::string, ASTConstants::InstructionType> m_instructionDictionary;
+            mutable std::mutex m_mutex; // Mutex to protect the root and dictionary
 
             //Recursive print method
             void printNode(const ASTNode* node, int level) const {

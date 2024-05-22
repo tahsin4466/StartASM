@@ -298,7 +298,7 @@ bool Parser::isOperand(pair<string, LexerConstants::TokenType> token) {
             return true;
         case LexerConstants::TokenType::STRING:
             return true;
-        case LexerConstants::TokenType::NEWLINE:
+        case LexerConstants::TokenType::NEWLINE:    
             return true;
         default:
             return false;
