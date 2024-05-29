@@ -28,7 +28,7 @@ Compiler::Compiler(std::string pathname, bool cmdSilent, bool cmdTimings, bool c
     m_parser(new Parser()),
     m_AST(new AST::AbstractSyntaxTree()),
     m_semanticAnalyzer(new SemanticAnalyzer()),
-    //m_codeGenerator(new CodeGenerator()),
+    m_codeGenerator(new CodeGenerator()),
     m_pathname(pathname){};
 
 Compiler::~Compiler() {
@@ -37,7 +37,7 @@ Compiler::~Compiler() {
     delete m_parser;
     delete m_AST;
     delete m_semanticAnalyzer;
-    //delete m_codeGenerator;
+    delete m_codeGenerator;
 }
 
 void Compiler::cmdPrint(std::string message) {
@@ -453,5 +453,5 @@ bool Compiler::checkAddressScopes() {
 }
 
 void Compiler::generateCode() {
-    m_codeGenerator->generateCode(m_AST);
+    //m_codeGenerator->generateCode(m_AST);
 }
