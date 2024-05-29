@@ -457,6 +457,7 @@ bool Compiler::checkAddressScopes() {
 void Compiler::generateCode() {
     AST::ASTNode* ASTRoot = m_AST->getRoot();
     int numInstructions = ASTRoot->getNumChildren();
+    #pragma omp parallel for
     for (int i = 0; i < numInstructions; i++) {
         //Cast the ASTNode to an instruction node
         AST::InstructionNode* instructionNode = dynamic_cast<AST::InstructionNode*>(ASTRoot->childAt(i));
@@ -465,6 +466,5 @@ void Compiler::generateCode() {
             //Call the code generator for the given line
             m_codeGenerator->generateCode(instructionNode);
         }
-
     }
 }
