@@ -22,7 +22,7 @@ Compiler::Compiler(std::string pathname, bool cmdSilent, bool cmdTimings, bool c
     cmd_silent(cmdSilent),
     cmd_timings(cmdTimings),
     cmd_tree(cmdTree),
-    m_statusMessage(""),
+    m_statusMessage(),
     m_lineIndex(0),
     m_lexer(new Lexer()),
     m_parser(new Parser()),
@@ -117,6 +117,8 @@ bool Compiler::compileCode() {
     //Generate code
     start = omp_get_wtime();
     generateCode();
+    cmdTimingPrint("Compiler: Generated LLVM IR\n");
+    cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
 
     if(cmd_tree && !cmd_silent) {
         cout << endl;
@@ -341,7 +343,7 @@ bool Compiler::analyzeSemantics() {
         //Cast the ASTNode to an instruction node
         AST::InstructionNode* instructionNode = dynamic_cast<AST::InstructionNode*>(ASTRoot->childAt(i));
         //If not nullptr and if the node isn't empty
-        if (instructionNode != nullptr && instructionNode->getNodeValue()!="") {
+        if (instructionNode != nullptr && !instructionNode->getNodeValue().empty()) {
             //Call the semantic analyzer and analyze the given node
             string error = m_semanticAnalyzer->analyzeSemantics(instructionNode);
             if (error != "") {
@@ -453,5 +455,16 @@ bool Compiler::checkAddressScopes() {
 }
 
 void Compiler::generateCode() {
-    //m_codeGenerator->generateCode(m_AST);
+    /*AST::ASTNode* ASTRoot = m_AST->getRoot();
+    int numInstructions = ASTRoot->getNumChildren();
+    for (int i = 0; i < numInstructions; i++) {
+        //Cast the ASTNode to an instruction node
+        AST::InstructionNode* instructionNode = dynamic_cast<AST::InstructionNode*>(ASTRoot->childAt(i));
+        //If not nullptr and if the node isn't empty
+        if (instructionNode != nullptr && !instructionNode->getNodeValue().empty()) {
+            //Call the code generator for the given line
+            m_codeGenerator->generateCode(instructionNode);
+        }
+
+    }*/
 }
