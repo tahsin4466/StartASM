@@ -71,18 +71,21 @@ int main(int argc, char* argv[]) {
     // Adjust the compiler instantiation to pass the truesilent flag
     Compiler StartASMCompiler(filepath, silent, timings, tree);
     double start = omp_get_wtime();
-    if (!StartASMCompiler.compileCode() && !truesilent) {
-        cout << StartASMCompiler.getStatus() << endl;
+    if (!StartASMCompiler.compileCode()) {
+        if (!truesilent) {
+            cout << StartASMCompiler.getStatus() << endl;
+        }
     }
-    double end = omp_get_wtime();
+    else {
+        double end = omp_get_wtime();
 
-    if (timings && !silent) {
-        cout << "Total time taken: " << (end - start) << " seconds\n";
+        if (timings && !silent) {
+            cout << "Total time taken: " << (end - start) << " seconds\n";
+        }
+
+        if (!silent) {
+            cout << StartASMCompiler.getNumLines() << " lines compiled.\n";
+        }
     }
-
-    if (!silent) {
-        cout << StartASMCompiler.getNumLines() << " lines compiled.\n";
-    }
-
     return 0;
 }

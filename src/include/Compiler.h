@@ -13,6 +13,7 @@
 
 class Parser;
 class SemanticAnalyzer;
+class CodeGenerator;
 
 class Compiler {
     public:
@@ -95,6 +96,8 @@ class Compiler {
         AST::AbstractSyntaxTree* m_AST;   
         //Pointer to semantic analyzer
         SemanticAnalyzer* m_semanticAnalyzer;
+        //Pointer to code generator
+        CodeGenerator* m_codeGenerator;
 
         //Terminal options
         bool cmd_silent;

@@ -11,7 +11,7 @@ public:
     CodeGenerator();
     ~CodeGenerator();
 
-    void generate(AST::AbstractSyntaxTree* ast);
+    void generateCode(AST::AbstractSyntaxTree* ast);
     void printIR();
 
 private:

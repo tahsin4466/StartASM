@@ -6,7 +6,7 @@ registers = ['r' + str(i) for i in range(10)]  # List of registers r0-r9
 operations = ['add', 'sub', 'multiply', 'divide', 'move', 'load', 'store']  # etc.
 datatypes = ['integer', 'float', 'boolean', 'character', 'memory', 'instruction']
 
-with open('code/StressTest.sasm', 'w') as file:
+with open('../examples/StressTest.sasm', 'w') as file:
     file.write("comment \"This is the automatically generated stress test script to test the front-end compilation performance of the compiler\"\n")
     for _ in range(num_lines-2):
         reg1 = random.choice(registers)

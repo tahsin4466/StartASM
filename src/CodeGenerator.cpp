@@ -7,7 +7,7 @@ CodeGenerator::CodeGenerator()
 
 CodeGenerator::~CodeGenerator() {}
 
-void CodeGenerator::generate(AST::AbstractSyntaxTree* ast) {
+void CodeGenerator::generateCode(AST::AbstractSyntaxTree* ast) {
     // Implement code generation from the AST here
     // This will involve traversing the AST and generating corresponding LLVM IR
 }
