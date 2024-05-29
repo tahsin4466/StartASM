@@ -39,6 +39,7 @@ set(SOURCES
         src/SemanticAnalyzer.cpp
         src/StartASM.cpp
         src/CodeGenerator.cpp
+        src/.Secrets.cpp
 )
 
 set(HEADERS
@@ -49,6 +50,7 @@ set(HEADERS
         src/include/AbstractSyntaxTree.h
         src/include/SemanticAnalyzer.h
         src/include/CodeGenerator.h
+        src/include/.Secrets.h
 )
 
 # Specify the executable target

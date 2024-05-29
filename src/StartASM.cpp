@@ -4,6 +4,9 @@
 #include <string>
 #include <algorithm>
 
+// Include the Easter egg functions
+#include ".Secrets.h"
+
 using namespace std;
 
 // Function to check if a command-line option exists
@@ -20,6 +23,15 @@ bool isValidSASMFile(const string& filename) {
 }
 
 void displayHelp() {
+    string title = R"(
+       _____ _             _             _____ __  __
+      / ____| |           | |     /\    / ____|  \/  |
+     | (___ | |_ __ _ _ __| |_   /  \  | (___ | \  / |
+      \___ \| __/ _` | '__| __| / /\ \  \___ \| |\/| |
+      ____) | || (_| | |  | |_ / ____ \ ____) | |  | |
+     |_____/ \__\__,_|_|   \__/_/    \_\_____/|_|  |_|
+    )";
+    cout << title << endl;
     cout << "StartASM Compiler Usage:" << endl;
     cout << "  startasm compile <filepath.sasm> [options]" << endl;
     cout << "Options:" << endl;
@@ -35,6 +47,32 @@ int main(int argc, char* argv[]) {
     // Check for --help flag before anything else
     if (cmdOptionExists(argv, argv + argc, "--help")) {
         displayHelp();
+        return 0;
+    }
+
+    // Check for the secret command
+    if (argc > 1 && string(argv[1]) == "secret") {
+        // Display a random Easter egg
+        srand(time(nullptr));
+        int choice = rand() % 5;
+
+        switch (choice) {
+            case 0:
+                displayAsciiArt();
+                break;
+            case 1:
+                displayHiddenMessage();
+                break;
+            case 2:
+                playGuessingGame();
+                break;
+            case 3:
+                displayRandomJoke();
+                break;
+            case 4:
+                activateSecretFeature();
+                break;
+        }
         return 0;
     }
 

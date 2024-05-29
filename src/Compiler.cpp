@@ -122,7 +122,7 @@ bool Compiler::compileCode() {
 
     if(cmd_tree && !cmd_silent) {
         cout << endl;
-        cout << "Printing AST\n";
+        cout << "AST for '" + m_pathname + "':\n";
         m_AST->printTree();
         cout << endl;
     }
@@ -151,7 +151,7 @@ bool Compiler::loadFile() {
     }
     else {
         //Return error if path not found
-        m_statusMessage = "Invalid path!";
+        m_statusMessage = "The path was invalid or the file could not be found.";
         return false;
     }
         
@@ -455,7 +455,7 @@ bool Compiler::checkAddressScopes() {
 }
 
 void Compiler::generateCode() {
-    /*AST::ASTNode* ASTRoot = m_AST->getRoot();
+    AST::ASTNode* ASTRoot = m_AST->getRoot();
     int numInstructions = ASTRoot->getNumChildren();
     for (int i = 0; i < numInstructions; i++) {
         //Cast the ASTNode to an instruction node
@@ -466,5 +466,5 @@ void Compiler::generateCode() {
             m_codeGenerator->generateCode(instructionNode);
         }
 
-    }*/
+    }
 }
