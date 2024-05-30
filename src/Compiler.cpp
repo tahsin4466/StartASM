@@ -95,6 +95,12 @@ bool Compiler::compileCode() {
     lexerDeletionFuture.get();
     cmdTimingPrint("Compiler: Built AST\n");
     cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
+    if(cmd_tree && !cmd_silent) {
+        cout << endl;
+        cout << "AST for '" + m_pathname + "':\n";
+        m_AST->printTree();
+        cout << endl;
+    }
 
     //Check address scopes and analyze semantics while deleting the parse tree concurrently
     start = omp_get_wtime();
@@ -119,13 +125,6 @@ bool Compiler::compileCode() {
     generateCode();
     cmdTimingPrint("Compiler: Generated LLVM IR\n");
     cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
-
-    if(cmd_tree && !cmd_silent) {
-        cout << endl;
-        cout << "AST for '" + m_pathname + "':\n";
-        m_AST->printTree();
-        cout << endl;
-    }
     return true;
 }
 
@@ -457,14 +456,16 @@ bool Compiler::checkAddressScopes() {
 void Compiler::generateCode() {
     AST::ASTNode* ASTRoot = m_AST->getRoot();
     int numInstructions = ASTRoot->getNumChildren();
+
     #pragma omp parallel for
     for (int i = 0; i < numInstructions; i++) {
-        //Cast the ASTNode to an instruction node
+        // Cast the ASTNode to an instruction node
         AST::InstructionNode* instructionNode = dynamic_cast<AST::InstructionNode*>(ASTRoot->childAt(i));
-        //If not nullptr and if the node isn't empty
+        // If not nullptr and if the node isn't empty
         if (instructionNode != nullptr && !instructionNode->getNodeValue().empty()) {
-            //Call the code generator for the given line
+            // Call the code generator for the given line
             m_codeGenerator->generateCode(instructionNode);
         }
     }
+    m_codeGenerator->printIR();
 }

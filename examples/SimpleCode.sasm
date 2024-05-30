@@ -1,9 +1,4 @@
-comment "Simple code is for basic testing"
-move r1 to r2
-load r1 and r2
-load r1 and r2
-hehehuhuhaha
-move r1 to r2
-move r1 and r3
-load m7 and m7
-move r1 and r2 and
+create integer 9 to r1
+create integer 10 to r2
+move r1 to r3
+add r2 with r3 to r4
