@@ -403,7 +403,7 @@ void Compiler::generateCode() {
     AST::ASTNode* ASTRoot = m_AST->getRoot();
     int numInstructions = ASTRoot->getNumChildren();
 
-    #pragma omp parallel for schedule(dynamic) default(none) shared(ASTRoot, numInstructions)
+    //#pragma omp parallel for schedule(dynamic) default(none) shared(ASTRoot, numInstructions)
     for (int i = 0; i < numInstructions; i++) {
         // Cast the ASTNode to an instruction node
         auto instructionNode = dynamic_cast<AST::InstructionNode*>(ASTRoot->childAt(i));
