@@ -18,7 +18,7 @@ class CodeGenerator;
 class Compiler {
     public:
         //Constructors and Destructors
-        Compiler(std::string pathname, bool cmdSilent, bool cmdTimings, bool cmdTree);
+        Compiler(std::string& pathname, bool cmdSilent, bool cmdTimings, bool cmdTree);
         ~Compiler();
 
         Compiler(const Compiler&) = delete;
@@ -26,27 +26,23 @@ class Compiler {
 
         //Accessors
         //Get number of lines
-        int getNumLines() {
-            return m_codeLines.size();
-        }
-        //Get current line index
-        int getLineIndex() {
-            return m_lineIndex;
+        [[nodiscard]] int getNumLines() const {
+            return int(m_codeLines.size());
         }
         //Get current status
-        std::string getStatus() {
+        [[nodiscard]] std::string getStatus() const {
             return m_statusMessage;
         }
 
         //Mutators
         //Change pathname
-        void changePath(std::string pathname) {
+        void changePath(std::string& pathname) {
             m_pathname = pathname;
         }
 
         //Printers
-        void cmdPrint(std::string message);
-        void cmdTimingPrint(std::string message);
+        void cmdPrint(const std::string& message) const;
+        void cmdTimingPrint(const std::string& message) const;
 
         //Public facing compile method
         //Code Compiling
@@ -55,11 +51,7 @@ class Compiler {
 
     private:
         //Internal parsing methods
-        //File loading
-        bool loadFile();
-        //Code Tokenizing
-        void lexCode();
-        //Validate the syntax using regex matching
+        //Validate the syntax and parse
         bool parseCode();
         //Resolve symbols and labels
         bool resolveSymbols();
@@ -86,8 +78,6 @@ class Compiler {
         std::string m_pathname;
         //String containing current status
         std::string m_statusMessage;
-        //Int containing current line index
-        int m_lineIndex;
         //Lexer
         Lexer* m_lexer;
         //Parser (PT nested inside parser)
