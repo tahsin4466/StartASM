@@ -51,8 +51,6 @@ class Compiler {
 
     private:
         //Internal parsing methods
-        //Validate the syntax and parse
-        bool parseCode();
         //Resolve symbols and labels
         bool resolveSymbols();
         //Build the AST
@@ -70,6 +68,8 @@ class Compiler {
         std::vector<std::string> m_codeLines;
         //Vector containing code tokens and tags
         std::vector<std::vector<std::pair<std::string, LexerConstants::TokenType>>> m_codeTokens;
+        //Parse tree for the code
+        PT::ParseTree* m_parseTree;
         //Hash table for symbol resolution, mapping labels to instruction addresses
         std::unordered_map<std::string, std::pair<std::string, int>> m_symbolTable;
 

@@ -11,10 +11,7 @@ using namespace PTConstants;
 using namespace PT;
 
 //Constructor - Initialize all data structure values and parsing templates
-Parser::Parser() { 
-    //Initialise the root pointer for the parse tree
-    m_parseTree = new ParseTree();
-
+Parser::Parser() {
     //Initialise the instructionMap with expected lengths of each instruction
     m_instructionMap.emplace("move", 4);
     m_instructionMap.emplace("load", 4);
@@ -117,13 +114,34 @@ Parser::Parser() {
 
 }
 
+bool Parser::parseCode(PT::ParseTree* parseTree, const std::vector<std::string>& codeLines, const std::vector<std::vector<std::pair<std::string, LexerConstants::TokenType>>>& tokens, std::string& errorMessage) {
+    //The parser relies on top-down recursive descent parsing
+    //Implementing parallelization is a NIGHTMARE, and very easily involves race-conditions and stack overflows
+    //Hence, parsing will remain sequential
 
+    for (int i=0; i<tokens.size(); i++) {
+        //Call validateInstruction in InstructionSet
+        string error = checkInstruction(parseTree, i, tokens[i]);
+        //If an error is present
+        if (!error.empty()) {
+            errorMessage += "\nInvalid syntax at line " + to_string(i + 1) + ": " + codeLines[i] + "\n" + error + "\n";
+        }
+    }
+
+    //Concatenate the statusMessage string from the map (which should be ordered already)
+    if (errorMessage.empty()) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
 
 //LEVEL 1 - INSTRUCTION PARSER AND CHECKER
-string Parser::checkInstruction(int line, vector<pair<string, LexerConstants::TokenType>> tokens) {
+string Parser::checkInstruction(ParseTree* parseTree, int line, vector<pair<string, LexerConstants::TokenType>> tokens) {
     //Zero case, return instantly with valid syntax and no AST construction
     if (tokens[0].second == LexerConstants::TokenType::BLANK) {
-        m_parseTree->getRoot()->insertChild((new GeneralNode(0, "", BLANK)));
+        parseTree->getRoot()->insertChild((new GeneralNode(0, "", BLANK)));
         return "";
     }
     //If keyword doesn't match, return error no instruction found
@@ -133,7 +151,7 @@ string Parser::checkInstruction(int line, vector<pair<string, LexerConstants::To
     auto itr = m_templateMap.find(tokens[0].first);
     //If found, go to parse instruction method creating a new instruction node
     if (itr!= m_templateMap.end()) {
-        return parseInstruction((m_parseTree->getRoot()->insertChild((new GeneralNode(0, tokens[0].first, INSTRUCTION)))), tokens, itr->second);
+        return parseInstruction(parseTree, (parseTree->getRoot()->insertChild((new GeneralNode(0, tokens[0].first, INSTRUCTION)))), tokens, itr->second);
     }
     else {
         //Edge case, valid instruction with no method implemented (debug)
@@ -141,14 +159,14 @@ string Parser::checkInstruction(int line, vector<pair<string, LexerConstants::To
     }
 }
 
-string Parser::parseInstruction(PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::vector<std::pair<std::pair<std::string, int>, std::function<std::string(PTNode*, std::vector<std::pair<std::string, LexerConstants::TokenType>>, std::string, int)>>> parsingTemplate) {
+string Parser::parseInstruction(ParseTree* parseTree, PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::vector<std::pair<std::pair<std::string, int>, std::function<std::string(ParseTree*, PTNode*, std::vector<std::pair<std::string, LexerConstants::TokenType>>, std::string, int)>>> parsingTemplate) {
     //Temporary return string
     string returnString;
     //Loop through all templates
     //NOTE - if the instruction is a no operand (i.e. empty parsingTemplate) loop will not run and will go straight to final check
     for (int i=0; i<parsingTemplate.size(); i++) {
         //Access the parsing function, passing the index expected in the token sequence
-        returnString = parsingTemplate[i].second(node, tokens, parsingTemplate[i].first.first, parsingTemplate[i].first.second);
+        returnString = parsingTemplate[i].second(parseTree, node, tokens, parsingTemplate[i].first.first, parsingTemplate[i].first.second);
         //If an error arises, return instantly
         if (returnString != "") {
             return returnString;
@@ -180,25 +198,25 @@ string Parser::parseInstruction(PTNode* node, std::vector<std::pair<std::string,
 
 
 //LEVEL 2 - CONJUNCTION AND CONDITION CHECKERS / PARSER HELPERS
-string Parser::checkImplicitConjunction(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
+string Parser::checkImplicitConjunction(ParseTree* parseTree, PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
     string returnString;
     //Implicit node is implicit, so always exists
     //Add keyword as child
     //Rewrite returnString if L2 analysis returns an error
-    returnString = parseConjunction(node->insertChild((new GeneralNode(Constants::IMPLICIT_INDEX, keyword, CONJUNCTION))), tokens, keyword, index);
+    returnString = parseConjunction(parseTree, node->insertChild((new GeneralNode(Constants::IMPLICIT_INDEX, keyword, CONJUNCTION))), tokens, keyword, index);
     return returnString;
 }
 
-string Parser::checkImplicitCondition(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
+string Parser::checkImplicitCondition(ParseTree* parseTree, PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
     string returnString;
     //Implicit node is implicit, so always exists
     //Add keyword as child
     //Rewrite returnString if L2 analysis returns an error
-    returnString = parseCondition(node->insertChild((new GeneralNode(Constants::IMPLICIT_INDEX, keyword, CONJUNCTION))), tokens, keyword, index);
+    returnString = parseCondition(parseTree, node->insertChild((new GeneralNode(Constants::IMPLICIT_INDEX, keyword, CONJUNCTION))), tokens, keyword, index);
     return returnString;
 }
 
-string Parser::checkExplicitConjunction(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
+string Parser::checkExplicitConjunction(ParseTree* parseTree, PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
     string returnString;
     //Check if a conjunction exists by comparing size
     if (tokens.size()<=index) {
@@ -211,12 +229,12 @@ string Parser::checkExplicitConjunction(PTNode* node, vector<pair<string, LexerC
     //If passed, add to keyword as child
     //Rewrite returnString if L2 analysis returns an error
     else {
-        returnString = parseConjunction(node->insertChild((new GeneralNode(index, keyword, CONJUNCTION))), tokens, keyword, index);
+        returnString = parseConjunction(parseTree, node->insertChild((new GeneralNode(index, keyword, CONJUNCTION))), tokens, keyword, index);
         return returnString;
     }
 }
 
-string Parser::checkExplicitCondition(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
+string Parser::checkExplicitCondition(ParseTree* parseTree, PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
     string returnString;
     //Check if a condition exists by comparing size
     if (tokens.size()<=index) {
@@ -229,12 +247,12 @@ string Parser::checkExplicitCondition(PTNode* node, vector<pair<string, LexerCon
     //If passed, add to keyword as child
     //Rewrite returnString if L2 analysis returns an error
     else {
-        returnString = parseCondition(node->insertChild((new GeneralNode(index, keyword, CONJUNCTION))), tokens, keyword, index);
+        returnString = parseCondition(parseTree, node->insertChild((new GeneralNode(index, keyword, CONJUNCTION))), tokens, keyword, index);
         return returnString;
     }
 }
 
-string Parser::parseConjunction(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
+string Parser::parseConjunction(ParseTree* parseTree, PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
     //Create temporary return string
     string returnString;
     //Increment index by one to now point to where the operand should be
@@ -254,7 +272,7 @@ string Parser::parseConjunction(PTNode* node, vector<pair<string, LexerConstants
     }
 }
 
-string Parser::parseCondition(PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
+string Parser::parseCondition(ParseTree* parseTree, PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
     //Create temporary return string
     string returnString;
     //Iterate the index to now point to where the condition should be
@@ -271,7 +289,7 @@ string Parser::parseCondition(PTNode* node, vector<pair<string, LexerConstants::
         //Insert a new child as the operand
         node->insertChild((new OperandNode(index, tokens[index].first, returnPTOperand(tokens[index].second))));
         return "";
-    } 
+    }
 }
 
 
@@ -298,7 +316,7 @@ bool Parser::isOperand(pair<string, LexerConstants::TokenType> token) {
             return true;
         case LexerConstants::TokenType::STRING:
             return true;
-        case LexerConstants::TokenType::NEWLINE:    
+        case LexerConstants::TokenType::NEWLINE:
             return true;
         default:
             return false;
@@ -357,9 +375,5 @@ PTConstants::OperandType Parser::returnPTOperand(LexerConstants::TokenType token
         default:
             return PTConstants::OperandType::UNKNOWN;
     }
-}
-
-void Parser::printTree() {
-    m_parseTree->printTree();
 }
 

@@ -25,6 +25,7 @@ Compiler::Compiler(std::string& pathname, bool cmdSilent, bool cmdTimings, bool 
     m_statusMessage(),
     m_lexer(new Lexer()),
     m_parser(new Parser()),
+    m_parseTree(new PT::ParseTree()),
     m_AST(new AST::AbstractSyntaxTree()),
     m_semanticAnalyzer(new SemanticAnalyzer()),
     m_codeGenerator(new CodeGenerator()),
@@ -64,7 +65,7 @@ bool Compiler::compileCode() {
     //Parse code
     cmdTimingPrint("Compiler: Parsing code\n");
     start = omp_get_wtime();
-    if(!parseCode()) {
+    if(!m_parser->parseCode(m_parseTree, m_codeLines, m_codeTokens, m_statusMessage)) {
         return false;
     }
     cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
@@ -127,35 +128,12 @@ bool Compiler::compileCode() {
     return true;
 }
 
-bool Compiler::parseCode() {
-    //The parser relies on top-down recursive descent parsing
-    //Implementing parallelization is a NIGHTMARE, and very easily involves race-conditions and stack overflows
-    //Hence, parsing will remain sequential
-
-    for (int i=0; i<m_codeTokens.size(); i++) {
-        //Call validateInstruction in InstructionSet
-        string error = m_parser->checkInstruction(i, m_codeTokens[i]);
-        //If an error is present
-        if (!error.empty()) {
-            m_statusMessage += "\nInvalid syntax at line " + to_string(i + 1) + ": " + m_codeLines[i] + "\n" + error + "\n";
-        }
-    }
-
-    //Concatenate the statusMessage string from the map (which should be ordered already)
-    if (m_statusMessage.empty()) {
-        return true; 
-    }
-    else {
-        return false;
-    }
-}
-
 bool Compiler::resolveSymbols() {
     //Variables to hold finalized invalid lines and parallelized lines map for each thread
     map<int, string> invalidLinesMap;
     string invalidLines;
     //Get the root of the parse tree
-    PT::PTNode* parseTreeRoot = m_parser->getParseTree()->getRoot();
+    PT::PTNode* parseTreeRoot = m_parseTree->getRoot();
     int parseTreeSize = parseTreeRoot->getNumChildren();
 
     //Look for label declarations in parse tree and add to the label table
@@ -238,7 +216,7 @@ bool Compiler::resolveSymbols() {
 
 void Compiler::buildAST() {
     // Get the root node of the parse tree and its size (frequent access)
-    PT::PTNode* PTRoot = m_parser->getParseTree()->getRoot();
+    PT::PTNode* PTRoot = m_parseTree->getRoot();
     int PTSize = PTRoot->getNumChildren();
     // Get the AST root node
     AST::ASTNode* ASTRoot = m_AST->getRoot();
