@@ -18,7 +18,7 @@ class CodeGenerator;
 class Compiler {
     public:
         //Constructors and Destructors
-        Compiler(std::string& pathname, bool cmdSilent, bool cmdTimings, bool cmdTree);
+        Compiler(std::string& pathname, bool cmdSilent, bool cmdTimings, bool cmdTree, bool cmdIr);
         ~Compiler();
 
         Compiler(const Compiler&) = delete;
@@ -93,6 +93,7 @@ class Compiler {
         bool cmd_silent;
         bool cmd_timings;
         bool cmd_tree;
+        bool cmd_ir;
 };
 
 #endif

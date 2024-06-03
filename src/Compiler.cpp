@@ -17,10 +17,11 @@
 
 using namespace std;
 
-Compiler::Compiler(std::string& pathname, bool cmdSilent, bool cmdTimings, bool cmdTree):
+Compiler::Compiler(std::string& pathname, bool cmdSilent, bool cmdTimings, bool cmdTree, bool cmdIr) :
     cmd_silent(cmdSilent),
     cmd_timings(cmdTimings),
     cmd_tree(cmdTree),
+    cmd_ir(cmdIr),
     m_statusMessage(),
     m_lexer(new Lexer()),
     m_parser(new Parser()),
@@ -117,6 +118,12 @@ bool Compiler::compileCode() {
     start = omp_get_wtime();
     generateCode();
     cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
+    if(cmd_ir && !cmd_silent) {
+        cout << endl;
+        cout << "LLVM IR for '" + m_pathname + "':\n";
+        m_codeGenerator->printIR();
+        cout << endl;
+    }
     return true;
 }
 
@@ -413,5 +420,4 @@ void Compiler::generateCode() {
             m_codeGenerator->generateCode(instructionNode);
         }
     }
-    m_codeGenerator->printIR();
 }

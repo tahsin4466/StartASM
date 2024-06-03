@@ -38,6 +38,7 @@ void displayHelp() {
     cout << "  --help        Display this help message and exit" << endl;
     cout << "  --timings     Print out timings for each compilation step" << endl;
     cout << "  --tree        Print out the AST (Abstract Syntax Tree)" << endl;
+    cout << "  --ir        Print out generated LLVM IR" << endl;
     cout << "  --silent      Suppress output (except syntax errors)" << endl;
     cout << "  --truesilent  Suppress all output, including syntax errors" << endl;
     cout << "Note that the use of --silent or --truesilent will override output flags such as --tree and --timings." << endl;
@@ -103,11 +104,12 @@ int main(int argc, char* argv[]) {
     // Flags
     bool timings = cmdOptionExists(argv, argv + argc, "--timings");
     bool tree = cmdOptionExists(argv, argv + argc, "--tree");
+    bool ir = cmdOptionExists(argv, argv + argc, "--ir");
     bool silent = cmdOptionExists(argv, argv + argc, "--silent") || cmdOptionExists(argv, argv + argc, "--truesilent");
     bool truesilent = cmdOptionExists(argv, argv + argc, "--truesilent");
 
     // Adjust the compiler instantiation to pass the truesilent flag
-    Compiler StartASMCompiler(filepath, silent, timings, tree);
+    Compiler StartASMCompiler(filepath, silent, timings, tree, ir);
     double start = omp_get_wtime();
     if (!StartASMCompiler.compileCode()) {
         if (!truesilent) {

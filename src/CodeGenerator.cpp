@@ -67,8 +67,6 @@ void CodeGenerator::handleAdd(AST::InstructionNode* node) {
 
             llvm::Value* destPtr = m_namedValues[destRegNode->getNodeValue()];
             Builder.CreateStore(result, destPtr);
-
-            llvm::errs() << "Debug: Added values from " << leftRegNode->getNodeValue() << " and " << rightRegNode->getNodeValue() << ", result stored in " << destRegNode->getNodeValue() << "\n";
         } else {
             llvm::errs() << "LLVM Error: Undefined register used in add operation.\n";
         }
@@ -88,7 +86,6 @@ void CodeGenerator::handleCreate(AST::InstructionNode* node) {
             llvm::Value* destPtr = m_namedValues[destRegNode->getNodeValue()];
             Builder.CreateStore(llvmValue, destPtr);
 
-            llvm::errs() << "Debug: Created integer value " << value << " and stored in " << destRegNode->getNodeValue() << "\n";
         } else {
             llvm::errs() << "LLVM Error: Unsupported operand type in create operation.\n";
         }
@@ -110,8 +107,6 @@ void CodeGenerator::handleMove(AST::InstructionNode* node) {
 
             llvm::Value* destPtr = m_namedValues[destRegNode->getNodeValue()];
             Builder.CreateStore(srcValue, destPtr);
-
-            llvm::errs() << "Debug: Moved value from " << srcRegNode->getNodeValue() << " to " << destRegNode->getNodeValue() << "\n";
         } else {
             llvm::errs() << "LLVM Error: Undefined register used in move operation.\n";
         }
