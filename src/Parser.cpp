@@ -1,7 +1,5 @@
 #include "include/Parser.h"
 
-#include <iostream>
-#include <regex>
 #include <string>
 #include <functional>
 #include <utility>
@@ -41,76 +39,76 @@ Parser::Parser() {
 
 
     //Move instruction template
-    m_templateMap["move"].push_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
-    m_templateMap["move"].push_back(make_pair(make_pair("to", 2), checkExplicitConjunction));
+    m_templateMap["move"].emplace_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
+    m_templateMap["move"].emplace_back(make_pair(make_pair("to", 2), checkExplicitConjunction));
     //Load instruction template
-    m_templateMap["load"].push_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
-    m_templateMap["load"].push_back(make_pair(make_pair("to", 2), checkExplicitConjunction));
+    m_templateMap["load"].emplace_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
+    m_templateMap["load"].emplace_back(make_pair(make_pair("to", 2), checkExplicitConjunction));
     //Store instruction template
-    m_templateMap["store"].push_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
-    m_templateMap["store"].push_back(make_pair(make_pair("to", 2), checkExplicitConjunction));
+    m_templateMap["store"].emplace_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
+    m_templateMap["store"].emplace_back(make_pair(make_pair("to", 2), checkExplicitConjunction));
     //Create instruction template
-    m_templateMap["create"].push_back(make_pair(make_pair("type", 0), checkImplicitCondition));
-    m_templateMap["create"].push_back(make_pair(make_pair("from", 1), checkImplicitConjunction));
-    m_templateMap["create"].push_back(make_pair(make_pair("to", 3), checkExplicitConjunction));
+    m_templateMap["create"].emplace_back(make_pair(make_pair("type", 0), checkImplicitCondition));
+    m_templateMap["create"].emplace_back(make_pair(make_pair("from", 1), checkImplicitConjunction));
+    m_templateMap["create"].emplace_back(make_pair(make_pair("to", 3), checkExplicitConjunction));
     //Cast instruction template
-    m_templateMap["cast"].push_back(make_pair(make_pair("type", 0), checkImplicitCondition));
-    m_templateMap["cast"].push_back(make_pair(make_pair("self", 1), checkImplicitConjunction));
+    m_templateMap["cast"].emplace_back(make_pair(make_pair("type", 0), checkImplicitCondition));
+    m_templateMap["cast"].emplace_back(make_pair(make_pair("self", 1), checkImplicitConjunction));
     //Add instruction template
-    m_templateMap["add"].push_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
-    m_templateMap["add"].push_back(make_pair(make_pair("with", 2), checkExplicitConjunction));
-    m_templateMap["add"].push_back(make_pair(make_pair("to", 4), checkExplicitConjunction));
+    m_templateMap["add"].emplace_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
+    m_templateMap["add"].emplace_back(make_pair(make_pair("with", 2), checkExplicitConjunction));
+    m_templateMap["add"].emplace_back(make_pair(make_pair("to", 4), checkExplicitConjunction));
     //Sub instruction template
-    m_templateMap["sub"].push_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
-    m_templateMap["sub"].push_back(make_pair(make_pair("with", 2), checkExplicitConjunction));
-    m_templateMap["sub"].push_back(make_pair(make_pair("to", 4), checkExplicitConjunction));
+    m_templateMap["sub"].emplace_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
+    m_templateMap["sub"].emplace_back(make_pair(make_pair("with", 2), checkExplicitConjunction));
+    m_templateMap["sub"].emplace_back(make_pair(make_pair("to", 4), checkExplicitConjunction));
     //Multiply instruction template
-    m_templateMap["multiply"].push_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
-    m_templateMap["multiply"].push_back(make_pair(make_pair("with", 2), checkExplicitConjunction));
-    m_templateMap["multiply"].push_back(make_pair(make_pair("to", 4), checkExplicitConjunction));
+    m_templateMap["multiply"].emplace_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
+    m_templateMap["multiply"].emplace_back(make_pair(make_pair("with", 2), checkExplicitConjunction));
+    m_templateMap["multiply"].emplace_back(make_pair(make_pair("to", 4), checkExplicitConjunction));
     //Divide instruction template
-    m_templateMap["divide"].push_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
-    m_templateMap["divide"].push_back(make_pair(make_pair("with", 2), checkExplicitConjunction));
-    m_templateMap["divide"].push_back(make_pair(make_pair("to", 4), checkExplicitConjunction));
+    m_templateMap["divide"].emplace_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
+    m_templateMap["divide"].emplace_back(make_pair(make_pair("with", 2), checkExplicitConjunction));
+    m_templateMap["divide"].emplace_back(make_pair(make_pair("to", 4), checkExplicitConjunction));
     //Or instruction template
-    m_templateMap["or"].push_back(make_pair(make_pair("self", 0), checkImplicitConjunction));
-    m_templateMap["or"].push_back(make_pair(make_pair("with", 2), checkExplicitConjunction));
+    m_templateMap["or"].emplace_back(make_pair(make_pair("self", 0), checkImplicitConjunction));
+    m_templateMap["or"].emplace_back(make_pair(make_pair("with", 2), checkExplicitConjunction));
     //And instruction template
-    m_templateMap["and"].push_back(make_pair(make_pair("self", 0), checkImplicitConjunction));
-    m_templateMap["and"].push_back(make_pair(make_pair("with", 2), checkExplicitConjunction));
+    m_templateMap["and"].emplace_back(make_pair(make_pair("self", 0), checkImplicitConjunction));
+    m_templateMap["and"].emplace_back(make_pair(make_pair("with", 2), checkExplicitConjunction));
     //Not instruction template
-    m_templateMap["not"].push_back(make_pair(make_pair("self", 0), checkImplicitConjunction));
+    m_templateMap["not"].emplace_back(make_pair(make_pair("self", 0), checkImplicitConjunction));
     //Shift instruction template (left)
-    m_templateMap["shift"].push_back(make_pair(make_pair("direction", 0), checkImplicitCondition));
-    m_templateMap["shift"].push_back(make_pair(make_pair("self", 1), checkImplicitConjunction));
-    m_templateMap["shift"].push_back(make_pair(make_pair("by", 3), checkExplicitConjunction));
+    m_templateMap["shift"].emplace_back(make_pair(make_pair("direction", 0), checkImplicitCondition));
+    m_templateMap["shift"].emplace_back(make_pair(make_pair("self", 1), checkImplicitConjunction));
+    m_templateMap["shift"].emplace_back(make_pair(make_pair("by", 3), checkExplicitConjunction));
     //Compare instruction template
-    m_templateMap["compare"].push_back(make_pair(make_pair("self", 0), checkImplicitConjunction));
-    m_templateMap["compare"].push_back(make_pair(make_pair("with", 2), checkExplicitConjunction));
+    m_templateMap["compare"].emplace_back(make_pair(make_pair("self", 0), checkImplicitConjunction));
+    m_templateMap["compare"].emplace_back(make_pair(make_pair("with", 2), checkExplicitConjunction));
     //Jump instruction
-    m_templateMap["jump"].push_back(make_pair(make_pair("if", 1), checkExplicitCondition));
-    m_templateMap["jump"].push_back(make_pair(make_pair("to", 3), checkExplicitConjunction));
+    m_templateMap["jump"].emplace_back(make_pair(make_pair("if", 1), checkExplicitCondition));
+    m_templateMap["jump"].emplace_back(make_pair(make_pair("to", 3), checkExplicitConjunction));
     //Call instruction
-    m_templateMap["call"].push_back(make_pair(make_pair("to", 1), checkExplicitConjunction));
+    m_templateMap["call"].emplace_back(make_pair(make_pair("to", 1), checkExplicitConjunction));
     //Push instruction
-    m_templateMap["push"].push_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
+    m_templateMap["push"].emplace_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
     //Pop instruction
-    m_templateMap["pop"].push_back(make_pair(make_pair("to", 1), checkExplicitConjunction));
+    m_templateMap["pop"].emplace_back(make_pair(make_pair("to", 1), checkExplicitConjunction));
     //Return instruction
     m_templateMap["return"];
     //Stop instruction
     m_templateMap["stop"];
     //Input instruction
-    m_templateMap["input"].push_back(make_pair(make_pair("type", 0), checkImplicitCondition));
-    m_templateMap["input"].push_back(make_pair(make_pair("to", 2), checkExplicitConjunction));
+    m_templateMap["input"].emplace_back(make_pair(make_pair("type", 0), checkImplicitCondition));
+    m_templateMap["input"].emplace_back(make_pair(make_pair("to", 2), checkExplicitConjunction));
     //Output instruction template
-    m_templateMap["output"].push_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
+    m_templateMap["output"].emplace_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
     //Print instruction
-    m_templateMap["print"].push_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
+    m_templateMap["print"].emplace_back(make_pair(make_pair("from", 0), checkImplicitConjunction));
     //Comment instruction
-    m_templateMap["comment"].push_back(make_pair(make_pair("static", 0), checkImplicitConjunction));
+    m_templateMap["comment"].emplace_back(make_pair(make_pair("static", 0), checkImplicitConjunction));
     //Label instruction
-    m_templateMap["label"].push_back(make_pair(make_pair("static", 0), checkImplicitConjunction));
+    m_templateMap["label"].emplace_back(make_pair(make_pair("static", 0), checkImplicitConjunction));
 
 }
 
@@ -121,7 +119,7 @@ bool Parser::parseCode(PT::ParseTree* parseTree, const std::vector<std::string>&
 
     for (int i=0; i<tokens.size(); i++) {
         //Call validateInstruction in InstructionSet
-        string error = checkInstruction(parseTree, i, tokens[i]);
+        string error = checkInstruction(parseTree, tokens[i]);
         //If an error is present
         if (!error.empty()) {
             errorMessage += "\nInvalid syntax at line " + to_string(i + 1) + ": " + codeLines[i] + "\n" + error + "\n";
@@ -138,7 +136,7 @@ bool Parser::parseCode(PT::ParseTree* parseTree, const std::vector<std::string>&
 }
 
 //LEVEL 1 - INSTRUCTION PARSER AND CHECKER
-string Parser::checkInstruction(ParseTree* parseTree, int line, vector<pair<string, LexerConstants::TokenType>> tokens) {
+string Parser::checkInstruction(ParseTree* parseTree, vector<pair<string, LexerConstants::TokenType>> tokens) {
     //Zero case, return instantly with valid syntax and no AST construction
     if (tokens[0].second == LexerConstants::TokenType::BLANK) {
         parseTree->getRoot()->insertChild((new GeneralNode(0, "", BLANK)));
@@ -159,16 +157,16 @@ string Parser::checkInstruction(ParseTree* parseTree, int line, vector<pair<stri
     }
 }
 
-string Parser::parseInstruction(ParseTree* parseTree, PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::vector<std::pair<std::pair<std::string, int>, std::function<std::string(ParseTree*, PTNode*, std::vector<std::pair<std::string, LexerConstants::TokenType>>, std::string, int)>>> parsingTemplate) {
+string Parser::parseInstruction(ParseTree* parseTree, PTNode* node, std::vector<std::pair<std::string, LexerConstants::TokenType>> tokens, std::vector<std::pair<std::pair<std::string, int>, std::function<std::string(ParseTree*, PTNode*, std::vector<std::pair<std::string, LexerConstants::TokenType>>, std::string&, int)>>> parsingTemplate) {
     //Temporary return string
     string returnString;
     //Loop through all templates
     //NOTE - if the instruction is a no operand (i.e. empty parsingTemplate) loop will not run and will go straight to final check
-    for (int i=0; i<parsingTemplate.size(); i++) {
+    for (auto& templateElement : parsingTemplate) {
         //Access the parsing function, passing the index expected in the token sequence
-        returnString = parsingTemplate[i].second(parseTree, node, tokens, parsingTemplate[i].first.first, parsingTemplate[i].first.second);
+        returnString = templateElement.second(parseTree, node, tokens, templateElement.first.first, templateElement.first.second);
         //If an error arises, return instantly
-        if (returnString != "") {
+        if (!returnString.empty()) {
             return returnString;
         }
         //Clear return string on every iteration
@@ -193,12 +191,12 @@ string Parser::parseInstruction(ParseTree* parseTree, PTNode* node, std::vector<
         return "Compiler error for '" + tokens[0].first + "'. Could not find instruction information.";
     }
 
-};
+}
 
 
 
 //LEVEL 2 - CONJUNCTION AND CONDITION CHECKERS / PARSER HELPERS
-string Parser::checkImplicitConjunction(ParseTree* parseTree, PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
+string Parser::checkImplicitConjunction(ParseTree* parseTree, PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string& keyword, int index) {
     string returnString;
     //Implicit node is implicit, so always exists
     //Add keyword as child
@@ -207,7 +205,7 @@ string Parser::checkImplicitConjunction(ParseTree* parseTree, PTNode* node, vect
     return returnString;
 }
 
-string Parser::checkImplicitCondition(ParseTree* parseTree, PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
+string Parser::checkImplicitCondition(ParseTree* parseTree, PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string& keyword, int index) {
     string returnString;
     //Implicit node is implicit, so always exists
     //Add keyword as child
@@ -216,7 +214,7 @@ string Parser::checkImplicitCondition(ParseTree* parseTree, PTNode* node, vector
     return returnString;
 }
 
-string Parser::checkExplicitConjunction(ParseTree* parseTree, PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
+string Parser::checkExplicitConjunction(ParseTree* parseTree, PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string& keyword, int index) {
     string returnString;
     //Check if a conjunction exists by comparing size
     if (tokens.size()<=index) {
@@ -234,7 +232,7 @@ string Parser::checkExplicitConjunction(ParseTree* parseTree, PTNode* node, vect
     }
 }
 
-string Parser::checkExplicitCondition(ParseTree* parseTree, PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
+string Parser::checkExplicitCondition(ParseTree* parseTree, PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string& keyword, int index) {
     string returnString;
     //Check if a condition exists by comparing size
     if (tokens.size()<=index) {
@@ -252,7 +250,7 @@ string Parser::checkExplicitCondition(ParseTree* parseTree, PTNode* node, vector
     }
 }
 
-string Parser::parseConjunction(ParseTree* parseTree, PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
+string Parser::parseConjunction(ParseTree* parseTree, PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string& keyword, int index) {
     //Create temporary return string
     string returnString;
     //Increment index by one to now point to where the operand should be
@@ -272,7 +270,7 @@ string Parser::parseConjunction(ParseTree* parseTree, PTNode* node, vector<pair<
     }
 }
 
-string Parser::parseCondition(ParseTree* parseTree, PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string keyword, int index) {
+string Parser::parseCondition(ParseTree* parseTree, PTNode* node, vector<pair<string, LexerConstants::TokenType>> tokens, string& keyword, int index) {
     //Create temporary return string
     string returnString;
     //Iterate the index to now point to where the condition should be
@@ -295,7 +293,7 @@ string Parser::parseCondition(ParseTree* parseTree, PTNode* node, vector<pair<st
 
 
 //LEVEL 3 - OPERANDS AND DESCRIPTORS
-bool Parser::isOperand(pair<string, LexerConstants::TokenType> token) {
+bool Parser::isOperand(pair<string, LexerConstants::TokenType>& token) {
     //Switch statement to determine if a lexer constant constitutes an operand in the PT
     switch (token.second) {
         case LexerConstants::TokenType::REGISTER:
@@ -323,7 +321,7 @@ bool Parser::isOperand(pair<string, LexerConstants::TokenType> token) {
     }
 }
 
-bool Parser::isDescriptor(pair<string, LexerConstants::TokenType> token) {
+bool Parser::isDescriptor(pair<string, LexerConstants::TokenType>& token) {
     //Check if token is a condition
     //Switch statement
     switch (token.second) {
