@@ -5,8 +5,6 @@
 #include <string>
 #include <functional>
 #include <utility>
-#include <sstream>
-
 
 using namespace std;
 using namespace LexerConstants;

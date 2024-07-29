@@ -14,6 +14,7 @@
 class Parser;
 class SemanticAnalyzer;
 class CodeGenerator;
+class SymbolResolver;
 
 class Compiler {
     public:
@@ -50,9 +51,7 @@ class Compiler {
 
 
     private:
-        //Internal parsing methods
-        //Resolve symbols and labels
-        bool resolveSymbols();
+        //Internal helper methods
         //Build the AST
         void buildAST();
         //Analyze Semantics
@@ -73,7 +72,7 @@ class Compiler {
         //Hash table for symbol resolution, mapping labels to instruction addresses
         std::unordered_map<std::string, std::pair<std::string, int>> m_symbolTable;
 
-        //Variables
+        //Variables and data structures
         //Pathname
         std::string m_pathname;
         //String containing current status
@@ -82,7 +81,9 @@ class Compiler {
         Lexer* m_lexer;
         //Parser (PT nested inside parser)
         Parser* m_parser;
-        //Pointer to AST (used directly by the compiler at multiple stages)
+        //Symbol Resolver
+        SymbolResolver* m_symbolResolver;
+        //AST (used directly by the compiler at multiple stages)
         AST::AbstractSyntaxTree* m_AST;   
         //Pointer to semantic analyzer
         SemanticAnalyzer* m_semanticAnalyzer;

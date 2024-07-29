@@ -56,6 +56,8 @@ set(HEADERS
         src/include/SemanticAnalyzer.h
         src/include/CodeGenerator.h
         src/include/.Secrets.h
+        src/SymbolResolver.cpp
+        src/include/SymbolResolver.h
 )
 
 # Specify the executable target
