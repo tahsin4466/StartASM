@@ -255,6 +255,7 @@ void Compiler::buildAST() {
     }
 
     // Insert instruction nodes into the AST root node (sequential part to ensure thread safety)
+    ASTRoot->reserveChildren(PTSize);
     for (int i = 0; i < PTSize; i++) {
         ASTRoot->insertChild(instructionNodes[i]);
     }

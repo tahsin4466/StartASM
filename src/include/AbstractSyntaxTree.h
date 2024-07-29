@@ -78,6 +78,9 @@ namespace AST {
                     return m_children[index];
                 }
             }
+            void reserveChildren(int numChildren) {
+                m_children.reserve(numChildren);
+            }
             
         protected:
             //Protected variables to be inherited by derived classes

@@ -75,9 +75,13 @@ namespace PT {
                     return m_children[index];
                 }
             }
+            //Reserve space for children
+            void reserveChildren(int numChildren) {
+                m_children.reserve(numChildren);
+            }
 
         protected:
-            //Variables to be inhereted by derived methods
+            //Variables to be inherited by derived methods
             int m_tokenIndex;
             std::string m_nodeValue;
             PTConstants::NodeType m_nodeType;

@@ -12,55 +12,63 @@ using namespace std;
 using namespace LexerConstants;
 
 //Constructor
-Lexer::Lexer(): m_stringTemplate("^\".*\"$") {
+Lexer::Lexer() : m_stringTemplate("^\".*\"$") {
+    //Reserve space for the token dictionary
+    m_tokenDictionary.reserve(39); //Total number of tokens being added
+
     //Add instructions to dictionary
-    m_tokenDictionary.emplace("move", INSTRUCTION);
-    m_tokenDictionary.emplace("load", INSTRUCTION);
-    m_tokenDictionary.emplace("store", INSTRUCTION);
-    m_tokenDictionary.emplace("create", INSTRUCTION);
-    m_tokenDictionary.emplace("cast", INSTRUCTION);
-    m_tokenDictionary.emplace("add", INSTRUCTION);
-    m_tokenDictionary.emplace("sub", INSTRUCTION);
-    m_tokenDictionary.emplace("multiply", INSTRUCTION);
-    m_tokenDictionary.emplace("divide", INSTRUCTION);
-    m_tokenDictionary.emplace("or", INSTRUCTION);
-    m_tokenDictionary.emplace("and", INSTRUCTION);
-    m_tokenDictionary.emplace("not", INSTRUCTION);
-    m_tokenDictionary.emplace("shift", INSTRUCTION);
-    m_tokenDictionary.emplace("compare", INSTRUCTION);
-    m_tokenDictionary.emplace("jump", INSTRUCTION);
-    m_tokenDictionary.emplace("call", INSTRUCTION);
-    m_tokenDictionary.emplace("push", INSTRUCTION);
-    m_tokenDictionary.emplace("pop", INSTRUCTION);
-    m_tokenDictionary.emplace("return", INSTRUCTION);
-    m_tokenDictionary.emplace("stop", INSTRUCTION);
-    m_tokenDictionary.emplace("input", INSTRUCTION);
-    m_tokenDictionary.emplace("output", INSTRUCTION);
-    m_tokenDictionary.emplace("print", INSTRUCTION);
-    m_tokenDictionary.emplace("label", INSTRUCTION);
+    m_tokenDictionary["move"] = INSTRUCTION;
+    m_tokenDictionary["load"] = INSTRUCTION;
+    m_tokenDictionary["store"] = INSTRUCTION;
+    m_tokenDictionary["create"] = INSTRUCTION;
+    m_tokenDictionary["cast"] = INSTRUCTION;
+    m_tokenDictionary["add"] = INSTRUCTION;
+    m_tokenDictionary["sub"] = INSTRUCTION;
+    m_tokenDictionary["multiply"] = INSTRUCTION;
+    m_tokenDictionary["divide"] = INSTRUCTION;
+    m_tokenDictionary["or"] = INSTRUCTION;
+    m_tokenDictionary["and"] = INSTRUCTION;
+    m_tokenDictionary["not"] = INSTRUCTION;
+    m_tokenDictionary["shift"] = INSTRUCTION;
+    m_tokenDictionary["compare"] = INSTRUCTION;
+    m_tokenDictionary["jump"] = INSTRUCTION;
+    m_tokenDictionary["call"] = INSTRUCTION;
+    m_tokenDictionary["push"] = INSTRUCTION;
+    m_tokenDictionary["pop"] = INSTRUCTION;
+    m_tokenDictionary["return"] = INSTRUCTION;
+    m_tokenDictionary["stop"] = INSTRUCTION;
+    m_tokenDictionary["input"] = INSTRUCTION;
+    m_tokenDictionary["output"] = INSTRUCTION;
+    m_tokenDictionary["print"] = INSTRUCTION;
+    m_tokenDictionary["label"] = INSTRUCTION;
+
     //Add conjunctions to dictionary
-    m_tokenDictionary.emplace("from", CONJUNCTION);
-    m_tokenDictionary.emplace("with", CONJUNCTION);
-    m_tokenDictionary.emplace("self", CONJUNCTION);
-    m_tokenDictionary.emplace("to", CONJUNCTION);
-    m_tokenDictionary.emplace("by", CONJUNCTION);
-    m_tokenDictionary.emplace("if", CONJUNCTION);
+    m_tokenDictionary["from"] = CONJUNCTION;
+    m_tokenDictionary["with"] = CONJUNCTION;
+    m_tokenDictionary["self"] = CONJUNCTION;
+    m_tokenDictionary["to"] = CONJUNCTION;
+    m_tokenDictionary["by"] = CONJUNCTION;
+    m_tokenDictionary["if"] = CONJUNCTION;
+
     //Add conditions to dictionary
-    m_tokenDictionary.emplace("left", SHIFTCONDITION);
-    m_tokenDictionary.emplace("right", SHIFTCONDITION);
-    m_tokenDictionary.emplace("greater", JUMPCONDITION);
-    m_tokenDictionary.emplace("less", JUMPCONDITION);
-    m_tokenDictionary.emplace("equal", JUMPCONDITION);
-    m_tokenDictionary.emplace("unequal", JUMPCONDITION);
-    m_tokenDictionary.emplace("zero", JUMPCONDITION);
-    m_tokenDictionary.emplace("nonzero", JUMPCONDITION);
-    m_tokenDictionary.emplace("unconditional", JUMPCONDITION);
-    m_tokenDictionary.emplace("integer", TYPECONDITION);
-    m_tokenDictionary.emplace("float", TYPECONDITION);
-    m_tokenDictionary.emplace("boolean", TYPECONDITION);
-    m_tokenDictionary.emplace("character", TYPECONDITION);
-    m_tokenDictionary.emplace("memory", TYPECONDITION);
-    m_tokenDictionary.emplace("instruction", TYPECONDITION);
+    m_tokenDictionary["left"] = SHIFTCONDITION;
+    m_tokenDictionary["right"] = SHIFTCONDITION;
+    m_tokenDictionary["greater"] = JUMPCONDITION;
+    m_tokenDictionary["less"] = JUMPCONDITION;
+    m_tokenDictionary["equal"] = JUMPCONDITION;
+    m_tokenDictionary["unequal"] = JUMPCONDITION;
+    m_tokenDictionary["zero"] = JUMPCONDITION;
+    m_tokenDictionary["nonzero"] = JUMPCONDITION;
+    m_tokenDictionary["unconditional"] = JUMPCONDITION;
+    m_tokenDictionary["integer"] = TYPECONDITION;
+    m_tokenDictionary["float"] = TYPECONDITION;
+    m_tokenDictionary["boolean"] = TYPECONDITION;
+    m_tokenDictionary["character"] = TYPECONDITION;
+    m_tokenDictionary["memory"] = TYPECONDITION;
+    m_tokenDictionary["instruction"] = TYPECONDITION;
+
+    //Reserve space for the operand dictionary
+    m_operandDictionary.reserve(8); //Total number of regex templates being added
 
     //Add operand regex templates to vector
     m_operandDictionary.emplace_back(regex("r[0-9]+"), REGISTER);
@@ -72,6 +80,7 @@ Lexer::Lexer(): m_stringTemplate("^\".*\"$") {
     m_operandDictionary.emplace_back(regex("."), CHARACTER);
     m_operandDictionary.emplace_back(regex("'([^']+)'"), LABEL);
 }
+
 
 //Main lexer method
 bool Lexer::lexFile(const std::string& filename, std::vector<std::string>& codeLines, std::vector<std::vector<std::pair<std::string, LexerConstants::TokenType>>>& tokenizedCode) {
