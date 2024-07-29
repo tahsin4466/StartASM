@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 3.10)
 project(startasm)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Ensure position-independent code
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Set the CMAKE_PREFIX_PATH to the directory containing LLVMConfig.cmake if necessary
 if(APPLE)
@@ -79,6 +84,8 @@ if(APPLE)
 elseif(UNIX)
     message(STATUS "Configuring for Linux")
     # Linux-specific settings here
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -no-pie -lstdc++fs")
 endif()
 
 # Ensure CMake RPATH settings for macOS
