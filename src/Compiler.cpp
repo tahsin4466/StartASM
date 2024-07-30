@@ -59,7 +59,7 @@ void Compiler::cmdTimingPrint(const std::string& message) const {
 
 bool Compiler::compileCode() {
     double start = omp_get_wtime();
-    //Lex code
+    //Lex code//
     cmdTimingPrint("Compiler: Lexing code\n");
     if (!m_lexer->lexFile(m_pathname, m_codeLines, m_codeTokens)) {
         m_statusMessage = "Lexing failed! Either the path was invalid or the file could not be found.";
@@ -67,7 +67,7 @@ bool Compiler::compileCode() {
     }
     cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
 
-    //Parse code
+    //Parse code//
     cmdTimingPrint("Compiler: Parsing code\n");
     start = omp_get_wtime();
     if(!m_parser->parseCode(m_parseTree, m_codeLines, m_codeTokens, m_statusMessage)) {
@@ -75,7 +75,7 @@ bool Compiler::compileCode() {
     }
     cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
 
-    //Resolve symbols
+    //Resolve symbols//
     cmdTimingPrint("Compiler: Resolving symbols\n");
     start = omp_get_wtime();
     if(!m_symbolResolver->resolveSymbols(m_symbolTable, m_parseTree->getRoot(), m_statusMessage, m_codeLines)) {
@@ -83,7 +83,7 @@ bool Compiler::compileCode() {
     }
     cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
 
-    //Delete the lexer and build the AST concurrently
+    //Delete the lexer and build the AST concurrently//
     cmdTimingPrint("Compiler: Building AST\n");
     start = omp_get_wtime();
     //Delete the lexer after PT creation is finished! It's no longer needed
@@ -101,7 +101,7 @@ bool Compiler::compileCode() {
         cout << endl;
     }
 
-    //Check address scopes and analyze semantics while deleting the parse tree concurrently
+    //Check address scopes and analyze semantics while deleting the parse tree concurrently//
     cmdTimingPrint("Compiler: Analyzing semantics and checking address scopes\n");
     start = omp_get_wtime();
     auto parserDeletionFuture = std::async(std::launch::async, [this] {
@@ -119,32 +119,10 @@ bool Compiler::compileCode() {
     }
     cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
 
-    //Generate code
+    //Generate code//
     cmdTimingPrint("Compiler: Generating LLVM IR\n");
     start = omp_get_wtime();
-    generateCode();
+
     cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
-    /*if(cmd_ir && !cmd_silent) {
-        cout << endl;
-        cout << "LLVM IR for '" + m_pathname + "':\n";
-        m_codeGenerator->printIR();
-        cout << endl;
-    }*/
     return true;
-}
-
-void Compiler::generateCode() {
-    /*AST::ASTNode* ASTRoot = m_AST->getRoot();
-    int numInstructions = ASTRoot->getNumChildren();
-
-    //#pragma omp parallel for schedule(dynamic) default(none) shared(ASTRoot, numInstructions)
-    for (int i = 0; i < numInstructions; i++) {
-        // Cast the ASTNode to an instruction node
-        auto instructionNode = dynamic_cast<AST::InstructionNode*>(ASTRoot->childAt(i));
-        // If not nullptr and if the node isn't empty
-        if (instructionNode != nullptr && !instructionNode->getNodeValue().empty()) {
-            // Call the code generator for the given line
-            m_codeGenerator->generateCode(instructionNode);
-        }
-    }*/
 }

@@ -53,10 +53,6 @@ class Compiler {
 
 
     private:
-        //Internal helper methods
-        //Generate the code
-        void generateCode();
-
         //Private variables
         //Data structures
         //Vector containing code lines
