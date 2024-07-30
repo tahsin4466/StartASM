@@ -12,13 +12,16 @@
 #include <utility>
 
 class Parser;
+class SymbolResolver;
+class ASTBuilder;
 class SemanticAnalyzer;
+class ScopeChecker;
 class CodeGenerator;
 
 class Compiler {
     public:
         //Constructors and Destructors
-        Compiler(std::string pathname, bool cmdSilent, bool cmdTimings, bool cmdTree);
+        Compiler(std::string& pathname, bool cmdSilent, bool cmdTimings, bool cmdTree, bool cmdIr);
         ~Compiler();
 
         Compiler(const Compiler&) = delete;
@@ -26,27 +29,23 @@ class Compiler {
 
         //Accessors
         //Get number of lines
-        int getNumLines() {
-            return m_codeLines.size();
-        }
-        //Get current line index
-        int getLineIndex() {
-            return m_lineIndex;
+        [[nodiscard]] int getNumLines() const {
+            return int(m_codeLines.size());
         }
         //Get current status
-        std::string getStatus() {
+        [[nodiscard]] std::string getStatus() const {
             return m_statusMessage;
         }
 
         //Mutators
         //Change pathname
-        void changePath(std::string pathname) {
+        void changePath(std::string& pathname) {
             m_pathname = pathname;
         }
 
         //Printers
-        void cmdPrint(std::string message);
-        void cmdTimingPrint(std::string message);
+        void cmdPrint(const std::string& message) const;
+        void cmdTimingPrint(const std::string& message) const;
 
         //Public facing compile method
         //Code Compiling
@@ -54,48 +53,36 @@ class Compiler {
 
 
     private:
-        //Internal parsing methods
-        //File loading
-        bool loadFile();
-        //Code Tokenizing
-        void lexCode();
-        //Validate the syntax using regex matching
-        bool parseCode();
-        //Resolve symbols and labels
-        bool resolveSymbols();
-        //Build the AST
-        void buildAST();
-        //Analyze Semantics
-        bool analyzeSemantics();
-        //Check address scope
-        bool checkAddressScopes();
-        //Generate the code
-        void generateCode();
-
         //Private variables
         //Data structures
         //Vector containing code lines
         std::vector<std::string> m_codeLines;
         //Vector containing code tokens and tags
         std::vector<std::vector<std::pair<std::string, LexerConstants::TokenType>>> m_codeTokens;
+        //Parse tree for the code
+        PT::ParseTree* m_parseTree;
         //Hash table for symbol resolution, mapping labels to instruction addresses
         std::unordered_map<std::string, std::pair<std::string, int>> m_symbolTable;
 
-        //Variables
+        //Variables and data structures
         //Pathname
         std::string m_pathname;
         //String containing current status
         std::string m_statusMessage;
-        //Int containing current line index
-        int m_lineIndex;
         //Lexer
         Lexer* m_lexer;
         //Parser (PT nested inside parser)
         Parser* m_parser;
-        //Pointer to AST (used directly by the compiler at multiple stages)
-        AST::AbstractSyntaxTree* m_AST;   
+        //Symbol Resolver
+        SymbolResolver* m_symbolResolver;
+        //AST (used directly by the compiler at multiple stages)
+        AST::AbstractSyntaxTree* m_AST;
+        //AST Builder
+        ASTBuilder* m_ASTBuilder;
         //Pointer to semantic analyzer
         SemanticAnalyzer* m_semanticAnalyzer;
+        //Pointer to scope checker
+        ScopeChecker* m_scopeChecker;
         //Pointer to code generator
         CodeGenerator* m_codeGenerator;
 
@@ -103,6 +90,7 @@ class Compiler {
         bool cmd_silent;
         bool cmd_timings;
         bool cmd_tree;
+        bool cmd_ir;
 };
 
 #endif

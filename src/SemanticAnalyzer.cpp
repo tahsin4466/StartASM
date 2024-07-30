@@ -108,7 +108,42 @@ SemanticAnalyzer::SemanticAnalyzer() {
     };
 }
 
-string SemanticAnalyzer::analyzeSemantics(InstructionNode* instructionNode) {
+bool SemanticAnalyzer::analyzeSemantics(AST::ASTNode *AST, const std::vector<std::string>& codeLines, std::string &errorMessage) {
+    //Parallelize semantic analysis as each instruction is independent and AST is immutable in this state
+    #pragma omp parallel for schedule(dynamic) default(none) shared(AST, m_invalidLines, codeLines)
+    //Iterate over all children of the AST (instruction nodes)
+    for (int i=0; i<AST->getNumChildren(); i++) {
+        //Cast the ASTNode to an instruction node
+        auto instructionNode = dynamic_cast<AST::InstructionNode*>(AST->childAt(i));
+        //If not nullptr and if the node isn't empty
+        if (instructionNode != nullptr && !instructionNode->getNodeValue().empty()) {
+            //Call the semantic analyzer and analyze the given node
+            string error = analyzeLine(instructionNode);
+            if (!error.empty()) {
+                //If error is present
+                //Critical section - STL manipulations are not thread safe
+                #pragma omp critical
+                {
+                    //Add error to error map at index i
+                    m_invalidLines[i] = "\nInvalid syntax at line " + to_string(i + 1) + ": " + codeLines[i] + "\n" + error;
+                }
+            }
+        }
+    }
+
+    //Concatenate status message string with all error messages
+    for (const auto& pair : m_invalidLines) {
+        errorMessage += pair.second;
+    }
+
+    //Return true if no errors, false otherwise
+    if (!errorMessage.empty()) {
+        return false;
+    }
+    return true;
+}
+
+string SemanticAnalyzer::analyzeLine(AST::InstructionNode *instructionNode) {
     //Create a return string that's empty by default
     string returnString = "";
     //Get the instruction type from the AST for easy access
