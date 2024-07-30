@@ -15,6 +15,7 @@ class Parser;
 class SymbolResolver;
 class ASTBuilder;
 class SemanticAnalyzer;
+class ScopeChecker;
 class CodeGenerator;
 
 class Compiler {
@@ -53,8 +54,6 @@ class Compiler {
 
     private:
         //Internal helper methods
-        //Check address scope
-        bool checkAddressScopes();
         //Generate the code
         void generateCode();
 
@@ -86,6 +85,8 @@ class Compiler {
         ASTBuilder* m_ASTBuilder;
         //Pointer to semantic analyzer
         SemanticAnalyzer* m_semanticAnalyzer;
+        //Pointer to scope checker
+        ScopeChecker* m_scopeChecker;
         //Pointer to code generator
         CodeGenerator* m_codeGenerator;
 

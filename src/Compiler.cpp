@@ -5,6 +5,7 @@
 #include "include/AbstractSyntaxTree.h"
 #include "include/ASTBuilder.h"
 #include "include/SemanticAnalyzer.h"
+#include "include/ScopeChecker.h"
 #include "include/CodeGenerator.h"
 
 #include <iostream>
@@ -13,7 +14,6 @@
 #include <omp.h>
 #include <mutex>
 #include <future>
-#include <map>
 #include <regex>
 
 using namespace std;
@@ -30,17 +30,18 @@ Compiler::Compiler(std::string& pathname, bool cmdSilent, bool cmdTimings, bool 
     m_AST(new AST::AbstractSyntaxTree()),
     m_ASTBuilder(new ASTBuilder()),
     m_semanticAnalyzer(new SemanticAnalyzer()),
+    m_scopeChecker(new ScopeChecker()),
     //m_codeGenerator(new CodeGenerator()),
     m_pathname(pathname) {}
 
 Compiler::~Compiler() {
-    //delete m_parser;
     delete m_lexer;
     delete m_parser;
     delete m_symbolResolver;
     delete m_AST;
     delete m_ASTBuilder;
     delete m_semanticAnalyzer;
+    delete m_scopeChecker;
     //delete m_codeGenerator;
 }
 
@@ -107,7 +108,7 @@ bool Compiler::compileCode() {
         delete m_parser;
         m_parser = nullptr;
     });
-    auto checkAddressScopesFuture = std::async(&Compiler::checkAddressScopes, this);
+    auto checkAddressScopesFuture = std::async(&ScopeChecker::checkAddressScopes, m_scopeChecker, m_AST->getRoot(), std::ref(m_statusMessage), std::ref(m_codeLines));
     auto analyzeSemanticsFuture = std::async(&SemanticAnalyzer::analyzeSemantics, m_semanticAnalyzer, m_AST->getRoot(), std::ref(m_codeLines), std::ref(m_statusMessage));
     // Wait for all tasks to complete and retrieve function results
     bool checkAddressScopesResult = checkAddressScopesFuture.get();
@@ -130,88 +131,6 @@ bool Compiler::compileCode() {
         cout << endl;
     }*/
     return true;
-}
-
-bool Compiler::checkAddressScopes() {
-    // Declare temporary variables for error reporting and finding instruction address index
-    std::string errorString;
-    std::mutex errorMutex; // Mutex to protect errorString
-    std::string instructionIndex;
-    const std::regex registerTemplate = std::regex("r[0-9]");
-    const std::regex instructionTemplate = std::regex("i\\[[0-9]{1,9}\\]");
-    const std::regex memoryTemplate = std::regex("m<[0-9]{1,9}>");
-
-    // Get AST root node
-    AST::ASTNode* ASTRoot = m_AST->getRoot();
-    int numInstructions = ASTRoot->getNumChildren();
-
-    // Loop through all child (instruction) nodes in AST
-    // Use OpenMP to parallelize the loop
-    #pragma omp parallel for schedule(dynamic) default(none) shared(ASTRoot, errorString, errorMutex, numInstructions, registerTemplate, instructionTemplate, memoryTemplate)
-    for (int i = 0; i < numInstructions; i++) {
-        AST::ASTNode* InstructionNode = ASTRoot->childAt(i);
-
-        // Local variable for collecting errors in the current iteration
-        std::string localErrorString;
-        std::string localInstructionIndex;
-
-        // Loop through all operands in instruction parent
-        for (int j = 0; j < InstructionNode->getNumChildren(); j++) {
-            // Get child node and cast dynamically to operand node
-            auto operandNode = dynamic_cast<AST::OperandNode*>(InstructionNode->childAt(j));
-            if (operandNode != nullptr) {
-                // Switch checking based on operand type
-                ASTConstants::OperandType operandType = operandNode->getOperandType();
-                switch (operandType) {
-                    case ASTConstants::REGISTER:
-                        // Run a regex template (this one with explicit bounds) to determine if the operand is in scope
-                        if (!std::regex_match(operandNode->getNodeValue(), registerTemplate)) {
-                            localErrorString += "\nScope error at line " + std::to_string(i + 1) + ": " + m_codeLines[i] + "\n" + "Register '" + operandNode->getNodeValue() + "' is out of range. Max register is r9\n";
-                        }
-                        break;
-                    case ASTConstants::MEMORYADDRESS:
-                        if (!std::regex_match(operandNode->getNodeValue(), memoryTemplate)) {
-                            localErrorString += "\nScope error at line " + std::to_string(i + 1) + ": " + m_codeLines[i] + "\n" + "Memory address '" + operandNode->getNodeValue() + "' is out of range. Max address is m<999999999>\n";
-                        }
-                        break;
-                    case ASTConstants::INSTRUCTIONADDRESS:
-                        // Instruction address both has to adhere to StartASM bounds (4 byte address) and the number of instructions themselves
-                        // First get the actual instruction index
-                        for (int k = 2; k < operandNode->getNodeValue().size() - 1; k++) {
-                            localInstructionIndex += operandNode->getNodeValue()[k];
-                        }
-                        // If the given instruction index is greater than the number of lines
-                        if ((std::stoi(localInstructionIndex) > m_codeLines.size())) {
-                            localErrorString += "\nScope error at line " + std::to_string(i + 1) + ": " + m_codeLines[i] + "\n" + "Instruction address '" + operandNode->getNodeValue() + "' is out of range. Expected i[0]-i[" + std::to_string(m_codeLines.size()) + "]\n";
-                        }
-                        // If the instruction index is larger than the StartASM limit
-                        else if (!std::regex_match(operandNode->getNodeValue(), instructionTemplate)) {
-                            localErrorString += "\nScope error at line " + std::to_string(i + 1) + ": " + m_codeLines[i] + "\n" + "Instruction address '" + operandNode->getNodeValue() + "' is out of range. Max address is i[999999999]\n";
-                        }
-                        localInstructionIndex.clear();
-                        break;
-                    // Base case - break
-                    default:
-                        break;
-                }
-            }
-        }
-
-        // Lock the mutex before modifying the shared errorString
-        if (!localErrorString.empty()) {
-            std::lock_guard<std::mutex> lock(errorMutex);
-            errorString += localErrorString;
-        }
-    }
-
-    // Return false if there are errors present in the string
-    if (!errorString.empty()) {
-        m_statusMessage += errorString;
-        return false;
-    }
-    else {
-        return true;
-    }
 }
 
 void Compiler::generateCode() {

@@ -45,6 +45,9 @@ set(SOURCES
         src/StartASM.cpp
         src/CodeGenerator.cpp
         src/.Secrets.cpp
+        src/ScopeChecker.cpp
+        src/SymbolResolver.cpp
+        src/ASTBuilder.cpp
 )
 
 set(HEADERS
@@ -56,10 +59,9 @@ set(HEADERS
         src/include/SemanticAnalyzer.h
         src/include/CodeGenerator.h
         src/include/.Secrets.h
-        src/SymbolResolver.cpp
         src/include/SymbolResolver.h
-        src/ASTBuilder.cpp
         src/include/ASTBuilder.h
+        src/include/ScopeChecker.h
 )
 
 # Specify the executable target
