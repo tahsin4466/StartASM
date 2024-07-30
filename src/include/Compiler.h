@@ -53,10 +53,6 @@ class Compiler {
 
     private:
         //Internal helper methods
-        //Build the AST
-        void buildAST();
-        //Analyze Semantics
-        bool analyzeSemantics();
         //Check address scope
         bool checkAddressScopes();
         //Generate the code

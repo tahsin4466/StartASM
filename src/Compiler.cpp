@@ -108,7 +108,7 @@ bool Compiler::compileCode() {
         m_parser = nullptr;
     });
     auto checkAddressScopesFuture = std::async(&Compiler::checkAddressScopes, this);
-    auto analyzeSemanticsFuture = std::async(&Compiler::analyzeSemantics, this);
+    auto analyzeSemanticsFuture = std::async(&SemanticAnalyzer::analyzeSemantics, m_semanticAnalyzer, m_AST->getRoot(), std::ref(m_codeLines), std::ref(m_statusMessage));
     // Wait for all tasks to complete and retrieve function results
     bool checkAddressScopesResult = checkAddressScopesFuture.get();
     bool analyzeSemanticsResult = analyzeSemanticsFuture.get();
@@ -130,47 +130,6 @@ bool Compiler::compileCode() {
         cout << endl;
     }*/
     return true;
-}
-
-bool Compiler::analyzeSemantics() {
-    //Create a map for parallelized error messages and the ASTRoot (reduce getter access)
-    map<int, string> errorMap;
-    AST::ASTNode* ASTRoot = m_AST->getRoot();
-
-    //Parallelize semantic analysis as each instruction is independent and AST is immutable in this state
-    #pragma omp parallel for schedule(dynamic) default(none) shared(ASTRoot, errorMap)
-    //Iterate over all children of the AST (instruction nodes)
-    for (int i=0; i<ASTRoot->getNumChildren(); i++) {
-        //Cast the ASTNode to an instruction node
-        auto instructionNode = dynamic_cast<AST::InstructionNode*>(ASTRoot->childAt(i));
-        //If not nullptr and if the node isn't empty
-        if (instructionNode != nullptr && !instructionNode->getNodeValue().empty()) {
-            //Call the semantic analyzer and analyze the given node
-            string error = m_semanticAnalyzer->analyzeSemantics(instructionNode);
-            if (!error.empty()) {
-                //If error is present
-                //Critical section - STL manipulations are not thread safe
-                #pragma omp critical
-                {
-                //Add error to error map at index i
-                errorMap[i] = "\nInvalid syntax at line " + to_string(i + 1) + ": " + m_codeLines[i] + "\n" + error;
-                }
-            }
-        }
-    }
-
-    //Concatenate status message string with all error messages
-    for (const auto& pair : errorMap) {
-        m_statusMessage += pair.second;
-    }
-
-    //Return true if no errors, false otherwise
-    if (m_statusMessage.empty()) {
-        return true;
-    }
-    else {
-        return false;
-    }
 }
 
 bool Compiler::checkAddressScopes() {
