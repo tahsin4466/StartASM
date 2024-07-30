@@ -3,6 +3,7 @@
 #include "include/Parser.h"
 #include "include/SymbolResolver.h"
 #include "include/AbstractSyntaxTree.h"
+#include "include/ASTBuilder.h"
 #include "include/SemanticAnalyzer.h"
 #include "include/CodeGenerator.h"
 
@@ -27,6 +28,7 @@ Compiler::Compiler(std::string& pathname, bool cmdSilent, bool cmdTimings, bool 
     m_parseTree(new PT::ParseTree()),
     m_symbolResolver(new SymbolResolver()),
     m_AST(new AST::AbstractSyntaxTree()),
+    m_ASTBuilder(new ASTBuilder()),
     m_semanticAnalyzer(new SemanticAnalyzer()),
     //m_codeGenerator(new CodeGenerator()),
     m_pathname(pathname) {}
@@ -37,6 +39,7 @@ Compiler::~Compiler() {
     delete m_parser;
     delete m_symbolResolver;
     delete m_AST;
+    delete m_ASTBuilder;
     delete m_semanticAnalyzer;
     //delete m_codeGenerator;
 }
@@ -87,7 +90,7 @@ bool Compiler::compileCode() {
         delete m_lexer;
         m_lexer = nullptr;
     });
-    buildAST();
+    m_ASTBuilder->buildAST(m_parseTree->getRoot(), m_AST);
     lexerDeletionFuture.get();
     cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
     if(cmd_tree && !cmd_silent) {
@@ -127,54 +130,6 @@ bool Compiler::compileCode() {
         cout << endl;
     }*/
     return true;
-}
-
-void Compiler::buildAST() {
-    // Get the root node of the parse tree and its size (frequent access)
-    PT::PTNode* PTRoot = m_parseTree->getRoot();
-    int PTSize = PTRoot->getNumChildren();
-    // Get the AST root node
-    AST::ASTNode* ASTRoot = m_AST->getRoot();
-
-    // Vector to store AST instruction nodes
-    std::vector<AST::InstructionNode*> instructionNodes(PTSize);
-
-    // Iterate over all children (instructions) in the parse tree
-    // Parallelize the creation of instruction nodes and their children
-    #pragma omp parallel for schedule(dynamic) default(none) shared(PTRoot, PTSize, instructionNodes)
-    for (int i = 0; i < PTSize; i++) {
-        // Get the pointer to the instruction node from the PT
-        PT::PTNode* PTInstructionNode = PTRoot->childAt(i);
-
-        // Initialize a new AST instruction node, using built-in conversion methods found in the AST class
-        auto ASTInstructionNode = new AST::InstructionNode(
-            PTInstructionNode->getNodeValue(),
-            m_AST->getInstructionType(PTInstructionNode->getNodeValue()),
-            m_AST->getNumOperands(PTInstructionNode->getNumChildren()),
-            i + 1
-        );
-
-        // Store the instruction node in the vector
-        instructionNodes[i] = ASTInstructionNode;
-
-        // Add all operands from the PT for the AST
-        for (int j = 0; j < PTInstructionNode->getNumChildren(); j++) {
-            // Get the operand node from the PT and cast to an OperandNode (parser guarantees this)
-            auto PTOperandNode = dynamic_cast<PT::OperandNode*>(PTInstructionNode->childAt(j)->childAt(0));
-
-            // Do a check anyway to make sure dynamic cast was successful
-            if (PTOperandNode != nullptr) {
-                // Add a child for the instruction node in the AST, using conversion functions from the AST as necessary
-                ASTInstructionNode->insertChild(new AST::OperandNode(PTOperandNode->getNodeValue(), m_AST->convertOperandType(PTOperandNode->getOperandType())));
-            }
-        }
-    }
-
-    // Insert instruction nodes into the AST root node (sequential part to ensure thread safety)
-    ASTRoot->reserveChildren(PTSize);
-    for (int i = 0; i < PTSize; i++) {
-        ASTRoot->insertChild(instructionNodes[i]);
-    }
 }
 
 bool Compiler::analyzeSemantics() {

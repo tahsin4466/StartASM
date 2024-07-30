@@ -58,6 +58,8 @@ set(HEADERS
         src/include/.Secrets.h
         src/SymbolResolver.cpp
         src/include/SymbolResolver.h
+        src/ASTBuilder.cpp
+        src/include/ASTBuilder.h
 )
 
 # Specify the executable target

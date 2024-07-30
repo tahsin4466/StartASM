@@ -12,9 +12,10 @@
 #include <utility>
 
 class Parser;
+class SymbolResolver;
+class ASTBuilder;
 class SemanticAnalyzer;
 class CodeGenerator;
-class SymbolResolver;
 
 class Compiler {
     public:
@@ -84,7 +85,9 @@ class Compiler {
         //Symbol Resolver
         SymbolResolver* m_symbolResolver;
         //AST (used directly by the compiler at multiple stages)
-        AST::AbstractSyntaxTree* m_AST;   
+        AST::AbstractSyntaxTree* m_AST;
+        //AST Builder
+        ASTBuilder* m_ASTBuilder;
         //Pointer to semantic analyzer
         SemanticAnalyzer* m_semanticAnalyzer;
         //Pointer to code generator
