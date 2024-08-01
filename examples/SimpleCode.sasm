@@ -2,3 +2,5 @@ create integer 9 to r1
 create integer 10 to r2
 move r1 to r3
 add r2 with r3 to r4
+output r4
+stop
