@@ -17,6 +17,9 @@ namespace ASTConstants {
 };
 
 namespace AST {
+    //Visitor forward decleration
+    class Visitor;
+
     //Broad AST Node
     class ASTNode {
         public:
@@ -36,6 +39,8 @@ namespace AST {
             ASTNode(const ASTNode&) = delete;
             ASTNode& operator=(const ASTNode&) = delete;
 
+            //Visitor method
+            virtual void accept(Visitor& visitor) = 0;
             //Getters
             const std::string getNodeValue() const {return m_nodeValue;};
             const ASTConstants::NodeType getNodeType() const {return m_nodeType;};
@@ -62,12 +67,7 @@ namespace AST {
                     return nullptr;
                 }
             };
-            void deleteLastChild() {
-                std::lock_guard<std::mutex> lock(m_mutex); // Lock the mutex
-                //Delete child and remove dangling pointer
-                delete m_children.back();
-                m_children.pop_back();
-            }
+
             ASTNode* childAt(int index) {
                 std::lock_guard<std::mutex> lock(m_mutex); // Lock the mutex
                 //Return nullptr if out of bounds
@@ -99,9 +99,11 @@ namespace AST {
             //Constructor/Destructor
             RootNode():
                 ASTNode(ASTConstants::NodeType::ROOT, "") {};
-            virtual ~RootNode() {}; 
+            virtual ~RootNode() = default;
             RootNode(const RootNode&) = delete;
-            RootNode& operator=(const RootNode&) = delete; 
+            RootNode& operator=(const RootNode&) = delete;
+
+            void accept(Visitor& visitor) override;
     };
 
     //Instruction Node Class
@@ -113,7 +115,7 @@ namespace AST {
                 m_instructionType(instructionType),
                 m_numOperands(numOperands),
                 m_line(line) {};
-            virtual ~InstructionNode() {}; 
+            virtual ~InstructionNode() = default;
             InstructionNode(const InstructionNode&) = delete;
             InstructionNode& operator=(const InstructionNode&) = delete; 
 
@@ -137,14 +139,18 @@ namespace AST {
             //Constructor/Destructor
             OperandNode(std::string nodeValue, ASTConstants::OperandType operandType):
                 ASTNode(ASTConstants::NodeType::OPERAND, nodeValue),
-                m_operandType(operandType) {};
-            virtual ~OperandNode() {}; 
+                m_operandType(operandType),
+                m_nodeValue(nodeValue) {};
+            virtual ~OperandNode() = default;
             OperandNode(const OperandNode&) = delete;
-            OperandNode& operator=(const OperandNode&) = delete; 
+            OperandNode& operator=(const OperandNode&) = delete;
+
+            void accept(Visitor& visitor) override;
 
             //Getters and setters
             const ASTConstants::OperandType getOperandType() const {return m_operandType;};
             void setOperandType(ASTConstants::OperandType type) {m_operandType = type;};
+            std::string m_nodeValue;
         
         private:
             //Store the operand type (direct conversion from parse tree constants)

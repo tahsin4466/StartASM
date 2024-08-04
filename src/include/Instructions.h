@@ -1,345 +1,174 @@
 #ifndef INSTRUCTIONS_H
 #define INSTRUCTIONS_H
 
-class InstructionSet;
+#include "AbstractSyntaxTree.h"
 
-#include "Operands.h"
-
-#include <vector>
 #include <string>
-#include <iostream>
 
+using namespace AST;
 
-
-//HIGH LEVEL INSTRUCTION CLASS
-//Defines the fundamental characteristics for an instruction, including a pointer to the set, an ID, num operands and the template to
-//verify syntax
-//Instruction is an ABC - it contains the execute() method that is defined in the most derived instruction class (e.g. mov, div, xor etc)
-class Instruction {
+class MoveInstruction: public InstructionNode {
     public:
-        //Constructor and destructor, taking the InstructionSet pointer, an ID and number of operands
-        Instruction(InstructionSet* set, int ID, int numOperands):
-            m_instructionSet(set),
-            m_instructionID(ID),
-            m_numOperands(numOperands) {};
-        virtual ~Instruction() {};
-
-        //Getters
-        int getID() {return m_instructionID;}
-        int getNumOperands() {return m_numOperands;}
-
-        //Virtual execute() function, Instruction class is an ABC
-        virtual void execute() = 0;
-
-    private:
-        //Pointer to Instruction Set
-        InstructionSet* m_instructionSet;
-        //Instruction ID
-        int m_instructionID;
-        //Number of Operands
-        int m_numOperands; 
-};
-
-
-
-//MID LEVEL OPERAND CLASS
-//Defines the parent class of each instruction based on number of operands
-//Contains protected pointers to each operand to be accessed by most derived instruction classes
-//Opernad classes are ABCS - execute() is defined only in most inhereited class
-class NoOperandInstruction: public Instruction {
-    public:
-        NoOperandInstruction(InstructionSet* set, int ID):
-            Instruction(set, ID, 0) {};
-        virtual ~NoOperandInstruction() {};
-
-        virtual void execute() = 0;
-};
-
-class OneOperandInstruction: public Instruction {
-    public:
-        OneOperandInstruction(InstructionSet* set, int ID, Operand* operand1):
-            Instruction(set, ID, 1),
-            m_operand1(operand1) {};
-        virtual ~OneOperandInstruction() {};
-
-        virtual void execute() = 0;
-
-    protected:
-        Operand* m_operand1;
-};
-
-class TwoOperandInstruction: public Instruction {
-    public:
-        TwoOperandInstruction(InstructionSet* set, int ID, Operand* operand1, Operand* operand2):
-            Instruction(set, ID, 2),
-            m_operand1(operand1),
-            m_operand2(operand2) {};
-        virtual ~TwoOperandInstruction() {};
-
-        virtual void execute() = 0;
-
-    protected:
-        Operand* m_operand1;
-        Operand* m_operand2;
-};
-
-class ThreeOperandInstruction: public Instruction {
-    public:
-        ThreeOperandInstruction(InstructionSet* set, int ID, Operand* operand1, Operand* operand2, Operand* operand3):
-            Instruction(set, ID, 3),
-            m_operand1(operand1),
-            m_operand2(operand2),
-            m_operand3(operand3) {};
-        virtual ~ThreeOperandInstruction() {};
-
-        virtual void execute() = 0;
-
-    protected:
-        Operand* m_operand1;
-        Operand* m_operand2;
-        Operand* m_operand3;
-};
-
-
-
-//LOW LEVEL INSTRUCTION CLASSES
-//Contains defenition for execute() method
-//Can access inherited member variables of reigster pointers
-//Are not ABCS - execute() is defined
-class MoveInstruction: public TwoOperandInstruction {
-    public:
-        MoveInstruction(InstructionSet* set, GeneralRegister* fromRegister, GeneralRegister* toRegister):
-            TwoOperandInstruction(set, 0, fromRegister, toRegister) {};
-        virtual ~MoveInstruction() {};
+        MoveInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::MOVE, ASTConstants::NumOperands::BINARY, line) {}
+        void accept(Visitor& visitor) override;
 
     virtual void execute();
 
 };
 
-class LoadValueInstruction: public OneOperandInstruction {
+class LoadInstruction: public InstructionNode {
     public:
-        LoadValueInstruction(InstructionSet* set, std::vector<uint8_t> fromValue, GeneralRegister* toRegister):
-            OneOperandInstruction(set, 1, toRegister) {};
-        virtual ~LoadValueInstruction() {};
-
-    virtual void execute();
-
+        LoadInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::LOAD, ASTConstants::NumOperands::BINARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class LoadMemoryInstruction: public TwoOperandInstruction {
+class StoreInstruction: public InstructionNode {
     public:
-        LoadMemoryInstruction(InstructionSet* set, HeapMemory* fromMemory, GeneralRegister* toRegister):
-            TwoOperandInstruction(set, 2, fromMemory, toRegister) {};
-    virtual ~LoadMemoryInstruction() {};
-
-    virtual void execute();
+        StoreInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::STORE, ASTConstants::NumOperands::BINARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class StoreMemoryInstruction: public TwoOperandInstruction {
+class CreateInstruction: public InstructionNode {
     public:
-        StoreMemoryInstruction(InstructionSet* set, GeneralRegister* fromRegister, HeapMemory* toMemory):
-            TwoOperandInstruction(set, 3, fromRegister, toMemory) {};
-        virtual ~StoreMemoryInstruction() {};
-
-        virtual void execute();
+        CreateInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::CREATE, ASTConstants::NumOperands::TERNARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class AdditionInstruction: public ThreeOperandInstruction {
+class CastInstruction: public InstructionNode {
     public:
-        AdditionInstruction(InstructionSet* set, GeneralRegister* fromRegister1, GeneralRegister* withRegister, GeneralRegister* toRegister):
-            ThreeOperandInstruction(set, 4, fromRegister1, withRegister, toRegister) {};
-        virtual ~AdditionInstruction() {};
-
-    virtual void execute();
+        CastInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::CAST, ASTConstants::NumOperands::BINARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class SubtractionInstruction: public ThreeOperandInstruction {
+class AddInstruction: public InstructionNode {
     public:
-        SubtractionInstruction(InstructionSet* set, GeneralRegister* fromRegister1, GeneralRegister* withRegister, GeneralRegister* toRegister):
-            ThreeOperandInstruction(set, 5, fromRegister1, withRegister, toRegister) {};
-        virtual ~SubtractionInstruction() {};
-
-    virtual void execute();
+    AddInstruction(const std::string& nodeValue, int line)
+            : InstructionNode(nodeValue, ASTConstants::InstructionType::ADD, ASTConstants::NumOperands::TERNARY, line) {}
+    void accept(Visitor& visitor) override;
 };
 
-class MultiplyInstruction: public ThreeOperandInstruction {
+class SubInstruction: public InstructionNode {
     public:
-        MultiplyInstruction(InstructionSet* set, GeneralRegister* fromRegister1, GeneralRegister* withRegister, GeneralRegister* toRegister):
-            ThreeOperandInstruction(set, 6, fromRegister1, withRegister, toRegister) {};
-        virtual ~MultiplyInstruction() {};
-    
-    virtual void execute();
+        SubInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::SUB, ASTConstants::NumOperands::TERNARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class DivideInstruction: public ThreeOperandInstruction {
+class MultiplyInstruction: public InstructionNode {
     public:
-        DivideInstruction(InstructionSet* set, GeneralRegister* fromRegister1, GeneralRegister* withRegister, GeneralRegister* toRegister):
-            ThreeOperandInstruction(set, 7, fromRegister1, withRegister, toRegister) {};
-        virtual ~DivideInstruction() {};
-
-        virtual void execute();
+        MultiplyInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::MULTIPLY, ASTConstants::NumOperands::TERNARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class OrInstruction: public TwoOperandInstruction {
+class DivideInstruction: public InstructionNode {
     public:
-        OrInstruction(InstructionSet* set, GeneralRegister* selfRegister1, GeneralRegister* withRegister):
-            TwoOperandInstruction(set, 8, selfRegister1, withRegister) {};
-        virtual ~OrInstruction() {};
-        
-        virtual void execute();
+        DivideInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::DIVIDE, ASTConstants::NumOperands::TERNARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class AndInstruction: public TwoOperandInstruction {
+class OrInstruction: public InstructionNode {
     public:
-        AndInstruction(InstructionSet* set, GeneralRegister* selfRegister1, GeneralRegister* withRegister):
-            TwoOperandInstruction(set, 11, selfRegister1, withRegister) {};
-        virtual ~AndInstruction() {};
-
-        virtual void execute();
+        OrInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::OR, ASTConstants::NumOperands::BINARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class NotInstruction: public OneOperandInstruction {
+class AndInstruction: public InstructionNode {
     public:
-        NotInstruction(InstructionSet* set, GeneralRegister* selfRegister):
-            OneOperandInstruction(set, 12, selfRegister) {};
-        virtual ~NotInstruction() {};
-
-        virtual void execute();
+        AndInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::AND, ASTConstants::NumOperands::BINARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class ShiftLeftArithmeticInstruction: public TwoOperandInstruction {
+class NotInstruction: public InstructionNode {
     public:
-        ShiftLeftArithmeticInstruction(InstructionSet* set, GeneralRegister* selfRegister, GeneralRegister* withRegister):
-            TwoOperandInstruction(set, 15, selfRegister, withRegister) {};
-        virtual ~ShiftLeftArithmeticInstruction() {};
-
-    virtual void execute();
+        NotInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::NOT, ASTConstants::NumOperands::UNARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class ShiftLeftLogicalInstruction: public TwoOperandInstruction {
+class ShiftInstruction: public InstructionNode {
     public:
-        ShiftLeftLogicalInstruction(InstructionSet* set, GeneralRegister* selfRegister, GeneralRegister* withRegister):
-            TwoOperandInstruction(set, 16, selfRegister, withRegister) {};
-        virtual ~ShiftLeftLogicalInstruction() {};
-
-    virtual void execute();
+        ShiftInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::SHIFT, ASTConstants::NumOperands::TERNARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class ShiftRightArithmeticInstruction: public TwoOperandInstruction {
+class CompareInstruction: public InstructionNode {
     public:
-        ShiftRightArithmeticInstruction(InstructionSet* set, GeneralRegister* selfRegister, GeneralRegister* withRegister):
-            TwoOperandInstruction(set, 17, selfRegister, withRegister) {};
-        virtual ~ShiftRightArithmeticInstruction() {};
-
-    virtual void execute();
+        CompareInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::COMPARE, ASTConstants::NumOperands::BINARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class ShiftRightLogicalInstruction: public TwoOperandInstruction {
+class JumpInstruction: public InstructionNode {
     public:
-        ShiftRightLogicalInstruction(InstructionSet* set, GeneralRegister* selfRegister, GeneralRegister* withRegister):
-            TwoOperandInstruction(set, 18, selfRegister, withRegister) {};
-        virtual ~ShiftRightLogicalInstruction() {};
-
-    virtual void execute();
+        JumpInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::JUMP, ASTConstants::NumOperands::BINARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class CompareInstruction: public TwoOperandInstruction {
+class CallInstruction: public InstructionNode {
     public:
-        CompareInstruction(InstructionSet* set, GeneralRegister* selfRegister, GeneralRegister* withRegister):
-            TwoOperandInstruction(set, 18, selfRegister, withRegister) {};
-        virtual ~CompareInstruction() {};
-
-    virtual void execute();
+        CallInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::CALL, ASTConstants::NumOperands::UNARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class JumpUnconditionalInstruction: public OneOperandInstruction {
+class PushInstruction: public InstructionNode {
     public:
-        JumpUnconditionalInstruction(InstructionSet* set, ProgramMemory* toInstruction):
-            OneOperandInstruction(set, 19, toInstruction) {};
-        virtual ~JumpUnconditionalInstruction() {};
-    
-    virtual void execute();
+        PushInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::PUSH, ASTConstants::NumOperands::UNARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class JumpGreaterInstruction: public OneOperandInstruction {
+class PopInstruction: public InstructionNode {
     public:
-        JumpGreaterInstruction(InstructionSet* set, ProgramMemory* toInstruction):
-            OneOperandInstruction(set, 19, toInstruction) {};
-        virtual ~JumpGreaterInstruction() {};
-    
-    virtual void execute();
+        PopInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::POP, ASTConstants::NumOperands::UNARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class JumpLessInstruction: public OneOperandInstruction {
+class ReturnInstruction: public InstructionNode {
     public:
-        JumpLessInstruction(InstructionSet* set, ProgramMemory* toInstruction):
-            OneOperandInstruction(set, 20, toInstruction) {};
-        virtual ~JumpLessInstruction() {};
-    
-    virtual void execute();
+        ReturnInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::RETURN, ASTConstants::NumOperands::NULLARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class JumpEqualInstruction: public OneOperandInstruction {
+class StopInstruction: public InstructionNode {
     public:
-        JumpEqualInstruction(InstructionSet* set, ProgramMemory* toInstruction):
-            OneOperandInstruction(set, 21, toInstruction) {};
-        virtual ~JumpEqualInstruction() {};
-    
-    virtual void execute();
+        StopInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::STOP, ASTConstants::NumOperands::NULLARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class JumpNotEqualInstruction: public OneOperandInstruction {
+class InputInstruction: public InstructionNode {
     public:
-        JumpNotEqualInstruction(InstructionSet* set, ProgramMemory* toInstruction):
-            OneOperandInstruction(set, 22, toInstruction) {};
-        virtual ~JumpNotEqualInstruction() {};
-    
-    virtual void execute();
+        InputInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::INPUT, ASTConstants::NumOperands::BINARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class JumpZeroInstruction: public OneOperandInstruction {
+class OutputInstruction: public InstructionNode {
     public:
-        JumpZeroInstruction(InstructionSet* set, ProgramMemory* toInstruction):
-            OneOperandInstruction(set, 23, toInstruction) {};
-        virtual ~JumpZeroInstruction() {};
-    
-    virtual void execute();
+        OutputInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::OUTPUT, ASTConstants::NumOperands::UNARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
-class JumpNotZeroInstruction: public OneOperandInstruction {
+class PrintInstruction: public InstructionNode {
     public:
-        JumpNotZeroInstruction(InstructionSet* set, ProgramMemory* toInstruction):
-            OneOperandInstruction(set, 24, toInstruction) {};
-        virtual ~JumpNotZeroInstruction() {};
-    
-    virtual void execute();
-};
-
-class StackPushInstruction: public OneOperandInstruction {
-    public:
-        StackPushInstruction(InstructionSet* set, GeneralRegister* fromRegister):
-            OneOperandInstruction(set, 25, fromRegister) {};
-        virtual ~StackPushInstruction() {};
-    
-    virtual void execute();
-};
-
-class StackPopInstruction: public OneOperandInstruction {
-    public:
-        StackPopInstruction(InstructionSet* set, GeneralRegister* toRegister):
-            OneOperandInstruction(set, 26, toRegister) {};
-        virtual ~StackPopInstruction() {};
-    
-    virtual void execute();
-};
-
-class StopInstruction: public NoOperandInstruction {
-    public:
-        StopInstruction(InstructionSet* set):
-            NoOperandInstruction(set, 28) {};
-        virtual ~StopInstruction() {};
-    
-    virtual void execute();
+        PrintInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::PRINT, ASTConstants::NumOperands::UNARY, line) {}
+        void accept(Visitor& visitor) override;
 };
 
 #endif
