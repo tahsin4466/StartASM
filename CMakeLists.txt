@@ -63,6 +63,7 @@ set(HEADERS
         include/symbolres/SymbolResolver.h
         include/ast/ASTBuilder.h
         include/scopecheck/ScopeChecker.h
+        include/codegen/Visitor.h
 )
 
 # Specify the executable target
