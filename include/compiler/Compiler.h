@@ -1,8 +1,8 @@
 #ifndef COMPILER_H
 #define COMPILER_H
 
-#include "Lexer.h"
-#include "AbstractSyntaxTree.h"
+#include "lexer/Lexer.h"
+#include "ast/AbstractSyntaxTree.h"
 
 #include <string>
 #include <utility>

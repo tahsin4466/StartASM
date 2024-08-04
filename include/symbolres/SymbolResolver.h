@@ -8,7 +8,7 @@
 #include <utility>
 #include <regex>
 
-#include "ParseTree.h"
+#include "pt/ParseTree.h"
 
 class SymbolResolver {
     public:

@@ -8,7 +8,7 @@
 #include <set>
 #include <map>
 
-#include "AbstractSyntaxTree.h"
+#include "ast/AbstractSyntaxTree.h"
 
 class SemanticAnalyzer {
     public:

@@ -7,7 +7,7 @@
 #include <string>
 #include <iostream>
 #include <mutex>
-#include "ParseTree.h"
+#include "pt/ParseTree.h"
 
 namespace ASTConstants {
     enum NodeType {ROOT, INSTRUCTION, OPERAND};

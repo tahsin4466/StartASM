@@ -7,7 +7,7 @@
 #include <utility>
 #include <regex>
 
-#include "AbstractSyntaxTree.h"
+#include "ast/AbstractSyntaxTree.h"
 
 class ScopeChecker {
     public:

@@ -7,8 +7,8 @@
 #include <utility>
 #include <regex>
 
-#include "ParseTree.h"
-#include "AbstractSyntaxTree.h"
+#include "pt/ParseTree.h"
+#include "ast/AbstractSyntaxTree.h"
 
 class ASTBuilder {
     public:

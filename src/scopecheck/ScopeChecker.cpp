@@ -1,4 +1,4 @@
-#include "ScopeChecker.h"
+#include "scopecheck/ScopeChecker.h"
 
 #include <string>
 #include <vector>

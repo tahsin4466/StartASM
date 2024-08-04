@@ -1,8 +1,8 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "ParseTree.h"
-#include "Lexer.h"
+#include "pt/ParseTree.h"
+#include "lexer/Lexer.h"
 
 #include <string>
 #include <vector>

@@ -1,4 +1,4 @@
-#include "include/ParseTree.h"
+#include "pt/ParseTree.h"
 
 namespace PT {
     // PTNode Implementation

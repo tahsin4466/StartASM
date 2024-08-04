@@ -1,11 +1,11 @@
-#include "include/Compiler.h"
+#include "compiler/Compiler.h"
 #include <iostream>
 #include <omp.h>
 #include <string>
 #include <algorithm>
 
 // Include the Easter egg functions
-#include ".Secrets.h"
+#include "misc/.Secrets.h"
 
 using namespace std;
 

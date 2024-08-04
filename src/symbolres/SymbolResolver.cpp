@@ -1,4 +1,4 @@
-#include "include/SymbolResolver.h"
+#include "symbolres/SymbolResolver.h"
 
 #include <string>
 #include <unordered_map>

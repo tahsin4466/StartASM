@@ -3,7 +3,7 @@
 #include <ctime>
 #include <vector>
 
-#include ".Secrets.h"
+#include "misc/.Secrets.h"
 
 void displayAsciiArt() {
     std::string art = R"(

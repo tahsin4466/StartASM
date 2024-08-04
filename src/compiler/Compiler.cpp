@@ -1,20 +1,18 @@
-#include "include/Compiler.h"
-#include "include/Lexer.h"
-#include "include/Parser.h"
-#include "include/SymbolResolver.h"
-#include "include/AbstractSyntaxTree.h"
-#include "include/ASTBuilder.h"
-#include "include/SemanticAnalyzer.h"
-#include "include/ScopeChecker.h"
-#include "include/CodeGenerator.h"
+#include "compiler/Compiler.h"
+#include "lexer/Lexer.h"
+#include "parser/Parser.h"
+#include "symbolres/SymbolResolver.h"
+#include "ast/AbstractSyntaxTree.h"
+#include "ast/ASTBuilder.h"
+#include "semantics/SemanticAnalyzer.h"
+#include "scopecheck/ScopeChecker.h"
+#include "codegen/CodeGenerator.h"
 
 #include <iostream>
 #include <vector>
 #include <string>
 #include <omp.h>
-#include <mutex>
 #include <future>
-#include <regex>
 
 using namespace std;
 
@@ -75,8 +73,8 @@ bool Compiler::compileCode() {
     }
     cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
 
-    //Resolve symbols//
-    cmdTimingPrint("Compiler: Resolving symbols\n");
+    //Resolve symbolres//
+    cmdTimingPrint("Compiler: Resolving symbolres\n");
     start = omp_get_wtime();
     if(!m_symbolResolver->resolveSymbols(m_symbolTable, m_parseTree->getRoot(), m_statusMessage, m_codeLines)) {
         return false;

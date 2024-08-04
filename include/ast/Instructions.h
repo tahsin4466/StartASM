@@ -1,7 +1,7 @@
 #ifndef INSTRUCTIONS_H
 #define INSTRUCTIONS_H
 
-#include "AbstractSyntaxTree.h"
+#include "ast/AbstractSyntaxTree.h"
 
 #include <string>
 
@@ -12,9 +12,6 @@ class MoveInstruction: public InstructionNode {
         MoveInstruction(const std::string& nodeValue, int line)
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::MOVE, ASTConstants::NumOperands::BINARY, line) {}
         void accept(Visitor& visitor) override;
-
-    virtual void execute();
-
 };
 
 class LoadInstruction: public InstructionNode {
