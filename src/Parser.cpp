@@ -1,6 +1,5 @@
 #include "include/Parser.h"
 
-#include <string>
 #include <functional>
 #include <utility>
 
@@ -105,7 +104,7 @@ Parser::Parser() {
         m_templateMap["not"].reserve(1);
         m_templateMap["not"].push_back({{"self", 0}, checkImplicitConjunction});
 
-    // Shift instruction template (left)
+    // Shift instruction template
         m_templateMap["shift"].reserve(3);
         m_templateMap["shift"].push_back({{"direction", 0}, checkImplicitCondition});
         m_templateMap["shift"].push_back({{"self", 1}, checkImplicitConjunction});
@@ -222,7 +221,7 @@ string Parser::parseInstruction(ParseTree* parseTree, PTNode* node, std::vector<
     }
 
     //Final check - syntax correct but there's excess tokens present
-    //Find size of template expected through instrunctionMap loopup
+    //Find size of template expected through instructionMap lookup
     auto itr = m_instructionMap.find(tokens[0].first);
     if(itr!=m_instructionMap.end()) {
         //If tokens exceed expected size
@@ -307,7 +306,7 @@ string Parser::parseConjunction(ParseTree* parseTree, PTNode* node, vector<pair<
     if(tokens.size()<=index) {
         return "Missing operand after '" + tokens[index-1].first + "'";
     }
-    //If the token in the operand position is not an operad, return an error
+    //If the token in the operand position is not an operand, return an error
     else if (!isOperand(tokens[index])) {
         return "Unknown operand '" + tokens[index].first + "' after '" + tokens[index-1].first + "'";
     }

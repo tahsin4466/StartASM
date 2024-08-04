@@ -48,6 +48,8 @@ set(SOURCES
         src/ScopeChecker.cpp
         src/SymbolResolver.cpp
         src/ASTBuilder.cpp
+        src/AbstractSyntaxTree.cpp
+        src/ParseTree.cpp
 )
 
 set(HEADERS

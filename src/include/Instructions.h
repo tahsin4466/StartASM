@@ -171,4 +171,18 @@ class PrintInstruction: public InstructionNode {
         void accept(Visitor& visitor) override;
 };
 
+class LabelInstruction: public InstructionNode {
+    public:
+        LabelInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::LABEL, ASTConstants::NumOperands::UNARY, line) {}
+        void accept(Visitor& visitor) override;
+};
+
+class CommentInstruction: public InstructionNode {
+    public:
+        CommentInstruction(const std::string& nodeValue, int line)
+                : InstructionNode(nodeValue, ASTConstants::InstructionType::COMMENT, ASTConstants::NumOperands::UNARY, line) {}
+        void accept(Visitor& visitor) override;
+};
+
 #endif
