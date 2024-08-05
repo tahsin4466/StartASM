@@ -1,4 +1,5 @@
 #include "ast/Instructions.h"
+#include "ast/Operands.h"
 
 namespace AST {
     // ASTNode Implementation

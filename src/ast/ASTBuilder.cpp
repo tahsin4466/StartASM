@@ -1,10 +1,60 @@
 #include "ast/ASTBuilder.h"
-
 #include <vector>
 
 using namespace std;
 
-void ASTBuilder::buildAST(PT::PTNode *parseTree, AST::AbstractSyntaxTree *abstractSyntaxTree) {
+ASTBuilder::ASTBuilder() {
+    initializeFactoryMaps();
+}
+
+void ASTBuilder::initializeFactoryMaps() {
+    //Factory map for creating instruction nodes
+    instructionFactoryMap = {
+            {ASTConstants::MOVE, [](const std::string& value, int line) { return new AST::MoveInstruction(value, line); }},
+            {ASTConstants::LOAD, [](const std::string& value, int line) { return new AST::LoadInstruction(value, line); }},
+            {ASTConstants::STORE, [](const std::string& value, int line) { return new AST::StoreInstruction(value, line); }},
+            {ASTConstants::CREATE, [](const std::string& value, int line) { return new AST::CreateInstruction(value, line); }},
+            {ASTConstants::CAST, [](const std::string& value, int line) { return new AST::CastInstruction(value, line); }},
+            {ASTConstants::ADD, [](const std::string& value, int line) { return new AST::AddInstruction(value, line); }},
+            {ASTConstants::SUB, [](const std::string& value, int line) { return new AST::SubInstruction(value, line); }},
+            {ASTConstants::MULTIPLY, [](const std::string& value, int line) { return new AST::MultiplyInstruction(value, line); }},
+            {ASTConstants::DIVIDE, [](const std::string& value, int line) { return new AST::DivideInstruction(value, line); }},
+            {ASTConstants::OR, [](const std::string& value, int line) { return new AST::OrInstruction(value, line); }},
+            {ASTConstants::AND, [](const std::string& value, int line) { return new AST::AndInstruction(value, line); }},
+            {ASTConstants::NOT, [](const std::string& value, int line) { return new AST::NotInstruction(value, line); }},
+            {ASTConstants::SHIFT, [](const std::string& value, int line) { return new AST::ShiftInstruction(value, line); }},
+            {ASTConstants::COMPARE, [](const std::string& value, int line) { return new AST::CompareInstruction(value, line); }},
+            {ASTConstants::JUMP, [](const std::string& value, int line) { return new AST::JumpInstruction(value, line); }},
+            {ASTConstants::CALL, [](const std::string& value, int line) { return new AST::CallInstruction(value, line); }},
+            {ASTConstants::PUSH, [](const std::string& value, int line) { return new AST::PushInstruction(value, line); }},
+            {ASTConstants::POP, [](const std::string& value, int line) { return new AST::PopInstruction(value, line); }},
+            {ASTConstants::RETURN, [](const std::string& value, int line) { return new AST::ReturnInstruction(value, line); }},
+            {ASTConstants::STOP, [](const std::string& value, int line) { return new AST::StopInstruction(value, line); }},
+            {ASTConstants::INPUT, [](const std::string& value, int line) { return new AST::InputInstruction(value, line); }},
+            {ASTConstants::OUTPUT, [](const std::string& value, int line) { return new AST::OutputInstruction(value, line); }},
+            {ASTConstants::PRINT, [](const std::string& value, int line) { return new AST::PrintInstruction(value, line); }},
+            {ASTConstants::LABEL, [](const std::string& value, int line) { return new AST::LabelInstruction(value, line); }},
+            {ASTConstants::COMMENT, [](const std::string& value, int line) { return new AST::CommentInstruction(value, line); }},
+    };
+
+    //Factory map for creating operand nodes
+    operandFactoryMap = {
+            {ASTConstants::REGISTER, [](const std::string& value) { return new AST::RegisterOperand(value); }},
+            {ASTConstants::INSTRUCTIONADDRESS, [](const std::string& value) { return new AST::InstructionAddressOperand(value); }},
+            {ASTConstants::MEMORYADDRESS, [](const std::string& value) { return new AST::MemoryAddressOperand(value); }},
+            {ASTConstants::INTEGER, [](const std::string& value) { return new AST::IntegerOperand(value); }},
+            {ASTConstants::FLOAT, [](const std::string& value) { return new AST::FloatOperand(value); }},
+            {ASTConstants::BOOLEAN, [](const std::string& value) { return new AST::BooleanOperand(value); }},
+            {ASTConstants::CHARACTER, [](const std::string& value) { return new AST::CharacterOperand(value); }},
+            {ASTConstants::STRING, [](const std::string& value) { return new AST::StringOperand(value); }},
+            {ASTConstants::NEWLINE, [](const std::string& value) { return new AST::NewlineOperand(value); }},
+            {ASTConstants::TYPECONDITION, [](const std::string& value) { return new AST::TypeConditionOperand(value); }},
+            {ASTConstants::SHIFTCONDITION, [](const std::string& value) { return new AST::ShiftConditionOperand(value); }},
+            {ASTConstants::JUMPCONDITION, [](const std::string& value) { return new AST::JumpConditionOperand(value); }},
+    };
+}
+
+void ASTBuilder::buildAST(PT::PTNode* parseTree, AST::AbstractSyntaxTree* abstractSyntaxTree) {
     int PTSize = parseTree->getNumChildren();
     // Get the AST root node
     AST::ASTNode* ASTRoot = abstractSyntaxTree->getRoot();
@@ -14,16 +64,16 @@ void ASTBuilder::buildAST(PT::PTNode *parseTree, AST::AbstractSyntaxTree *abstra
 
     // Iterate over all children (instructions) in the parse tree
     // Parallelize the creation of instruction nodes and their children
-    #pragma omp parallel for schedule(dynamic) default(none) shared(parseTree, PTSize, instructionNodes, abstractSyntaxTree)
+#pragma omp parallel for schedule(dynamic) default(none) shared(parseTree, PTSize, instructionNodes, abstractSyntaxTree)
     for (int i = 0; i < PTSize; i++) {
         // Get the pointer to the instruction node from the PT
         PT::PTNode* PTInstructionNode = parseTree->childAt(i);
 
         // Initialize a new AST instruction node, using built-in conversion methods found in the AST class
         auto ASTInstructionNode = instructionBuilder(
-            abstractSyntaxTree->getInstructionType(PTInstructionNode->getNodeValue()),
-            PTInstructionNode->getNodeValue(),
-            i + 1
+                abstractSyntaxTree->getInstructionType(PTInstructionNode->getNodeValue()),
+                PTInstructionNode->getNodeValue(),
+                i + 1
         );
 
         // Store the instruction node in the vector
@@ -37,7 +87,10 @@ void ASTBuilder::buildAST(PT::PTNode *parseTree, AST::AbstractSyntaxTree *abstra
             // Do a check anyway to make sure dynamic cast was successful
             if (PTOperandNode != nullptr && ASTInstructionNode != nullptr) {
                 // Add a child for the instruction node in the AST, using conversion functions from the AST as necessary
-                ASTInstructionNode->insertChild(new AST::OperandNode(PTOperandNode->getNodeValue(), abstractSyntaxTree->convertOperandType(PTOperandNode->getOperandType())));
+                ASTInstructionNode->insertChild(operandBuilder(
+                        abstractSyntaxTree->convertOperandType(PTOperandNode->getOperandType()),
+                        PTOperandNode->getNodeValue()
+                ));
             }
         }
     }
@@ -49,88 +102,18 @@ void ASTBuilder::buildAST(PT::PTNode *parseTree, AST::AbstractSyntaxTree *abstra
     }
 }
 
-AST::InstructionNode* ASTBuilder::instructionBuilder(ASTConstants::InstructionType nodeType, std::string value, int line) {
-    AST::InstructionNode* returnNode = nullptr;
-    switch (nodeType) {
-        case ASTConstants::MOVE:
-            returnNode = new AST::MoveInstruction(value, line);
-            break;
-        case ASTConstants::LOAD:
-            returnNode = new AST::LoadInstruction(value, line);
-            break;
-        case ASTConstants::STORE:
-            returnNode = new AST::StoreInstruction(value, line);
-            break;
-        case ASTConstants::CREATE:
-            returnNode = new AST::CreateInstruction(value, line);
-            break;
-        case ASTConstants::CAST:
-            returnNode = new AST::CastInstruction(value, line);
-            break;
-        case ASTConstants::ADD:
-            returnNode = new AST::AddInstruction(value, line);
-            break;
-        case ASTConstants::SUB:
-            returnNode = new AST::SubInstruction(value, line);
-            break;
-        case ASTConstants::MULTIPLY:
-            returnNode = new AST::MultiplyInstruction(value, line);
-            break;
-        case ASTConstants::DIVIDE:
-            returnNode = new AST::DivideInstruction(value, line);
-            break;
-        case ASTConstants::OR:
-            returnNode = new AST::OrInstruction(value, line);
-            break;
-        case ASTConstants::AND:
-            returnNode = new AST::AndInstruction(value, line);
-            break;
-        case ASTConstants::NOT:
-            returnNode = new AST::NotInstruction(value, line);
-            break;
-        case ASTConstants::SHIFT:
-            returnNode = new AST::ShiftInstruction(value, line);
-            break;
-        case ASTConstants::COMPARE:
-            returnNode = new AST::CompareInstruction(value, line);
-            break;
-        case ASTConstants::JUMP:
-            returnNode = new AST::JumpInstruction(value, line);
-            break;
-        case ASTConstants::CALL:
-            returnNode = new AST::CallInstruction(value, line);
-            break;
-        case ASTConstants::PUSH:
-            returnNode = new AST::PushInstruction(value, line);
-            break;
-        case ASTConstants::POP:
-            returnNode = new AST::PopInstruction(value, line);
-            break;
-        case ASTConstants::RETURN:
-            returnNode = new AST::ReturnInstruction(value, line);
-            break;
-        case ASTConstants::STOP:
-            returnNode = new AST::StopInstruction(value, line);
-            break;
-        case ASTConstants::INPUT:
-            returnNode = new AST::InputInstruction(value, line);
-            break;
-        case ASTConstants::OUTPUT:
-            returnNode = new AST::OutputInstruction(value, line);
-            break;
-        case ASTConstants::PRINT:
-            returnNode = new AST::PrintInstruction(value, line);
-            break;
-        case ASTConstants::LABEL:
-            returnNode = new AST::LabelInstruction(value, line);
-            break;
-        case ASTConstants::COMMENT:
-            returnNode = new AST::CommentInstruction(value, line);
-            break;
-        case ASTConstants::NONE:
-        default:
-            break;
+AST::InstructionNode* ASTBuilder::instructionBuilder(ASTConstants::InstructionType nodeType, const std::string& value, int line) {
+    auto it = instructionFactoryMap.find(nodeType);
+    if (it != instructionFactoryMap.end()) {
+        return it->second(value, line);
     }
-    return returnNode;
+    return nullptr;
+}
 
+AST::OperandNode* ASTBuilder::operandBuilder(ASTConstants::OperandType nodeType, const std::string& value) {
+    auto it = operandFactoryMap.find(nodeType);
+    if (it != operandFactoryMap.end()) {
+        return it->second(value);
+    }
+    return nullptr;
 }

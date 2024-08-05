@@ -64,6 +64,7 @@ set(HEADERS
         include/ast/ASTBuilder.h
         include/scopecheck/ScopeChecker.h
         include/codegen/Visitor.h
+        include/ast/Operands.h
 )
 
 # Specify the executable target

@@ -6,21 +6,31 @@
 #include <unordered_map>
 #include <utility>
 #include <regex>
+#include <functional>
 
 #include "pt/ParseTree.h"
 #include "ast/Instructions.h"
+#include "ast/Operands.h"
 
 class ASTBuilder {
-    public:
-        ASTBuilder() = default;
-       ~ASTBuilder() = default;
-        ASTBuilder(const ASTBuilder&) = delete;
-        ASTBuilder& operator=(const ASTBuilder&) = delete;
+public:
+    ASTBuilder();
+    ~ASTBuilder() = default;
+    ASTBuilder(const ASTBuilder&) = delete;
+    ASTBuilder& operator=(const ASTBuilder&) = delete;
 
-        void buildAST (PT::PTNode* parseTree, AST::AbstractSyntaxTree* abstractSyntaxTree);
+    void buildAST(PT::PTNode* parseTree, AST::AbstractSyntaxTree* abstractSyntaxTree);
 
-    private:
-        AST::InstructionNode* instructionBuilder(ASTConstants::InstructionType nodeType, std::string value, int line);
-        void operandBuilder(ASTConstants::OperandType nodeType, std::string value, int line);
+private:
+    using InstructionFactory = std::function<AST::InstructionNode*(const std::string&, int)>;
+    std::unordered_map<ASTConstants::InstructionType, InstructionFactory> instructionFactoryMap;
+
+    using OperandFactory = std::function<AST::OperandNode*(const std::string&)>;
+    std::unordered_map<ASTConstants::OperandType, OperandFactory> operandFactoryMap;
+
+    void initializeFactoryMaps();
+    AST::InstructionNode* instructionBuilder(ASTConstants::InstructionType nodeType, const std::string& value, int line);
+    AST::OperandNode* operandBuilder(ASTConstants::OperandType nodeType, const std::string& value);
 };
-#endif //STARTASM_ASTBUILDER_H
+
+#endif // STARTASM_ASTBUILDER_H

@@ -2,10 +2,12 @@
 #define VISITOR_H
 
 namespace AST {
+    //AST template node forward declerations
     class RootNode;
     class InstructionNode;
     class OperandNode;
 
+    //AST Instruction node forward declerations
     class MoveInstruction;
     class LoadInstruction;
     class StoreInstruction;
@@ -30,6 +32,20 @@ namespace AST {
     class PrintInstruction;
     class LabelInstruction;
     class CommentInstruction;
+
+    //AST Operand node forward declerations
+    class RegisterOperand;
+    class InstructionAddressOperand;
+    class MemoryAddressOperand;
+    class IntegerOperand;
+    class FloatOperand;
+    class BooleanOperand;
+    class CharacterOperand;
+    class StringOperand;
+    class NewlineOperand;
+    class TypeConditionOperand;
+    class ShiftConditionOperand;
+    class JumpConditionOperand;
 
     class Visitor {
     public:
@@ -61,6 +77,19 @@ namespace AST {
         virtual void visit(PrintInstruction& node) = 0;
         virtual void visit(LabelInstruction& node) = 0;
         virtual void visit(CommentInstruction& node) = 0;
+
+        virtual void visit(RegisterOperand& node) = 0;
+        virtual void visit(InstructionAddressOperand& node) = 0;
+        virtual void visit(MemoryAddressOperand& node) = 0;
+        virtual void visit(IntegerOperand& node) = 0;
+        virtual void visit(FloatOperand& node) = 0;
+        virtual void visit(BooleanOperand& node) = 0;
+        virtual void visit(StringOperand& node) = 0;
+        virtual void visit(NewlineOperand& node) = 0;
+        virtual void visit(TypeConditionOperand& node) = 0;
+        virtual void visit(ShiftConditionOperand& node) = 0;
+        virtual void visit(JumpConditionOperand& node) = 0;
+
     };
 }
 

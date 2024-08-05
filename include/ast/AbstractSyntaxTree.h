@@ -91,7 +91,6 @@ namespace AST {
         OperandNode(const OperandNode&) = delete;
         OperandNode& operator=(const OperandNode&) = delete;
 
-        void accept(Visitor& visitor) override;
         const ASTConstants::OperandType getOperandType() const;
         void setOperandType(ASTConstants::OperandType type);
 
