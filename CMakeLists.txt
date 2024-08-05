@@ -37,38 +37,41 @@ add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 
 # List all source files and headers
 set(SOURCES
-        src/Compiler.cpp
-        src/Instructions.cpp
-        src/Lexer.cpp
-        src/Parser.cpp
-        src/SemanticAnalyzer.cpp
-        src/StartASM.cpp
-        src/CodeGenerator.cpp
-        src/.Secrets.cpp
-        src/ScopeChecker.cpp
-        src/SymbolResolver.cpp
-        src/ASTBuilder.cpp
+        src/compiler/Compiler.cpp
+        src/lexer/Lexer.cpp
+        src/parser/Parser.cpp
+        src/semantics/SemanticAnalyzer.cpp
+        src/compiler/StartASM.cpp
+        src/codegen/CodeGenerator.cpp
+        src/misc/.Secrets.cpp
+        src/scopecheck/ScopeChecker.cpp
+        src/symbolres/SymbolResolver.cpp
+        src/ast/ASTBuilder.cpp
+        src/ast/AbstractSyntaxTree.cpp
+        src/pt/ParseTree.cpp
 )
 
 set(HEADERS
-        src/include/Compiler.h
-        src/include/Instructions.h
-        src/include/Lexer.h
-        src/include/Parser.h
-        src/include/AbstractSyntaxTree.h
-        src/include/SemanticAnalyzer.h
-        src/include/CodeGenerator.h
-        src/include/.Secrets.h
-        src/include/SymbolResolver.h
-        src/include/ASTBuilder.h
-        src/include/ScopeChecker.h
+        include/compiler/Compiler.h
+        include/ast/Instructions.h
+        include/lexer/Lexer.h
+        include/parser/Parser.h
+        include/ast/AbstractSyntaxTree.h
+        include/semantics/SemanticAnalyzer.h
+        include/codegen/CodeGenerator.h
+        include/misc/.Secrets.h
+        include/symbolres/SymbolResolver.h
+        include/ast/ASTBuilder.h
+        include/scopecheck/ScopeChecker.h
+        include/ast/Visitor.h
+        include/ast/Operands.h
 )
 
 # Specify the executable target
 add_executable(startasm ${SOURCES} ${HEADERS})
 
 # Include project headers
-include_directories(src/include)
+include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # Link against LLVM and OpenMP libraries
 llvm_map_components_to_libnames(LLVM_LIBS core support irreader)
