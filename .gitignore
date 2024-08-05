@@ -1,5 +1,6 @@
 #Dynamically Generated Tester Code
 examples/StressTest.sasm
+testscripts/StressTest.sasm
 
 #StartASM Executable
 /StartASMCompiler
