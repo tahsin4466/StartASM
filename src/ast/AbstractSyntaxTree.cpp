@@ -1,4 +1,4 @@
-#include "ast/AbstractSyntaxTree.h"
+#include "ast/Instructions.h"
 
 namespace AST {
     // ASTNode Implementation
