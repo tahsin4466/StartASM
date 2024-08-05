@@ -57,7 +57,6 @@ namespace AST {
             : ASTNode(ASTConstants::NodeType::OPERAND, nodeValue), m_operandType(operandType) {}
 
     OperandNode::~OperandNode() = default;
-    void OperandNode::accept(Visitor& visitor) {}
 
     const ASTConstants::OperandType OperandNode::getOperandType() const { return m_operandType; }
     void OperandNode::setOperandType(ASTConstants::OperandType type) { m_operandType = type; }

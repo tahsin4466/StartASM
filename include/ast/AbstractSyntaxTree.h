@@ -8,6 +8,7 @@
 #include <iostream>
 #include <mutex>
 #include "pt/ParseTree.h"
+#include "Visitor.h"
 
 namespace ASTConstants {
     enum NodeType {ROOT, INSTRUCTION, OPERAND};
@@ -17,7 +18,7 @@ namespace ASTConstants {
 };
 
 namespace AST {
-    // Visitor forward declaration
+    //Visitor forward declaration
     class Visitor;
 
     // Broad AST Node
@@ -61,7 +62,7 @@ namespace AST {
         RootNode(const RootNode&) = delete;
         RootNode& operator=(const RootNode&) = delete;
 
-        void accept(Visitor& visitor) override;
+        void accept(Visitor& visitor) override {visitor.visit(*this);}
     };
 
     //Template instruction node class

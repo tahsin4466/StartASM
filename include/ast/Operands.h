@@ -11,7 +11,7 @@ namespace AST {
         RegisterOperand(const std::string &nodeValue)
             : OperandNode(nodeValue, ASTConstants::OperandType::REGISTER) {}
 
-        void accept(Visitor &visitor) override;
+        void accept(Visitor &visitor) override {visitor.visit(*this);};
     };
 
     class InstructionAddressOperand: public OperandNode {
@@ -19,7 +19,7 @@ namespace AST {
         InstructionAddressOperand(const std::string &nodeValue)
                 : OperandNode(nodeValue, ASTConstants::OperandType::INSTRUCTIONADDRESS) {}
 
-        void accept(Visitor &visitor) override;
+        void accept(Visitor &visitor) override {visitor.visit(*this);};
     };
 
     class MemoryAddressOperand: public OperandNode {
@@ -27,7 +27,7 @@ namespace AST {
         MemoryAddressOperand(const std::string &nodeValue)
                 : OperandNode(nodeValue, ASTConstants::OperandType::MEMORYADDRESS) {}
 
-        void accept(Visitor &visitor) override;
+        void accept(Visitor &visitor) override {visitor.visit(*this);};
     };
 
     class IntegerOperand: public OperandNode {
@@ -35,7 +35,7 @@ namespace AST {
         IntegerOperand(const std::string &nodeValue)
                 : OperandNode(nodeValue, ASTConstants::OperandType::INTEGER) {}
 
-        void accept(Visitor &visitor) override;
+        void accept(Visitor &visitor) override {visitor.visit(*this);};
     };
 
     class FloatOperand: public OperandNode {
@@ -43,7 +43,7 @@ namespace AST {
         FloatOperand(const std::string &nodeValue)
                 : OperandNode(nodeValue, ASTConstants::OperandType::FLOAT) {}
 
-        void accept(Visitor &visitor) override;
+        void accept(Visitor &visitor) override {visitor.visit(*this);};
     };
 
     class BooleanOperand: public OperandNode {
@@ -51,7 +51,7 @@ namespace AST {
         BooleanOperand(const std::string &nodeValue)
                 : OperandNode(nodeValue, ASTConstants::OperandType::BOOLEAN) {}
 
-        void accept(Visitor &visitor) override;
+        void accept(Visitor &visitor) override {visitor.visit(*this);};
     };
 
     class CharacterOperand: public OperandNode {
@@ -59,7 +59,7 @@ namespace AST {
         CharacterOperand(const std::string &nodeValue)
             : OperandNode(nodeValue, ASTConstants::OperandType::CHARACTER) {}
 
-        void accept(Visitor &visitor) override;
+        void accept(Visitor &visitor) override {visitor.visit(*this);};
     };
 
     class StringOperand: public OperandNode {
@@ -67,7 +67,7 @@ namespace AST {
         StringOperand(const std::string &nodeValue)
                 : OperandNode(nodeValue, ASTConstants::OperandType::STRING) {}
 
-        void accept(Visitor &visitor) override;
+        void accept(Visitor &visitor) override {visitor.visit(*this);};
     };
 
     class NewlineOperand: public OperandNode {
@@ -75,7 +75,7 @@ namespace AST {
         NewlineOperand(const std::string &nodeValue)
                 : OperandNode(nodeValue, ASTConstants::OperandType::NEWLINE) {}
 
-        void accept(Visitor &visitor) override;
+        void accept(Visitor &visitor) override {visitor.visit(*this);};
     };
 
     class TypeConditionOperand: public OperandNode {
@@ -83,7 +83,7 @@ namespace AST {
         TypeConditionOperand(const std::string &nodeValue)
                 : OperandNode(nodeValue, ASTConstants::OperandType::TYPECONDITION) {}
 
-        void accept(Visitor &visitor) override;
+        void accept(Visitor &visitor) override {visitor.visit(*this);};
     };
 
     class ShiftConditionOperand: public OperandNode {
@@ -91,7 +91,7 @@ namespace AST {
         ShiftConditionOperand(const std::string &nodeValue)
             : OperandNode(nodeValue, ASTConstants::OperandType::SHIFTCONDITION) {}
 
-        void accept(Visitor &visitor) override;
+        void accept(Visitor &visitor) override {visitor.visit(*this);};
     };
 
     class JumpConditionOperand: public OperandNode {
@@ -99,7 +99,7 @@ namespace AST {
         JumpConditionOperand(const std::string &nodeValue)
                 : OperandNode(nodeValue, ASTConstants::OperandType::JUMPCONDITION) {}
 
-        void accept(Visitor &visitor) override;
+        void accept(Visitor &visitor) override {visitor.visit(*this);};
     };
 }
 
