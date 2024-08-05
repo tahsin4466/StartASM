@@ -3,12 +3,12 @@
 
 namespace AST {
     // ASTNode Implementation
-    ASTNode::ASTNode(ASTConstants::NodeType type, std::string value)
+    ASTNode::ASTNode(ASTConstants::NodeType type, const std::string &value)
             : m_nodeType(type), m_nodeValue(value) {}
 
     ASTNode::~ASTNode() {
-        for (int i = 0; i < m_children.size(); i++) {
-            delete m_children[i];
+        for (auto & child : m_children) {
+            delete child;
         }
         m_children.clear();
     }
@@ -25,7 +25,7 @@ namespace AST {
 
     ASTNode* ASTNode::childAt(int index) {
         std::lock_guard<std::mutex> lock(m_mutex);
-        if (index >= m_children.size()) {
+        if (index >= static_cast<int>(m_children.size())) {
             return nullptr;
         } else {
             return m_children[index];
@@ -39,27 +39,18 @@ namespace AST {
     // RootNode Implementation
     RootNode::RootNode() : ASTNode(ASTConstants::NodeType::ROOT, "") {}
     RootNode::~RootNode() = default;
-    void RootNode::accept(Visitor& visitor) {}
 
     // InstructionNode Implementation
-    InstructionNode::InstructionNode(std::string nodeValue, ASTConstants::InstructionType instructionType, ASTConstants::NumOperands numOperands, int line)
+    InstructionNode::InstructionNode(const std::string &nodeValue, ASTConstants::InstructionType instructionType, ASTConstants::NumOperands numOperands, int line)
             : ASTNode(ASTConstants::NodeType::INSTRUCTION, nodeValue), m_instructionType(instructionType), m_numOperands(numOperands), m_line(line) {}
 
     InstructionNode::~InstructionNode() = default;
 
-    const ASTConstants::InstructionType InstructionNode::getInstructionType() const { return m_instructionType; }
-    const ASTConstants::NumOperands InstructionNode::getNumOperands() const { return m_numOperands; }
-    void InstructionNode::setInstructionType(ASTConstants::InstructionType type) { m_instructionType = type; }
-    void InstructionNode::setNumOperands(ASTConstants::NumOperands num) { m_numOperands = num; }
-
     // OperandNode Implementation
-    OperandNode::OperandNode(std::string nodeValue, ASTConstants::OperandType operandType)
+    OperandNode::OperandNode(const std::string &nodeValue, ASTConstants::OperandType operandType)
             : ASTNode(ASTConstants::NodeType::OPERAND, nodeValue), m_operandType(operandType) {}
 
     OperandNode::~OperandNode() = default;
-
-    const ASTConstants::OperandType OperandNode::getOperandType() const { return m_operandType; }
-    void OperandNode::setOperandType(ASTConstants::OperandType type) { m_operandType = type; }
 
     // AbstractSyntaxTree Implementation
     AbstractSyntaxTree::AbstractSyntaxTree() {
@@ -101,7 +92,7 @@ namespace AST {
         return m_root;
     }
 
-    ASTConstants::InstructionType AbstractSyntaxTree::getInstructionType(std::string instruction) {
+    ASTConstants::InstructionType AbstractSyntaxTree::getInstructionType(const std::string &instruction) {
         std::lock_guard<std::mutex> lock(m_mutex);
         auto itr = m_instructionDictionary.find(instruction);
         if (itr != m_instructionDictionary.end()) {

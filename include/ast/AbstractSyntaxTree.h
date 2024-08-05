@@ -18,30 +18,26 @@ namespace ASTConstants {
 };
 
 namespace AST {
-    //Visitor forward declaration
     class Visitor;
 
     // Broad AST Node
     class ASTNode {
     public:
-        //Constructor and destructor
-        ASTNode(ASTConstants::NodeType type, std::string value);
+        ASTNode(ASTConstants::NodeType type, const std::string &value);
         virtual ~ASTNode();
-        //Remove copy and assignment
         ASTNode(const ASTNode&) = delete;
         ASTNode& operator=(const ASTNode&) = delete;
 
-        //Visitor accept method
         virtual void accept(Visitor& visitor) = 0;
 
-        //Getters
-        const std::string getNodeValue() const { return m_nodeValue; }
-        const ASTConstants::NodeType getNodeType() const { return m_nodeType; }
-        const int getNumChildren() const { return m_children.size(); }
+        // Getters
+        std::string getNodeValue() const { return m_nodeValue; }
+        ASTConstants::NodeType getNodeType() const { return m_nodeType; }
+        int getNumChildren() const { return static_cast<int>(m_children.size()); }
         const std::vector<ASTNode*>& getChildren() const { return m_children; }
 
-        //Setters
-        void setNodeValue(std::string value) { m_nodeValue = value; }
+        // Setters
+        void setNodeValue(const std::string &value) { m_nodeValue = value; }
         ASTNode* insertChild(ASTNode* childNode);
         ASTNode* childAt(int index);
         void reserveChildren(int numChildren);
@@ -53,30 +49,30 @@ namespace AST {
         mutable std::mutex m_mutex;
     };
 
-    //Specailized root node class (top level in AST)
+    // Specialized root node class (top level in AST)
     class RootNode: public ASTNode {
         friend class AST;
     public:
         RootNode();
-        virtual ~RootNode();
+        ~RootNode() override;
         RootNode(const RootNode&) = delete;
         RootNode& operator=(const RootNode&) = delete;
 
-        void accept(Visitor& visitor) override {visitor.visit(*this);}
+        void accept(Visitor& visitor) override { visitor.visit(*this); }
     };
 
-    //Template instruction node class
+    // Template instruction node class
     class InstructionNode: public ASTNode {
     public:
-        InstructionNode(std::string nodeValue, ASTConstants::InstructionType instructionType, ASTConstants::NumOperands numOperands, int line);
-        virtual ~InstructionNode();
+        InstructionNode(const std::string &nodeValue, ASTConstants::InstructionType instructionType, ASTConstants::NumOperands numOperands, int line);
+        ~InstructionNode() override;
         InstructionNode(const InstructionNode&) = delete;
         InstructionNode& operator=(const InstructionNode&) = delete;
 
-        const ASTConstants::InstructionType getInstructionType() const;
-        const ASTConstants::NumOperands getNumOperands() const;
-        void setInstructionType(ASTConstants::InstructionType type);
-        void setNumOperands(ASTConstants::NumOperands num);
+        ASTConstants::InstructionType getInstructionType() const { return m_instructionType; }
+        ASTConstants::NumOperands getNumOperands() const { return m_numOperands; }
+        void setInstructionType(ASTConstants::InstructionType type) { m_instructionType = type; }
+        void setNumOperands(ASTConstants::NumOperands num) { m_numOperands = num; }
 
     private:
         ASTConstants::InstructionType m_instructionType;
@@ -84,28 +80,28 @@ namespace AST {
         int m_line;
     };
 
-    //Operand Node Class
+    // Operand Node Class
     class OperandNode: public ASTNode {
     public:
-        OperandNode(std::string nodeValue, ASTConstants::OperandType operandType);
-        virtual ~OperandNode();
+        OperandNode(const std::string &nodeValue, ASTConstants::OperandType operandType);
+        ~OperandNode() override;
         OperandNode(const OperandNode&) = delete;
         OperandNode& operator=(const OperandNode&) = delete;
 
-        const ASTConstants::OperandType getOperandType() const;
-        void setOperandType(ASTConstants::OperandType type);
+        ASTConstants::OperandType getOperandType() const { return m_operandType; }
+        void setOperandType(ASTConstants::OperandType type) { m_operandType = type; }
 
     private:
         ASTConstants::OperandType m_operandType;
     };
 
-    //AST wrapper class
+    // AST wrapper class
     class AbstractSyntaxTree {
     public:
         AbstractSyntaxTree();
         ~AbstractSyntaxTree();
         ASTNode* getRoot();
-        ASTConstants::InstructionType getInstructionType(std::string instruction);
+        ASTConstants::InstructionType getInstructionType(const std::string &instruction);
         ASTConstants::NumOperands getNumOperands(int num);
         ASTConstants::OperandType convertOperandType(PTConstants::OperandType type);
         void printTree() const;
