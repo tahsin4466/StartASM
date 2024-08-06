@@ -40,6 +40,15 @@ namespace AST {
     RootNode::RootNode() : ASTNode(ASTConstants::NodeType::ROOT, "") {}
     RootNode::~RootNode() = default;
 
+    void RootNode::accept(AST::Visitor &visitor) {
+        //Visit for root node first (usually nothing)
+        visitor.visit(*this);
+        //Visit for all instruction children
+        for (auto* child : m_children) {
+            child->accept(visitor);
+        }
+    }
+
     // InstructionNode Implementation
     InstructionNode::InstructionNode(const std::string &nodeValue, ASTConstants::InstructionType instructionType, ASTConstants::NumOperands numOperands, int line)
             : ASTNode(ASTConstants::NodeType::INSTRUCTION, nodeValue), m_instructionType(instructionType), m_numOperands(numOperands), m_line(line) {}

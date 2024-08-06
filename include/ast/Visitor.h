@@ -7,78 +7,43 @@ namespace AST {
 
     //AST Instruction node forward declarations
     class MoveInstruction;
-
     class LoadInstruction;
-
     class StoreInstruction;
-
     class CreateInstruction;
-
     class CastInstruction;
-
     class AddInstruction;
-
     class SubInstruction;
-
     class MultiplyInstruction;
-
     class DivideInstruction;
-
     class OrInstruction;
-
     class AndInstruction;
-
     class NotInstruction;
-
     class ShiftInstruction;
-
     class CompareInstruction;
-
     class JumpInstruction;
-
     class CallInstruction;
-
     class PushInstruction;
-
     class PopInstruction;
-
     class ReturnInstruction;
-
     class StopInstruction;
-
     class InputInstruction;
-
     class OutputInstruction;
-
     class PrintInstruction;
-
     class LabelInstruction;
-
     class CommentInstruction;
 
     //AST Operand node forward declarations
     class RegisterOperand;
-
     class InstructionAddressOperand;
-
     class MemoryAddressOperand;
-
     class IntegerOperand;
-
     class FloatOperand;
-
     class BooleanOperand;
-
     class CharacterOperand;
-
     class StringOperand;
-
     class NewlineOperand;
-
     class TypeConditionOperand;
-
     class ShiftConditionOperand;
-
     class JumpConditionOperand;
 
     class Visitor {

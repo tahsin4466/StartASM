@@ -8,11 +8,20 @@
 namespace AST {
     class MoveInstruction : public InstructionNode {
     public:
+        //Constructor - specifies num operands automatically
         MoveInstruction(const std::string &nodeValue, int line)
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::MOVE, ASTConstants::NumOperands::BINARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        //Accept method
+        void accept(Visitor &visitor) override {
+            //Visit for the instruction first
+            visitor.visit(*this);
+            //Iterate and visit for children
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class LoadInstruction : public InstructionNode {
@@ -21,7 +30,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::LOAD, ASTConstants::NumOperands::BINARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class StoreInstruction : public InstructionNode {
@@ -30,7 +44,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::STORE, ASTConstants::NumOperands::BINARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class CreateInstruction : public InstructionNode {
@@ -39,7 +58,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::CREATE, ASTConstants::NumOperands::TERNARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class CastInstruction : public InstructionNode {
@@ -48,7 +72,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::CAST, ASTConstants::NumOperands::BINARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class AddInstruction : public InstructionNode {
@@ -57,7 +86,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::ADD, ASTConstants::NumOperands::TERNARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class SubInstruction : public InstructionNode {
@@ -66,7 +100,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::SUB, ASTConstants::NumOperands::TERNARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class MultiplyInstruction : public InstructionNode {
@@ -75,7 +114,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::MULTIPLY,
                                   ASTConstants::NumOperands::TERNARY, line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class DivideInstruction : public InstructionNode {
@@ -84,7 +128,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::DIVIDE, ASTConstants::NumOperands::TERNARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class OrInstruction : public InstructionNode {
@@ -93,7 +142,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::OR, ASTConstants::NumOperands::BINARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class AndInstruction : public InstructionNode {
@@ -102,7 +156,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::AND, ASTConstants::NumOperands::BINARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class NotInstruction : public InstructionNode {
@@ -111,7 +170,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::NOT, ASTConstants::NumOperands::UNARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class ShiftInstruction : public InstructionNode {
@@ -120,7 +184,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::SHIFT, ASTConstants::NumOperands::TERNARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class CompareInstruction : public InstructionNode {
@@ -129,7 +198,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::COMPARE, ASTConstants::NumOperands::BINARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class JumpInstruction : public InstructionNode {
@@ -138,7 +212,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::JUMP, ASTConstants::NumOperands::BINARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class CallInstruction : public InstructionNode {
@@ -147,7 +226,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::CALL, ASTConstants::NumOperands::UNARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class PushInstruction : public InstructionNode {
@@ -156,7 +240,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::PUSH, ASTConstants::NumOperands::UNARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class PopInstruction : public InstructionNode {
@@ -165,7 +254,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::POP, ASTConstants::NumOperands::UNARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class ReturnInstruction : public InstructionNode {
@@ -174,7 +268,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::RETURN, ASTConstants::NumOperands::NULLARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class StopInstruction : public InstructionNode {
@@ -183,7 +282,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::STOP, ASTConstants::NumOperands::NULLARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class InputInstruction : public InstructionNode {
@@ -192,7 +296,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::INPUT, ASTConstants::NumOperands::BINARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class OutputInstruction : public InstructionNode {
@@ -201,7 +310,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::OUTPUT, ASTConstants::NumOperands::UNARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class PrintInstruction : public InstructionNode {
@@ -210,7 +324,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::PRINT, ASTConstants::NumOperands::UNARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class LabelInstruction : public InstructionNode {
@@ -219,7 +338,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::LABEL, ASTConstants::NumOperands::UNARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 
     class CommentInstruction : public InstructionNode {
@@ -228,7 +352,12 @@ namespace AST {
                 : InstructionNode(nodeValue, ASTConstants::InstructionType::COMMENT, ASTConstants::NumOperands::UNARY,
                                   line) {}
 
-        void accept(Visitor &visitor) override {visitor.visit(*this);};
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+            for (auto* child : m_children) {
+                child->accept(visitor);
+            }
+        };
     };
 }
 #endif

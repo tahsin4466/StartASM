@@ -58,7 +58,7 @@ namespace AST {
         RootNode(const RootNode&) = delete;
         RootNode& operator=(const RootNode&) = delete;
 
-        void accept(Visitor& visitor) override { visitor.visit(*this); }
+        void accept(Visitor& visitor) override;
     };
 
     // Template instruction node class
