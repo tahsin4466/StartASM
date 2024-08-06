@@ -39,18 +39,18 @@ void ASTBuilder::initializeFactoryMaps() {
 
     //Factory map for creating operand nodes
     operandFactoryMap = {
-            {ASTConstants::REGISTER, [](const std::string& value) { return new AST::RegisterOperand(value); }},
-            {ASTConstants::INSTRUCTIONADDRESS, [](const std::string& value) { return new AST::InstructionAddressOperand(value); }},
-            {ASTConstants::MEMORYADDRESS, [](const std::string& value) { return new AST::MemoryAddressOperand(value); }},
-            {ASTConstants::INTEGER, [](const std::string& value) { return new AST::IntegerOperand(value); }},
-            {ASTConstants::FLOAT, [](const std::string& value) { return new AST::FloatOperand(value); }},
-            {ASTConstants::BOOLEAN, [](const std::string& value) { return new AST::BooleanOperand(value); }},
-            {ASTConstants::CHARACTER, [](const std::string& value) { return new AST::CharacterOperand(value); }},
-            {ASTConstants::STRING, [](const std::string& value) { return new AST::StringOperand(value); }},
-            {ASTConstants::NEWLINE, [](const std::string& value) { return new AST::NewlineOperand(value); }},
-            {ASTConstants::TYPECONDITION, [](const std::string& value) { return new AST::TypeConditionOperand(value); }},
-            {ASTConstants::SHIFTCONDITION, [](const std::string& value) { return new AST::ShiftConditionOperand(value); }},
-            {ASTConstants::JUMPCONDITION, [](const std::string& value) { return new AST::JumpConditionOperand(value); }},
+            {ASTConstants::REGISTER, [](const std::string& value, int line) { return new AST::RegisterOperand(value, line); }},
+            {ASTConstants::INSTRUCTIONADDRESS, [](const std::string& value, int line) { return new AST::InstructionAddressOperand(value, line); }},
+            {ASTConstants::MEMORYADDRESS, [](const std::string& value, int line) { return new AST::MemoryAddressOperand(value, line); }},
+            {ASTConstants::INTEGER, [](const std::string& value, int line) { return new AST::IntegerOperand(value, line); }},
+            {ASTConstants::FLOAT, [](const std::string& value, int line) { return new AST::FloatOperand(value, line); }},
+            {ASTConstants::BOOLEAN, [](const std::string& value, int line) { return new AST::BooleanOperand(value, line); }},
+            {ASTConstants::CHARACTER, [](const std::string& value, int line) { return new AST::CharacterOperand(value, line); }},
+            {ASTConstants::STRING, [](const std::string& value, int line) { return new AST::StringOperand(value, line); }},
+            {ASTConstants::NEWLINE, [](const std::string& value, int line) { return new AST::NewlineOperand(value, line); }},
+            {ASTConstants::TYPECONDITION, [](const std::string& value, int line) { return new AST::TypeConditionOperand(value, line); }},
+            {ASTConstants::SHIFTCONDITION, [](const std::string& value, int line) { return new AST::ShiftConditionOperand(value, line); }},
+            {ASTConstants::JUMPCONDITION, [](const std::string& value, int line) { return new AST::JumpConditionOperand(value, line); }},
     };
 }
 
@@ -89,7 +89,8 @@ void ASTBuilder::buildAST(PT::PTNode* parseTree, AST::AbstractSyntaxTree* abstra
                 // Add a child for the instruction node in the AST, using conversion functions from the AST as necessary
                 ASTInstructionNode->insertChild(operandBuilder(
                         abstractSyntaxTree->convertOperandType(PTOperandNode->getOperandType()),
-                        PTOperandNode->getNodeValue()
+                        PTOperandNode->getNodeValue(),
+                        i+1
                 ));
             }
         }
@@ -110,10 +111,10 @@ AST::InstructionNode* ASTBuilder::instructionBuilder(ASTConstants::InstructionTy
     return nullptr;
 }
 
-AST::OperandNode* ASTBuilder::operandBuilder(ASTConstants::OperandType nodeType, const std::string& value) {
+AST::OperandNode* ASTBuilder::operandBuilder(ASTConstants::OperandType nodeType, const std::string& value, int line) {
     auto it = operandFactoryMap.find(nodeType);
     if (it != operandFactoryMap.end()) {
-        return it->second(value);
+        return it->second(value, line);
     }
     return nullptr;
 }
