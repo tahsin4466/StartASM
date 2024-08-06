@@ -9,127 +9,8 @@ using namespace std;
 using namespace AST;
 using namespace ASTConstants;
 
-SemanticAnalyzer::SemanticAnalyzer() {
-    //Constructor for SemanticAnalyzer
-    //Initialize hash map with instructions and vectors containing sets of valid operands
-    m_semanticMap[InstructionType::MOVE] = {
-        {OperandType::REGISTER},
-        {OperandType::REGISTER}
-    };
-    m_semanticMap[InstructionType::LOAD] = {
-        {OperandType::MEMORYADDRESS, OperandType::REGISTER},
-        {OperandType::REGISTER}
-    };
-    m_semanticMap[InstructionType::STORE] = {
-        {OperandType::REGISTER},
-        {OperandType::MEMORYADDRESS, OperandType::REGISTER}
-    };
-    m_semanticMap[InstructionType::CREATE] = {
-        {OperandType::TYPECONDITION},
-        {OperandType::INTEGER, OperandType::CHARACTER, OperandType::BOOLEAN, OperandType::FLOAT, OperandType::MEMORYADDRESS, OperandType::INSTRUCTIONADDRESS},
-        {OperandType::REGISTER}
-    };
-    m_semanticMap[InstructionType::CAST] = {
-        {OperandType::TYPECONDITION},
-        {OperandType::REGISTER}
-    };
-    m_semanticMap[InstructionType::ADD] = {
-        {OperandType::REGISTER},
-        {OperandType::REGISTER},
-        {OperandType::REGISTER}
-    };
-    m_semanticMap[InstructionType::SUB] = {
-        {OperandType::REGISTER},
-        {OperandType::REGISTER},
-        {OperandType::REGISTER}
-    };
-    m_semanticMap[InstructionType::MULTIPLY] = {
-        {OperandType::REGISTER},
-        {OperandType::REGISTER},
-        {OperandType::REGISTER}
-    };
-    m_semanticMap[InstructionType::DIVIDE] = {
-        {OperandType::REGISTER},
-        {OperandType::REGISTER},
-        {OperandType::REGISTER}
-    };
-    m_semanticMap[InstructionType::OR] = {
-        {OperandType::REGISTER},
-        {OperandType::REGISTER}
-    };
-    m_semanticMap[InstructionType::AND] = {
-        {OperandType::REGISTER},
-        {OperandType::REGISTER}
-    };
-    m_semanticMap[InstructionType::NOT] = {
-        {OperandType::REGISTER},
-    };
-    m_semanticMap[InstructionType::SHIFT] = {
-        {OperandType::SHIFTCONDITION},
-        {OperandType::REGISTER},
-        {OperandType::REGISTER}
-    };
-    m_semanticMap[InstructionType::COMPARE] = {
-        {OperandType::REGISTER},
-        {OperandType::REGISTER}
-    };
-    m_semanticMap[InstructionType::JUMP] = {
-        {OperandType::JUMPCONDITION},
-        {OperandType::INSTRUCTIONADDRESS, OperandType::REGISTER}
-    };
-    m_semanticMap[InstructionType::CALL] = {
-        {OperandType::INSTRUCTIONADDRESS, OperandType::REGISTER}
-    };
-    m_semanticMap[InstructionType::PUSH] = {
-        {OperandType::REGISTER}
-    };
-    m_semanticMap[InstructionType::POP] = {
-        {OperandType::REGISTER}
-    };
-    m_semanticMap[InstructionType::RETURN] = {
-    };
-    m_semanticMap[InstructionType::STOP] = {
-    };
-    m_semanticMap[InstructionType::INPUT] = {
-        {OperandType::TYPECONDITION},
-        {OperandType::REGISTER}
-    };
-    m_semanticMap[InstructionType::OUTPUT] = {
-        {OperandType::REGISTER}
-    };
-    m_semanticMap[InstructionType::PRINT] = {
-        {OperandType::STRING, OperandType::NEWLINE},
-    };
-    m_semanticMap[InstructionType::LABEL] = {
-        {OperandType::INSTRUCTIONADDRESS}
-    };
-    m_semanticMap[InstructionType::COMMENT] = {
-        {OperandType::STRING}
-    };
-}
-
 bool SemanticAnalyzer::analyzeSemantics(AST::ASTNode *AST, const std::vector<std::string>& codeLines, std::string &errorMessage) {
-    //Parallelize semantic analysis as each instruction is independent and AST is immutable in this state
-    #pragma omp parallel for schedule(dynamic) default(none) shared(AST, m_invalidLines, codeLines)
-    //Iterate over all children of the AST (instruction nodes)
-    for (int i=0; i<AST->getNumChildren(); i++) {
-        //Cast the ASTNode to an instruction node
-        auto instructionNode = dynamic_cast<AST::InstructionNode*>(AST->childAt(i));
-        //If not nullptr and if the node isn't empty
-        if (instructionNode != nullptr && !instructionNode->getNodeValue().empty()) {
-            //Call the semantic analyzer and analyze the given node
-            string error = analyzeLine(instructionNode);
-            if (!error.empty()) {
-                //If error is present
-                //Critical section - STL manipulations are not thread safe
-                #pragma omp critical
-                {
-                    //Add error to error map at index i
-                    m_invalidLines[i] = "\nInvalid syntax at line " + to_string(i + 1) + ": " + codeLines[i] + "\n" + error;
-                }
-            }
-        }
-    }
+
 
     //Concatenate status message string with all error messages
     for (const auto& pair : m_invalidLines) {
@@ -143,7 +24,7 @@ bool SemanticAnalyzer::analyzeSemantics(AST::ASTNode *AST, const std::vector<std
     return true;
 }
 
-string SemanticAnalyzer::analyzeLine(AST::InstructionNode *instructionNode) {
+/*string SemanticAnalyzer::analyzeLine(AST::InstructionNode *instructionNode) {
     //Create a return string that's empty by default
     string returnString = "";
     //Get the instruction type from the AST for easy access
@@ -192,7 +73,7 @@ string SemanticAnalyzer::analyzeLine(AST::InstructionNode *instructionNode) {
     }
     //Return the string after checking the whole instruction semantic template
     return returnString;
-}
+}*/
 
 string SemanticAnalyzer::enumToString(OperandType type) {
     //This method simply switches an OperandType with a string outlining the expected operand for easy error printing

@@ -39,18 +39,18 @@ void ASTBuilder::initializeFactoryMaps() {
 
     //Factory map for creating operand nodes
     operandFactoryMap = {
-            {ASTConstants::REGISTER, [](const std::string& value, int line) { return new AST::RegisterOperand(value, line); }},
-            {ASTConstants::INSTRUCTIONADDRESS, [](const std::string& value, int line) { return new AST::InstructionAddressOperand(value, line); }},
-            {ASTConstants::MEMORYADDRESS, [](const std::string& value, int line) { return new AST::MemoryAddressOperand(value, line); }},
-            {ASTConstants::INTEGER, [](const std::string& value, int line) { return new AST::IntegerOperand(value, line); }},
-            {ASTConstants::FLOAT, [](const std::string& value, int line) { return new AST::FloatOperand(value, line); }},
-            {ASTConstants::BOOLEAN, [](const std::string& value, int line) { return new AST::BooleanOperand(value, line); }},
-            {ASTConstants::CHARACTER, [](const std::string& value, int line) { return new AST::CharacterOperand(value, line); }},
-            {ASTConstants::STRING, [](const std::string& value, int line) { return new AST::StringOperand(value, line); }},
-            {ASTConstants::NEWLINE, [](const std::string& value, int line) { return new AST::NewlineOperand(value, line); }},
-            {ASTConstants::TYPECONDITION, [](const std::string& value, int line) { return new AST::TypeConditionOperand(value, line); }},
-            {ASTConstants::SHIFTCONDITION, [](const std::string& value, int line) { return new AST::ShiftConditionOperand(value, line); }},
-            {ASTConstants::JUMPCONDITION, [](const std::string& value, int line) { return new AST::JumpConditionOperand(value, line); }},
+            {ASTConstants::REGISTER, [](const std::string& value, int line, short int pos) { return new AST::RegisterOperand(value, line, pos); }},
+            {ASTConstants::INSTRUCTIONADDRESS, [](const std::string& value, int line, short int pos) { return new AST::InstructionAddressOperand(value, line, pos); }},
+            {ASTConstants::MEMORYADDRESS, [](const std::string& value, int line, short int pos) { return new AST::MemoryAddressOperand(value, line, pos); }},
+            {ASTConstants::INTEGER, [](const std::string& value, int line, short int pos) { return new AST::IntegerOperand(value, line, pos); }},
+            {ASTConstants::FLOAT, [](const std::string& value, int line, short int pos) { return new AST::FloatOperand(value, line, pos); }},
+            {ASTConstants::BOOLEAN, [](const std::string& value, int line, short int pos) { return new AST::BooleanOperand(value, line, pos); }},
+            {ASTConstants::CHARACTER, [](const std::string& value, int line, short int pos) { return new AST::CharacterOperand(value, line, pos); }},
+            {ASTConstants::STRING, [](const std::string& value, int line, short int pos) { return new AST::StringOperand(value, line, pos); }},
+            {ASTConstants::NEWLINE, [](const std::string& value, int line, short int pos) { return new AST::NewlineOperand(value, line, pos); }},
+            {ASTConstants::TYPECONDITION, [](const std::string& value, int line, short int pos) { return new AST::TypeConditionOperand(value, line, pos); }},
+            {ASTConstants::SHIFTCONDITION, [](const std::string& value, int line, short int pos) { return new AST::ShiftConditionOperand(value, line, pos); }},
+            {ASTConstants::JUMPCONDITION, [](const std::string& value, int line, short int pos) { return new AST::JumpConditionOperand(value, line, pos); }},
     };
 }
 
@@ -90,7 +90,8 @@ void ASTBuilder::buildAST(PT::PTNode* parseTree, AST::AbstractSyntaxTree* abstra
                 ASTInstructionNode->insertChild(operandBuilder(
                         abstractSyntaxTree->convertOperandType(PTOperandNode->getOperandType()),
                         PTOperandNode->getNodeValue(),
-                        i+1
+                        i+1,
+                        static_cast<short>(j)
                 ));
             }
         }
@@ -111,10 +112,10 @@ AST::InstructionNode* ASTBuilder::instructionBuilder(ASTConstants::InstructionTy
     return nullptr;
 }
 
-AST::OperandNode* ASTBuilder::operandBuilder(ASTConstants::OperandType nodeType, const std::string& value, int line) {
+AST::OperandNode* ASTBuilder::operandBuilder(ASTConstants::OperandType nodeType, const std::string& value, int line, short int pos) {
     auto it = operandFactoryMap.find(nodeType);
     if (it != operandFactoryMap.end()) {
-        return it->second(value, line);
+        return it->second(value, line, pos);
     }
     return nullptr;
 }

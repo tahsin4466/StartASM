@@ -1,7 +1,6 @@
 #ifndef CODEGENERATOR_H
 #define CODEGENERATOR_H
 
-#include "ast/Visitor.h"
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/IRBuilder.h>
@@ -9,10 +8,18 @@
 #include <memory>
 #include <iostream>
 
+#include "ast/Visitor.h"
+#include "ast/AbstractSyntaxTree.h"
+
 class CodeGenerator : public AST::Visitor {
     public:
         CodeGenerator();
+        ~CodeGenerator() = default;
+        //Remove copy and assignment operator
+        CodeGenerator(const CodeGenerator&) = delete;
+        CodeGenerator& operator=(const CodeGenerator&) = delete;
         void visit(AST::RootNode& node) override;
+
 
         // Specific visit methods for each instruction
         void visit(AST::MoveInstruction& node) override;

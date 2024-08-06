@@ -25,12 +25,12 @@ private:
     using InstructionFactory = std::function<AST::InstructionNode*(const std::string&, int)>;
     std::unordered_map<ASTConstants::InstructionType, InstructionFactory> instructionFactoryMap;
 
-    using OperandFactory = std::function<AST::OperandNode*(const std::string&, int line)>;
+    using OperandFactory = std::function<AST::OperandNode*(const std::string&, int line, short int pos)>;
     std::unordered_map<ASTConstants::OperandType, OperandFactory> operandFactoryMap;
 
     void initializeFactoryMaps();
     AST::InstructionNode* instructionBuilder(ASTConstants::InstructionType nodeType, const std::string& value, int line);
-    AST::OperandNode* operandBuilder(ASTConstants::OperandType nodeType, const std::string& value, int line);
+    AST::OperandNode* operandBuilder(ASTConstants::OperandType nodeType, const std::string& value, int line, short int pos);
 };
 
 #endif // STARTASM_ASTBUILDER_H

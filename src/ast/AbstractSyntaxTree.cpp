@@ -56,8 +56,8 @@ namespace AST {
     InstructionNode::~InstructionNode() = default;
 
     // OperandNode Implementation
-    OperandNode::OperandNode(const std::string &nodeValue, ASTConstants::OperandType operandType, int line)
-            : ASTNode(ASTConstants::NodeType::OPERAND, nodeValue), m_operandType(operandType), m_line(line) {}
+    OperandNode::OperandNode(const std::string &nodeValue, ASTConstants::OperandType operandType, int line, short int pos)
+            : ASTNode(ASTConstants::NodeType::OPERAND, nodeValue), m_operandType(operandType), m_line(line), m_pos(pos) {}
 
     OperandNode::~OperandNode() = default;
 
@@ -153,7 +153,6 @@ namespace AST {
             case PTConstants::OperandType::TYPECONDITION:
                 return ASTConstants::OperandType::TYPECONDITION;
             case PTConstants::OperandType::UNKNOWN:
-                return ASTConstants::OperandType::UNKNOWN;
             default:
                 return ASTConstants::OperandType::UNKNOWN;
         }

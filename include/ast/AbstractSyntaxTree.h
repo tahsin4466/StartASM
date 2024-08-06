@@ -83,7 +83,7 @@ namespace AST {
     // Operand Node Class
     class OperandNode: public ASTNode {
     public:
-        OperandNode(const std::string &nodeValue, ASTConstants::OperandType operandType, int line);
+        OperandNode(const std::string &nodeValue, ASTConstants::OperandType operandType, int line, short int pos);
         ~OperandNode() override;
         OperandNode(const OperandNode&) = delete;
         OperandNode& operator=(const OperandNode&) = delete;
@@ -94,6 +94,7 @@ namespace AST {
     private:
         ASTConstants::OperandType m_operandType;
         int m_line;
+        short int m_pos;
     };
 
     // AST wrapper class
