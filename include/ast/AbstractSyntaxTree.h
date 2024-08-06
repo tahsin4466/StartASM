@@ -13,7 +13,7 @@
 namespace ASTConstants {
     enum NodeType {ROOT, INSTRUCTION, OPERAND};
     enum InstructionType {MOVE, LOAD, STORE, CREATE, CAST, ADD, SUB, MULTIPLY, DIVIDE, OR, AND, NOT, SHIFT, COMPARE, JUMP, CALL, PUSH, POP, RETURN, STOP, INPUT, OUTPUT, PRINT, LABEL, COMMENT, NONE};
-    enum OperandType {REGISTER, INSTRUCTIONADDRESS, MEMORYADDRESS, INTEGER, FLOAT, BOOLEAN, CHARACTER, STRING, NEWLINE, TYPECONDITION, SHIFTCONDITION, JUMPCONDITION, UNKNOWN};
+    enum OperandType {REGISTER, INSTRUCTIONADDRESS, MEMORYADDRESS, INTEGER, FLOAT, BOOLEAN, CHARACTER, STRING, NEWLINE, TYPECONDITION, SHIFTCONDITION, JUMPCONDITION, UNKNOWN, EMPTY};
     enum NumOperands {NULLARY, UNARY, BINARY, TERNARY, INVALID};
 };
 
@@ -71,6 +71,7 @@ namespace AST {
 
         ASTConstants::InstructionType getInstructionType() const { return m_instructionType; }
         ASTConstants::NumOperands getNumOperands() const { return m_numOperands; }
+        int getLine() const {return m_line; }
         void setInstructionType(ASTConstants::InstructionType type) { m_instructionType = type; }
         void setNumOperands(ASTConstants::NumOperands num) { m_numOperands = num; }
 
@@ -89,6 +90,8 @@ namespace AST {
         OperandNode& operator=(const OperandNode&) = delete;
 
         ASTConstants::OperandType getOperandType() const { return m_operandType; }
+        int getLine() const {return m_line; }
+        short int getPos() const {return m_pos;}
         void setOperandType(ASTConstants::OperandType type) { m_operandType = type; }
 
     private:

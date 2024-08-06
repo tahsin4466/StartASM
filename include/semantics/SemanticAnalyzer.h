@@ -4,12 +4,14 @@
 #include <string>
 #include <iostream>
 #include <vector>
-#include <unordered_map>
+#include <unordered_set>
 #include <set>
 #include <map>
 
-#include "ast/AbstractSyntaxTree.h"
+#include "ast/Instructions.h"
+#include "ast/Operands.h"
 #include "ast/Visitor.h"
+
 
 class SemanticAnalyzer: public AST::Visitor {
     public:
@@ -21,7 +23,7 @@ class SemanticAnalyzer: public AST::Visitor {
         SemanticAnalyzer& operator=(const SemanticAnalyzer&) = delete;
 
         //Main Semantic Analysis Method
-        bool analyzeSemantics(AST::ASTNode *AST, const std::vector<std::string>& codeLines, std::string &errorMessage)
+        bool analyzeSemantics(AST::ASTNode *AST, const std::vector<std::string>& codeLines, std::string &errorMessage);
 
 
     private:
@@ -29,9 +31,11 @@ class SemanticAnalyzer: public AST::Visitor {
         std::vector<std::vector<ASTConstants::OperandType>> m_semanticContext;
         //Data structure for errors
         std::map<int, std::string> m_invalidLines;
+        //Reference to code lines
+        std::vector<std::string>& m_lines;
 
         //Visitor Methods
-        void visit(AST::RootNode& node) override;
+        void visit(AST::RootNode& node) override {};
 
         void visit(AST::MoveInstruction& node) override;
         void visit(AST::LoadInstruction& node) override;
@@ -72,8 +76,9 @@ class SemanticAnalyzer: public AST::Visitor {
         void visit(AST::JumpConditionOperand& node) override;
 
         //Helper functions
-        std::string enumToString(ASTConstants::OperandType type);
-        void freeContext();
+        void handleAtomicInstructionError(int line, const std::vector<ASTConstants::OperandType>& expectedTemplate, AST::InstructionNode& node); //Handle error logging for atomic instructions
+        void handleMultipleInstructionError(int line, const std::vector<std::unordered_set<ASTConstants::OperandType>>& expectedTemplate, AST::InstructionNode& node); //Handle error logging for multiple type instructions
+        std::string enumToString(ASTConstants::OperandType type); //Error logging helper function
 
 };
 #endif

@@ -2,15 +2,23 @@
 
 #include <string>
 #include <vector>
-#include <unordered_map>
-#include <set>
 
 using namespace std;
 using namespace AST;
 using namespace ASTConstants;
 
 bool SemanticAnalyzer::analyzeSemantics(AST::ASTNode *AST, const std::vector<std::string>& codeLines, std::string &errorMessage) {
+    m_lines = codeLines;
+    //Prepopulate the local semantic context - an operation will never have >3 operands
+    std::vector<ASTConstants::OperandType> localContext(3, ASTConstants::EMPTY); //Set initial operands to empty for easier matching
+    //Perallocate the global semantic context based on the number of lines
+    m_semanticContext = std::vector<std::vector<ASTConstants::OperandType>>(codeLines.size()+1, localContext);
 
+    //Visit the root and iterate over the AST
+    AST->accept(*this);
+
+    //Clear the context
+    m_semanticContext.clear();
 
     //Concatenate status message string with all error messages
     for (const auto& pair : m_invalidLines) {
@@ -22,6 +30,95 @@ bool SemanticAnalyzer::analyzeSemantics(AST::ASTNode *AST, const std::vector<std
         return false;
     }
     return true;
+}
+
+void SemanticAnalyzer::visit(AST::MoveInstruction& node) {
+    //CASE 1 - Atomic type instruction
+    //Expected semantic structure of instruction
+    const vector<ASTConstants::OperandType> semanticTemplate = {REGISTER, REGISTER, EMPTY};
+    int line = node.getLine();
+    //Check local semantic context
+    if (m_semanticContext[line] == semanticTemplate) {
+        return; //Return instantly if match found
+    }
+    //Pass to error handler if a match isn't found
+    handleAtomicInstructionError(line, semanticTemplate, node);
+}
+
+void SemanticAnalyzer::visit(AST::CreateInstruction& node) {
+    //CASE 2 - Multiple type instruction
+    //Expected semantic structure of instruction - some operands can be of multiple types
+    const vector<unordered_set<ASTConstants::OperandType>> semanticTemplate = {
+            {TYPECONDITION},
+            {INTEGER, CHARACTER, BOOLEAN, FLOAT, MEMORYADDRESS, INSTRUCTIONADDRESS},
+            {REGISTER}
+    };
+    int line = node.getLine();
+    vector<ASTConstants::OperandType> localContext = m_semanticContext[line];
+    //Iterate over possible semantics
+    for (int i=0; i<localContext.size(); i++) {
+        //Check if every operand in the context is a part of valid operands in the template
+        if (semanticTemplate[i].find(localContext[i]) == semanticTemplate[i].end()) {
+            //Handle error if not
+            handleMultipleInstructionError(line, semanticTemplate, node);
+        }
+    }
+    //Returns successfuly if end of loop is reached
+}
+
+void SemanticAnalyzer::visit(AST::RegisterOperand& node) {
+    //Insert its type in the local semantic context
+    m_semanticContext[node.getLine()][node.getPos()] = node.getOperandType();
+}
+
+void SemanticAnalyzer::handleAtomicInstructionError(int line, const std::vector<ASTConstants::OperandType> &expectedTemplate, AST::InstructionNode &node) {
+    //Create the invalid line log first
+    string errorLine = "Invalid syntax at line " + to_string(line) + ": " + m_lines[line-1] + "\n";
+    vector<ASTConstants::OperandType> localContext = m_semanticContext[line];
+    //Check every mismatched operand
+    for (int i=0; i<localContext.size(); i++) {
+        if (localContext[i] != expectedTemplate[i]) {
+            if (expectedTemplate[i] != EMPTY) {
+                //Unrecognized operand if not expecting an empty space
+                 errorLine += "Unrecognized operand '" + node.childAt(i)->getNodeValue() + "'. Expected " + enumToString(expectedTemplate[i]) + "\n";
+            }
+            else {
+                //Excess operand if expecting an empty space
+                errorLine += "Unexpected extra operand '" + node.childAt(i)->getNodeValue() + "'\n";
+            }
+        }
+    }
+    //Add to the invalid lines map
+    m_invalidLines[line] = errorLine;
+}
+
+void SemanticAnalyzer::handleMultipleInstructionError(int line, const std::vector<std::unordered_set<ASTConstants::OperandType>> &expectedTemplate, AST::InstructionNode &node) {
+    //Create the invalid line log first
+    const unordered_set<ASTConstants::OperandType> emptyTemplate = {EMPTY};
+    string errorLine = "Invalid syntax at line " + to_string(line) + ": " + m_lines[line-1] + "\n";
+    vector<ASTConstants::OperandType> localContext = m_semanticContext[line];
+
+    //Iterate over all given operands in the local context
+    for (int i=0; i<localContext.size(); i++) {
+        //If a local context token doesn't match any in the template for that index
+        if (expectedTemplate[i].find(localContext[i]) == expectedTemplate[i].end()) {
+            if (expectedTemplate[i] != emptyTemplate) {
+                errorLine += "Unrecognized operand '" + node.childAt(i)->getNodeValue() + "'. Expected ";
+                //Add all possible expected operands
+                for (auto it = expectedTemplate[i].begin(); it != expectedTemplate[i].end(); ++it) {
+                    if (it != expectedTemplate[i].begin()) {
+                        errorLine += " or ";
+                    }
+                    errorLine += enumToString(*it);
+                }
+                errorLine += "\n";
+            }
+            else {
+                //Excess operand if expecting an empty space
+                errorLine += "Unexpected extra operand '" + node.childAt(i)->getNodeValue() + "'\n";
+            }
+        }
+    }
 }
 
 /*string SemanticAnalyzer::analyzeLine(AST::InstructionNode *instructionNode) {

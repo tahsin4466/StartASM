@@ -15,12 +15,12 @@ namespace AST {
 
         //Accept method
         void accept(Visitor &visitor) override {
-            //Visit for the instruction first
-            visitor.visit(*this);
-            //Iterate and visit for children
+            //Iterate and visit for children first
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            //Visit for the instruction
+            visitor.visit(*this);
         };
     };
 
@@ -31,10 +31,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -45,10 +45,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -59,10 +59,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -73,10 +73,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -87,10 +87,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -101,10 +101,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -115,10 +115,10 @@ namespace AST {
                                   ASTConstants::NumOperands::TERNARY, line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -129,10 +129,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -143,10 +143,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -157,10 +157,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -171,10 +171,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -185,10 +185,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -199,10 +199,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -213,10 +213,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -227,10 +227,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -241,10 +241,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -255,10 +255,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -269,10 +269,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -283,10 +283,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -297,10 +297,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -311,10 +311,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -325,10 +325,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -339,10 +339,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 
@@ -353,10 +353,10 @@ namespace AST {
                                   line) {}
 
         void accept(Visitor &visitor) override {
-            visitor.visit(*this);
             for (auto* child : m_children) {
                 child->accept(visitor);
             }
+            visitor.visit(*this);
         };
     };
 }
