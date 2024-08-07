@@ -43,7 +43,8 @@ namespace AST {
     void RootNode::accept(AST::Visitor &visitor) {
         //Visit for root node first (usually nothing)
         visitor.visit(*this);
-        //Visit for all instruction children
+        //Visit for all instruction children (multithreaded)
+        #pragma omp parallel for schedule(auto) default(none) shared(visitor)
         for (auto* child : m_children) {
             child->accept(visitor);
         }

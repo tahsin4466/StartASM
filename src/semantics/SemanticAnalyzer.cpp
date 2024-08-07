@@ -373,16 +373,19 @@ void SemanticAnalyzer::handleAtomicInstructionError(int line, const std::vector<
         if (localContext[i] != expectedTemplate[i]) {
             if (expectedTemplate[i] != EMPTY) {
                 //Unrecognized operand if not expecting an empty space
-                 errorLine += "Unrecognized operand '" + node.childAt(i)->getNodeValue() + "'. Expected " + enumToString(expectedTemplate[i]) + "\n";
+                 errorLine += "Unrecognized operand '" + node.childAt(i)->getNodeValue() + "'. Expected " + enumToString(expectedTemplate[i]) + "\n\n";
             }
             else {
                 //Excess operand if expecting an empty space
-                errorLine += "Unexpected extra operand '" + node.childAt(i)->getNodeValue() + "'\n";
+                errorLine += "Unexpected extra operand '" + node.childAt(i)->getNodeValue() + "'\n\n";
             }
         }
     }
     //Add to the invalid lines map
-    m_invalidLines[line] = errorLine;
+    #pragma omp critical
+    {
+        m_invalidLines[line] = errorLine;
+    };
 }
 
 void SemanticAnalyzer::handleMultipleInstructionError(int line, const std::vector<std::unordered_set<ASTConstants::OperandType>> &expectedTemplate, AST::InstructionNode &node) {
@@ -404,16 +407,19 @@ void SemanticAnalyzer::handleMultipleInstructionError(int line, const std::vecto
                     }
                     errorLine += enumToString(*it);
                 }
-                errorLine += "\n";
+                errorLine += "\n\n";
             }
             else {
                 //Excess operand if expecting an empty space
-                errorLine += "Unexpected extra operand '" + node.childAt(i)->getNodeValue() + "'\n";
+                errorLine += "Unexpected extra operand '" + node.childAt(i)->getNodeValue() + "'\n\n";
             }
         }
     }
     //Add to the invalid lines map
-    m_invalidLines[line] = errorLine;
+    #pragma omp critical
+    {
+        m_invalidLines[line] = errorLine;
+    };
 }
 
 string SemanticAnalyzer::enumToString(OperandType type) {
