@@ -27,7 +27,7 @@ Compiler::Compiler(std::string& pathname, bool cmdSilent, bool cmdTimings, bool 
     m_symbolResolver(new SymbolResolver()),
     m_AST(new AST::AbstractSyntaxTree()),
     m_ASTBuilder(new ASTBuilder()),
-    m_semanticAnalyzer(new SemanticAnalyzer()),
+    m_semanticAnalyzer(new SemanticAnalyzer(m_codeLines)),
     m_scopeChecker(new ScopeChecker()),
     //m_codeGenerator(new CodeGenerator()),
     m_pathname(pathname) {}
@@ -107,7 +107,7 @@ bool Compiler::compileCode() {
         m_parser = nullptr;
     });
     auto checkAddressScopesFuture = std::async(&ScopeChecker::checkAddressScopes, m_scopeChecker, m_AST->getRoot(), std::ref(m_statusMessage), std::ref(m_codeLines));
-    auto analyzeSemanticsFuture = std::async(&SemanticAnalyzer::analyzeSemantics, m_semanticAnalyzer, m_AST->getRoot(), std::ref(m_codeLines), std::ref(m_statusMessage));
+    auto analyzeSemanticsFuture = std::async(&SemanticAnalyzer::analyzeSemantics, m_semanticAnalyzer, m_AST->getRoot(), std::ref(m_statusMessage));
     // Wait for all tasks to complete and retrieve function results
     bool checkAddressScopesResult = checkAddressScopesFuture.get();
     bool analyzeSemanticsResult = analyzeSemanticsFuture.get();

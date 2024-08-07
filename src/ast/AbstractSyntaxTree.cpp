@@ -40,6 +40,16 @@ namespace AST {
     RootNode::RootNode() : ASTNode(ASTConstants::NodeType::ROOT, "") {}
     RootNode::~RootNode() = default;
 
+    void RootNode::accept(AST::Visitor &visitor) {
+        //Visit for root node first (usually nothing)
+        visitor.visit(*this);
+        //Visit for all instruction children (multithreaded)
+        #pragma omp parallel for schedule(auto) default(none) shared(visitor)
+        for (auto* child : m_children) {
+            child->accept(visitor);
+        }
+    }
+
     // InstructionNode Implementation
     InstructionNode::InstructionNode(const std::string &nodeValue, ASTConstants::InstructionType instructionType, ASTConstants::NumOperands numOperands, int line)
             : ASTNode(ASTConstants::NodeType::INSTRUCTION, nodeValue), m_instructionType(instructionType), m_numOperands(numOperands), m_line(line) {}
@@ -47,8 +57,8 @@ namespace AST {
     InstructionNode::~InstructionNode() = default;
 
     // OperandNode Implementation
-    OperandNode::OperandNode(const std::string &nodeValue, ASTConstants::OperandType operandType)
-            : ASTNode(ASTConstants::NodeType::OPERAND, nodeValue), m_operandType(operandType) {}
+    OperandNode::OperandNode(const std::string &nodeValue, ASTConstants::OperandType operandType, int line, short int pos)
+            : ASTNode(ASTConstants::NodeType::OPERAND, nodeValue), m_operandType(operandType), m_line(line), m_pos(pos) {}
 
     OperandNode::~OperandNode() = default;
 
@@ -144,7 +154,6 @@ namespace AST {
             case PTConstants::OperandType::TYPECONDITION:
                 return ASTConstants::OperandType::TYPECONDITION;
             case PTConstants::OperandType::UNKNOWN:
-                return ASTConstants::OperandType::UNKNOWN;
             default:
                 return ASTConstants::OperandType::UNKNOWN;
         }

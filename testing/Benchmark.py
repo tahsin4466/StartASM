@@ -23,6 +23,7 @@ registers = ['r' + str(i) for i in range(10)]  # List of registers r0-r9
 operations = ['add', 'sub', 'multiply', 'divide', 'move', 'load', 'store']  # etc.
 datatypes = ['integer', 'float', 'boolean', 'character', 'memory', 'instruction']
 
+print("Preparing test unit")
 # Create the stress test file
 with open(stress_test_path, 'w') as file:
     file.write("comment \"This is the automatically generated stress test script to test the front-end compilation performance of the compiler\"\n")
@@ -48,6 +49,7 @@ with open(stress_test_path, 'w') as file:
         file.write(line + '\n')
     file.write("stop")
 
+print("Starting benchmark")
 # Change the working directory to the root directory
 root_dir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(root_dir)
