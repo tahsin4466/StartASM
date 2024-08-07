@@ -75,7 +75,7 @@ class Compiler {
         Parser* m_parser;
         //Symbol Resolver
         SymbolResolver* m_symbolResolver;
-        //AST (used directly by the compiler at multiple stages)
+        //AST (used directly by the main at multiple stages)
         AST::AbstractSyntaxTree* m_AST;
         //AST Builder
         ASTBuilder* m_ASTBuilder;

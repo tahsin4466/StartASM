@@ -12,7 +12,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 if(APPLE)
     set(CMAKE_PREFIX_PATH "/usr/local/opt/llvm")
     set(LLVM_DIR "/usr/local/opt/llvm/lib/cmake/llvm")
-    # Set the compiler to use Homebrew LLVM
+    # Set the main to use Homebrew LLVM
     set(CMAKE_C_COMPILER "/usr/local/opt/llvm/bin/clang")
     set(CMAKE_CXX_COMPILER "/usr/local/opt/llvm/bin/clang++")
     set(OpenMP_C_FLAGS "-Xpreprocessor -fopenmp -I/usr/local/opt/llvm/include")
@@ -37,11 +37,11 @@ add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 
 # List all source files and headers
 set(SOURCES
-        src/compiler/Compiler.cpp
+        src/main/Compiler.cpp
         src/lexer/Lexer.cpp
         src/parser/Parser.cpp
         src/semantics/SemanticAnalyzer.cpp
-        src/compiler/StartASM.cpp
+        src/main/StartASM.cpp
         src/codegen/CodeGenerator.cpp
         src/misc/.Secrets.cpp
         src/scopecheck/ScopeChecker.cpp
@@ -52,7 +52,7 @@ set(SOURCES
 )
 
 set(HEADERS
-        include/compiler/Compiler.h
+        include/main/Compiler.h
         include/ast/Instructions.h
         include/lexer/Lexer.h
         include/parser/Parser.h

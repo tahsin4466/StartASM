@@ -26,7 +26,7 @@ datatypes = ['integer', 'float', 'boolean', 'character', 'memory', 'instruction'
 print("Preparing test unit")
 # Create the stress test file
 with open(stress_test_path, 'w') as file:
-    file.write("comment \"This is the automatically generated stress test script to test the front-end compilation performance of the compiler\"\n")
+    file.write("comment \"This is the automatically generated stress test script to test the front-end compilation performance of the main\"\n")
     for _ in range(num_lines-2):
         reg1 = random.choice(registers)
         reg2 = random.choice(registers)
@@ -67,5 +67,5 @@ except PermissionError:
 except Exception as e:
     print(f"Other error deleting stress test file: {e}")
 
-# Print the output of the compiler
+# Print the output of the main
 print(result.stdout)

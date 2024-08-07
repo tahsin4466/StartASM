@@ -1,10 +1,9 @@
-#include "compiler/Compiler.h"
 #include <iostream>
 #include <omp.h>
 #include <string>
 #include <algorithm>
 
-// Include the Easter egg functions
+#include "main/Compiler.h"
 #include "misc/.Secrets.h"
 
 using namespace std;
@@ -108,7 +107,7 @@ int main(int argc, char* argv[]) {
     bool silent = cmdOptionExists(argv, argv + argc, "--silent") || cmdOptionExists(argv, argv + argc, "--truesilent");
     bool truesilent = cmdOptionExists(argv, argv + argc, "--truesilent");
 
-    // Adjust the compiler instantiation to pass the truesilent flag
+    // Adjust the main instantiation to pass the truesilent flag
     Compiler StartASMCompiler(filepath, silent, timings, tree, ir);
     double start = omp_get_wtime();
     if (!StartASMCompiler.compileCode()) {

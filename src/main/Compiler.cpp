@@ -1,4 +1,4 @@
-#include "compiler/Compiler.h"
+#include "main/Compiler.h"
 #include "lexer/Lexer.h"
 #include "parser/Parser.h"
 #include "symbolres/SymbolResolver.h"
