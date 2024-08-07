@@ -28,7 +28,7 @@ Compiler::Compiler(std::string& pathname, bool cmdSilent, bool cmdTimings, bool 
     m_AST(new AST::AbstractSyntaxTree()),
     m_ASTBuilder(new ASTBuilder()),
     m_semanticAnalyzer(new SemanticAnalyzer(m_codeLines)),
-    m_scopeChecker(new ScopeChecker()),
+    m_scopeChecker(new ScopeChecker(m_codeLines)),
     //m_codeGenerator(new CodeGenerator()),
     m_pathname(pathname) {}
 
