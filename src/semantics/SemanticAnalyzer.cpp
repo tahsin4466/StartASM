@@ -237,11 +237,12 @@ void SemanticAnalyzer::visit(AST::CreateInstruction& node) {
 void SemanticAnalyzer::visit(AST::LoadInstruction& node) {
     const std::vector<std::unordered_set<ASTConstants::OperandType>> semanticTemplate = {
             {MEMORYADDRESS, REGISTER},
-            {REGISTER}
+            {REGISTER},
+            {EMPTY}
     };
     int line = node.getLine();
     const auto& localContext = m_semanticContext[line];
-    for (size_t i = 0; i < localContext.size(); ++i) {
+    for (int i=0; i < localContext.size(); i++) {
         if (semanticTemplate[i].find(localContext[i]) == semanticTemplate[i].end()) {
             handleMultipleInstructionError(line, semanticTemplate, node);
             return;
@@ -252,11 +253,12 @@ void SemanticAnalyzer::visit(AST::LoadInstruction& node) {
 void SemanticAnalyzer::visit(AST::StoreInstruction& node) {
     const std::vector<std::unordered_set<ASTConstants::OperandType>> semanticTemplate = {
             {REGISTER},
-            {MEMORYADDRESS, REGISTER}
+            {MEMORYADDRESS, REGISTER},
+            {EMPTY}
     };
     int line = node.getLine();
     const auto& localContext = m_semanticContext[line];
-    for (size_t i = 0; i < localContext.size(); ++i) {
+    for (int i=0; i < localContext.size(); i++) {
         if (semanticTemplate[i].find(localContext[i]) == semanticTemplate[i].end()) {
             handleMultipleInstructionError(line, semanticTemplate, node);
             return;
@@ -267,11 +269,12 @@ void SemanticAnalyzer::visit(AST::StoreInstruction& node) {
 void SemanticAnalyzer::visit(AST::JumpInstruction& node) {
     const std::vector<std::unordered_set<ASTConstants::OperandType>> semanticTemplate = {
             {JUMPCONDITION},
-            {INSTRUCTIONADDRESS, REGISTER}
+            {INSTRUCTIONADDRESS, REGISTER},
+            {EMPTY}
     };
     int line = node.getLine();
     const auto& localContext = m_semanticContext[line];
-    for (size_t i = 0; i < localContext.size(); ++i) {
+    for (int i=0; i < localContext.size(); i++) {
         if (semanticTemplate[i].find(localContext[i]) == semanticTemplate[i].end()) {
             handleMultipleInstructionError(line, semanticTemplate, node);
             return;
@@ -281,11 +284,13 @@ void SemanticAnalyzer::visit(AST::JumpInstruction& node) {
 
 void SemanticAnalyzer::visit(AST::CallInstruction& node) {
     const std::vector<std::unordered_set<ASTConstants::OperandType>> semanticTemplate = {
-            {INSTRUCTIONADDRESS, REGISTER}
+            {INSTRUCTIONADDRESS, REGISTER},
+            {EMPTY},
+            {EMPTY}
     };
     int line = node.getLine();
     const auto& localContext = m_semanticContext[line];
-    for (size_t i = 0; i < localContext.size(); ++i) {
+    for (int i=0; i < localContext.size(); i++) {
         if (semanticTemplate[i].find(localContext[i]) == semanticTemplate[i].end()) {
             handleMultipleInstructionError(line, semanticTemplate, node);
             return;
@@ -295,11 +300,13 @@ void SemanticAnalyzer::visit(AST::CallInstruction& node) {
 
 void SemanticAnalyzer::visit(AST::PrintInstruction& node) {
     const std::vector<std::unordered_set<ASTConstants::OperandType>> semanticTemplate = {
-            {STRING, NEWLINE}
+            {STRING, NEWLINE},
+            {EMPTY},
+            {EMPTY}
     };
     int line = node.getLine();
     const auto& localContext = m_semanticContext[line];
-    for (size_t i = 0; i < localContext.size(); ++i) {
+    for (int i=0; i < localContext.size(); i++) {
         if (semanticTemplate[i].find(localContext[i]) == semanticTemplate[i].end()) {
             handleMultipleInstructionError(line, semanticTemplate, node);
             return;
@@ -405,6 +412,8 @@ void SemanticAnalyzer::handleMultipleInstructionError(int line, const std::vecto
             }
         }
     }
+    //Add to the invalid lines map
+    m_invalidLines[line] = errorLine;
 }
 
 string SemanticAnalyzer::enumToString(OperandType type) {
