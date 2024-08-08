@@ -73,13 +73,19 @@ bool Compiler::compileCode() {
     }
     cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
 
-    //Resolve symbolres//
-    cmdTimingPrint("Compiler: Resolving symbolres\n");
+    // Resolve symbols while concurrently deleting lexer tokens //
+    cmdTimingPrint("Compiler: Resolving symbols\n");
     start = omp_get_wtime();
-    if(!m_symbolResolver->resolveSymbols(m_symbolTable, m_parseTree->getRoot(), m_statusMessage, m_codeLines)) {
+    auto codeTokensDeletionFuture = std::async(std::launch::async, [this] {
+        m_codeTokens.clear();
+        m_codeTokens.shrink_to_fit();
+    });
+    bool resolveSymbolsResult = m_symbolResolver->resolveSymbols(m_symbolTable, m_parseTree->getRoot(), m_statusMessage, m_codeLines);
+    codeTokensDeletionFuture.get();
+    if(!resolveSymbolsResult) {
         return false;
     }
-    cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
+    cmdTimingPrint("Time taken: " + to_string(omp_get_wtime() - start) + "\n\n");
 
     //Delete the lexer and build the AST concurrently//
     cmdTimingPrint("Compiler: Building AST\n");
@@ -99,28 +105,33 @@ bool Compiler::compileCode() {
         cout << endl;
     }
 
-    //Check address scopes and analyze semantics while deleting the parse tree concurrently//
+    //Check address scopes and analyze semantics while deleting the parser and parseTree//
     cmdTimingPrint("Compiler: Analyzing semantics and checking address scopes\n");
     start = omp_get_wtime();
     auto parserDeletionFuture = std::async(std::launch::async, [this] {
         delete m_parser;
         m_parser = nullptr;
     });
+    auto parseTreeDeletionFuture = std::async(std::launch::async, [this] {
+        delete m_parseTree;
+        m_parseTree = nullptr;
+    });
     auto checkAddressScopesFuture = std::async(&ScopeChecker::checkAddressScopes, m_scopeChecker, m_AST->getRoot(), std::ref(m_statusMessage), std::ref(m_codeLines));
     auto analyzeSemanticsFuture = std::async(&SemanticAnalyzer::analyzeSemantics, m_semanticAnalyzer, m_AST->getRoot(), std::ref(m_statusMessage));
-    // Wait for all tasks to complete and retrieve function results
     bool checkAddressScopesResult = checkAddressScopesFuture.get();
     bool analyzeSemanticsResult = analyzeSemanticsFuture.get();
     parserDeletionFuture.get();
+    parseTreeDeletionFuture.get();
     if(!checkAddressScopesResult || !analyzeSemanticsResult) {
         return false;
     }
-    cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
 
-    //Generate code//
+    cmdTimingPrint("Time taken: " + to_string(omp_get_wtime() - start) + "\n\n");
+
+
+    //Generate code and delete codeLines//
     cmdTimingPrint("Compiler: Generating LLVM IR\n");
     start = omp_get_wtime();
-
     cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
     return true;
 }
