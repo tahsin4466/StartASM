@@ -7,9 +7,8 @@ using namespace std;
 using namespace AST;
 using namespace ASTConstants;
 
-SemanticAnalyzer::SemanticAnalyzer(std::vector<std::string>& lines) : m_lines(lines) {
-    // Initialization code if needed
-}
+SemanticAnalyzer::SemanticAnalyzer(std::vector<std::string>& lines) : m_lines(lines) {}
+
 bool SemanticAnalyzer::analyzeSemantics(AST::ASTNode *AST, std::string &errorMessage) {
     //Prepopulate the local semantic context - an operation will never have >3 operands
     std::vector<ASTConstants::OperandType> localContext(3, ASTConstants::EMPTY); //Set initial operands to empty for easier matching

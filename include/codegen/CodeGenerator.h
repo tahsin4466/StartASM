@@ -19,7 +19,7 @@ class CodeGenerator : public AST::Visitor {
         CodeGenerator(const CodeGenerator&) = delete;
         CodeGenerator& operator=(const CodeGenerator&) = delete;
 
-        void generateCode(AST::ASTNode* AST);
+        void generateCode(AST::ASTNode* AST, int numLines);
         void printIR();
 
     private:
@@ -30,7 +30,7 @@ class CodeGenerator : public AST::Visitor {
         static std::map<std::string, llvm::Value *> NamedValues;
 
         //LLVM Value Context
-        std::vector<std::vector<llvm::Value*>> OperandValues;
+        std::vector<std::vector<std::pair<ASTConstants::OperandType, llvm::Value*>>> OperandValues;
         std::vector<llvm::Value*> InstructionValues;
 
         //Root node visitor

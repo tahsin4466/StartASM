@@ -33,117 +33,123 @@ CodeGenerator::~CodeGenerator() {
     TheContext.reset();
 }
 
-void CodeGenerator::generateCode(AST::ASTNode *AST) {
+void CodeGenerator::generateCode(AST::ASTNode *AST, int numLines) {
+    //Initialize LLVM Value Data Structures
+    vector<pair<ASTConstants::OperandType, Value*>> localValues(3, pair(ASTConstants::EMPTY, nullptr));
+    OperandValues = vector<vector<pair<ASTConstants::OperandType, Value*>>>(numLines+1, localValues);
+    InstructionValues = vector<Value*>(numLines+1, nullptr);
+
     //Visit the root and iterate over the AST
     AST->accept(*this);
 }
 
-void CodeGenerator::visit(AST::RootNode& node) {
-    std::cout << "**TODO: Root Node**\n";
-}
+//Root Node Visitor (Do nothing)
+void CodeGenerator::visit(AST::RootNode& node) {}
 
+
+//Instruction Generators
 void CodeGenerator::visit(AST::MoveInstruction& node) {
-    std::cout << "TODO: MoveInstruction\n";
+    //std::cout << "TODO: MoveInstruction\n";
 }
 
 void CodeGenerator::visit(AST::LoadInstruction& node) {
-    std::cout << "TODO: LoadInstruction\n";
+   // std::cout << "TODO: LoadInstruction\n";
 }
 
 void CodeGenerator::visit(AST::StoreInstruction& node) {
-    std::cout << "TODO: StoreInstruction\n";
+    //std::cout << "TODO: StoreInstruction\n";
 }
 
 void CodeGenerator::visit(AST::CreateInstruction& node) {
-    std::cout << "TODO: CreateInstruction\n";
+    //std::cout << "TODO: CreateInstruction\n";
 }
 
 void CodeGenerator::visit(AST::CastInstruction& node) {
-    std::cout << "TODO: CastInstruction\n";
+    //std::cout << "TODO: CastInstruction\n";
 }
 
 void CodeGenerator::visit(AST::AddInstruction& node) {
-    std::cout << "TODO: AddInstruction\n";
+    //std::cout << "TODO: AddInstruction\n";
 }
 
 void CodeGenerator::visit(AST::SubInstruction& node) {
-    std::cout << "TODO: SubInstruction\n";
+    //std::cout << "TODO: SubInstruction\n";
 }
 
 void CodeGenerator::visit(AST::MultiplyInstruction& node) {
-    std::cout << "TODO: MultiplyInstruction\n";
+    //std::cout << "TODO: MultiplyInstruction\n";
 }
 
 void CodeGenerator::visit(AST::DivideInstruction& node) {
-    std::cout << "TODO: DivideInstruction\n";
+    //std::cout << "TODO: DivideInstruction\n";
 }
 
 void CodeGenerator::visit(AST::OrInstruction& node) {
-    std::cout << "TODO: OrInstruction\n";
+    //std::cout << "TODO: OrInstruction\n";
 }
 
 void CodeGenerator::visit(AST::AndInstruction& node) {
-    std::cout << "TODO: AndInstruction\n";
+    //std::cout << "TODO: AndInstruction\n";
 }
 
 void CodeGenerator::visit(AST::NotInstruction& node) {
-    std::cout << "TODO: AndInstruction\n";
+    //std::cout << "TODO: AndInstruction\n";
 }
 
 void CodeGenerator::visit(AST::ShiftInstruction& node) {
-    std::cout << "TODO: ShiftInstruction\n";
+    //std::cout << "TODO: ShiftInstruction\n";
 }
 
 void CodeGenerator::visit(AST::CompareInstruction& node) {
-    std::cout << "TODO: CompareInstruction\n";
+    //std::cout << "TODO: CompareInstruction\n";
 }
 
 void CodeGenerator::visit(AST::JumpInstruction& node) {
-    std::cout << "TODO: JumpInstruction\n";
+    //std::cout << "TODO: JumpInstruction\n";
 }
 
 void CodeGenerator::visit(AST::CallInstruction& node) {
-    std::cout << "TODO: CallInstruction\n";
+    //std::cout << "TODO: CallInstruction\n";
 }
 
 void CodeGenerator::visit(AST::PushInstruction& node) {
-    std::cout << "TODO: PushInstruction\n";
+    //std::cout << "TODO: PushInstruction\n";
 }
 
 void CodeGenerator::visit(AST::PopInstruction& node) {
-    std::cout << "TODO: PopInstruction\n";
+    //std::cout << "TODO: PopInstruction\n";
 }
 
 void CodeGenerator::visit(AST::ReturnInstruction& node) {
-    std::cout << "TODO: ReturnInstruction\n";
+    //std::cout << "TODO: ReturnInstruction\n";
 }
 
 void CodeGenerator::visit(AST::StopInstruction& node) {
-    std::cout << "TODO: StopInstruction\n";
+    //std::cout << "TODO: StopInstruction\n";
 }
 
 void CodeGenerator::visit(AST::InputInstruction& node) {
-    std::cout << "TODO: InputInstruction\n";
+    //std::cout << "TODO: InputInstruction\n";
 }
 
 void CodeGenerator::visit(AST::OutputInstruction& node) {
-    std::cout << "TODO: OutputInstruction\n";
+    //std::cout << "TODO: OutputInstruction\n";
 }
 
 void CodeGenerator::visit(AST::PrintInstruction& node) {
-    std::cout << "TODO: PrintInstruction\n";
+    //std::cout << "TODO: PrintInstruction\n";
 }
 
 void CodeGenerator::visit(AST::LabelInstruction& node) {
-    std::cout << "TODO: LabelInstruction\n";
+    //std::cout << "TODO: LabelInstruction\n";
 }
 
 void CodeGenerator::visit(AST::CommentInstruction& node) {
-    std::cout << "TODO: CommentInstruction\n";
+    //std::cout << "TODO: CommentInstruction\n";
 }
 
 
-
+//Operand Generators
 void CodeGenerator::visit(AST::RegisterOperand& node) {
     std::cout << "-> TODO: RegisterOperand\n";
 }
@@ -157,39 +163,49 @@ void CodeGenerator::visit(AST::MemoryAddressOperand& node) {
 }
 
 void CodeGenerator::visit(AST::IntegerOperand& node) {
-    std::cout << "-> TODO: IntegerOperand\n";
+    //Basic 32bit int
+    cout << "Converting int" << endl;
+    OperandValues[node.getLine()][node.getPos()] = pair(node.getOperandType(),ConstantInt::get(*TheContext, APInt(32, stoi(node.getNodeValue()), true)));
 }
 
 void CodeGenerator::visit(AST::FloatOperand& node) {
-    std::cout << "-> TODO: FloatOperand\n";
+    //Basic 32bit float
+    cout << "Converting float" << endl;
+    OperandValues[node.getLine()][node.getPos()] = pair(node.getOperandType(), ConstantFP::get(*TheContext, APFloat(stof(node.getNodeValue()))));
 }
 
 void CodeGenerator::visit(AST::BooleanOperand& node) {
-    std::cout << "-> TODO: BooleanOperand\n";
+    //Bool is treated as 1 bit integer
+    cout << "Converting bool" << endl;
+    OperandValues[node.getLine()][node.getPos()] = pair(node.getOperandType(), ConstantInt::get(*TheContext, APInt(1, (node.getNodeValue() == "true"), false)));
 }
 
 void CodeGenerator::visit(AST::CharacterOperand& node) {
-    std::cout << "-> TODO: CharacterOperand\n";
+    //Char is treated as 8-bit ASCII integer
+    cout << "Converting char" << endl;
+    OperandValues[node.getLine()][node.getPos()] = pair(node.getOperandType(), ConstantInt::get(*TheContext, APInt(8, node.getNodeValue()[0], false)));
 }
 
+//String and newline operands are for runtime library print functions
 void CodeGenerator::visit(AST::StringOperand& node) {
-    std::cout << "-> TODO: StringOperand\n";
+    OperandValues[node.getLine()][node.getPos()] = pair(node.getOperandType(), nullptr);
 }
 
 void CodeGenerator::visit(AST::NewlineOperand& node) {
-    std::cout << "-> TODO: NewlineOperand\n";
+    OperandValues[node.getLine()][node.getPos()] = pair(node.getOperandType(), nullptr);
 }
 
+//Conditions are for instruction type decision-making
 void CodeGenerator::visit(AST::TypeConditionOperand& node) {
-    std::cout << "-> TODO: TypeConditionOperand\n";
+    OperandValues[node.getLine()][node.getPos()] = pair(node.getOperandType(), nullptr);
 }
 
 void CodeGenerator::visit(AST::ShiftConditionOperand& node) {
-    std::cout << "-> TODO: ShiftConditionOperand\n";
+    OperandValues[node.getLine()][node.getPos()] = pair(node.getOperandType(), nullptr);
 }
 
 void CodeGenerator::visit(AST::JumpConditionOperand& node) {
-    std::cout << "-> TODO: JumpConditionOperand\n";
+    OperandValues[node.getLine()][node.getPos()] = pair(node.getOperandType(), nullptr);
 }
 
 void CodeGenerator::printIR() {
