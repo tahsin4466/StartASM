@@ -15,7 +15,7 @@
 class SemanticAnalyzer: public AST::Visitor {
 public:
     // Constructor/destructor
-    SemanticAnalyzer(std::vector<std::string>& lines);
+    explicit SemanticAnalyzer(std::vector<std::string>& lines);
     ~SemanticAnalyzer() = default;
 
     // Remove copy and assignment operator

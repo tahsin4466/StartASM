@@ -21,6 +21,7 @@ bool SemanticAnalyzer::analyzeSemantics(AST::ASTNode *AST, std::string &errorMes
 
     //Clear the context
     m_semanticContext.clear();
+    m_semanticContext.shrink_to_fit();
 
     //Concatenate status message string with all error messages
     for (const auto& pair : m_invalidLines) {

@@ -29,8 +29,9 @@ Compiler::Compiler(std::string& pathname, bool cmdSilent, bool cmdTimings, bool 
     m_ASTBuilder(new ASTBuilder()),
     m_semanticAnalyzer(new SemanticAnalyzer(m_codeLines)),
     m_scopeChecker(new ScopeChecker(m_codeLines)),
-    //m_codeGenerator(new CodeGenerator()),
-    m_pathname(pathname) {}
+    m_codeGenerator(new CodeGenerator()),
+    m_pathname(pathname),
+    m_numLines(0) {}
 
 Compiler::~Compiler() {
     delete m_lexer;
@@ -40,7 +41,7 @@ Compiler::~Compiler() {
     delete m_ASTBuilder;
     delete m_semanticAnalyzer;
     delete m_scopeChecker;
-    //delete m_codeGenerator;
+    delete m_codeGenerator;
 }
 
 void Compiler::cmdPrint(const std::string& message) const {
@@ -63,6 +64,7 @@ bool Compiler::compileCode() {
         m_statusMessage = "Lexing failed! Either the path was invalid or the file could not be found.";
         return false;
     }
+    m_numLines = m_codeLines.size();
     cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
 
     //Parse code//
@@ -125,13 +127,19 @@ bool Compiler::compileCode() {
     if(!checkAddressScopesResult || !analyzeSemanticsResult) {
         return false;
     }
-
     cmdTimingPrint("Time taken: " + to_string(omp_get_wtime() - start) + "\n\n");
 
 
-    //Generate code and delete codeLines//
     cmdTimingPrint("Compiler: Generating LLVM IR\n");
     start = omp_get_wtime();
-    cmdTimingPrint("Time taken: " + to_string(omp_get_wtime()-start) + "\n\n");
+    std::future<void> generateCodeFuture = std::async(std::launch::async, &CodeGenerator::generateCode, m_codeGenerator, m_AST->getRoot());
+    std::future<void> clearCodeLinesFuture = std::async(std::launch::async, [this]() {
+        m_codeLines.clear();
+        m_codeLines.shrink_to_fit();
+    });
+    generateCodeFuture.wait();
+    clearCodeLinesFuture.wait();
+    cmdTimingPrint("Time taken: " + std::to_string(omp_get_wtime() - start) + "\n\n");
+
     return true;
 }

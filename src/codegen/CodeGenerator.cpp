@@ -2,14 +2,44 @@
 #include "ast/Instructions.h"
 #include "ast/Operands.h"
 
+using namespace std;
+using namespace llvm;
+using namespace AST;
 
-CodeGenerator::CodeGenerator()
-        : context(), builder(context) {
-    module = std::make_unique<llvm::Module>("StartASMModule", context);
+//Static LLVM Components Decleration
+std::unique_ptr<llvm::LLVMContext> CodeGenerator::TheContext;
+std::unique_ptr<llvm::IRBuilder<>> CodeGenerator::Builder;
+std::unique_ptr<llvm::Module> CodeGenerator::TheModule;
+std::map<std::string, llvm::Value *> CodeGenerator::NamedValues;
+
+
+CodeGenerator::CodeGenerator() {
+    // Initialize the LLVM context
+    TheContext = make_unique<llvm::LLVMContext>();
+    // Initialize the IRBuilder with the context
+    Builder = make_unique<llvm::IRBuilder<>>(*TheContext);
+    // Initialize the module with a name and the context
+    TheModule = make_unique<llvm::Module>("StartASM_module", *TheContext);
+    if (!TheContext || !Builder || !TheModule) {
+        cerr << "Initialization failed" << std::endl;
+        exit(0);
+    }
+}
+
+CodeGenerator::~CodeGenerator() {
+    //Just to ensure proper order of deletion of LLVM components
+    TheModule.reset();
+    Builder.reset();
+    TheContext.reset();
+}
+
+void CodeGenerator::generateCode(AST::ASTNode *AST) {
+    //Visit the root and iterate over the AST
+    AST->accept(*this);
 }
 
 void CodeGenerator::visit(AST::RootNode& node) {
-    std::cout << "TODO: Root Node\n";
+    std::cout << "**TODO: Root Node**\n";
 }
 
 void CodeGenerator::visit(AST::MoveInstruction& node) {
@@ -53,6 +83,10 @@ void CodeGenerator::visit(AST::OrInstruction& node) {
 }
 
 void CodeGenerator::visit(AST::AndInstruction& node) {
+    std::cout << "TODO: AndInstruction\n";
+}
+
+void CodeGenerator::visit(AST::NotInstruction& node) {
     std::cout << "TODO: AndInstruction\n";
 }
 
@@ -108,54 +142,56 @@ void CodeGenerator::visit(AST::CommentInstruction& node) {
     std::cout << "TODO: CommentInstruction\n";
 }
 
+
+
 void CodeGenerator::visit(AST::RegisterOperand& node) {
-    std::cout << "TODO: RegisterOperand\n";
+    std::cout << "-> TODO: RegisterOperand\n";
 }
 
 void CodeGenerator::visit(AST::InstructionAddressOperand& node) {
-    std::cout << "TODO: InstructionAddressOperand\n";
+    std::cout << "-> TODO: InstructionAddressOperand\n";
 }
 
 void CodeGenerator::visit(AST::MemoryAddressOperand& node) {
-    std::cout << "TODO: MemoryAddressOperand\n";
+    std::cout << "-> TODO: MemoryAddressOperand\n";
 }
 
 void CodeGenerator::visit(AST::IntegerOperand& node) {
-    std::cout << "TODO: IntegerOperand\n";
+    std::cout << "-> TODO: IntegerOperand\n";
 }
 
 void CodeGenerator::visit(AST::FloatOperand& node) {
-    std::cout << "TODO: FloatOperand\n";
+    std::cout << "-> TODO: FloatOperand\n";
 }
 
 void CodeGenerator::visit(AST::BooleanOperand& node) {
-    std::cout << "TODO: BooleanOperand\n";
+    std::cout << "-> TODO: BooleanOperand\n";
 }
 
 void CodeGenerator::visit(AST::CharacterOperand& node) {
-    std::cout << "TODO: CharacterOperand\n";
+    std::cout << "-> TODO: CharacterOperand\n";
 }
 
 void CodeGenerator::visit(AST::StringOperand& node) {
-    std::cout << "TODO: StringOperand\n";
+    std::cout << "-> TODO: StringOperand\n";
 }
 
 void CodeGenerator::visit(AST::NewlineOperand& node) {
-    std::cout << "TODO: NewlineOperand\n";
+    std::cout << "-> TODO: NewlineOperand\n";
 }
 
 void CodeGenerator::visit(AST::TypeConditionOperand& node) {
-    std::cout << "TODO: TypeConditionOperand\n";
+    std::cout << "-> TODO: TypeConditionOperand\n";
 }
 
 void CodeGenerator::visit(AST::ShiftConditionOperand& node) {
-    std::cout << "TODO: ShiftConditionOperand\n";
+    std::cout << "-> TODO: ShiftConditionOperand\n";
 }
 
 void CodeGenerator::visit(AST::JumpConditionOperand& node) {
-    std::cout << "TODO: JumpConditionOperand\n";
+    std::cout << "-> TODO: JumpConditionOperand\n";
 }
 
 void CodeGenerator::printIR() {
-    module->print(llvm::outs(), nullptr);
+
 }

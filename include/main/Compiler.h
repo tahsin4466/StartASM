@@ -30,7 +30,7 @@ class Compiler {
         //Accessors
         //Get number of lines
         [[nodiscard]] int getNumLines() const {
-            return int(m_codeLines.size());
+            return m_numLines;
         }
         //Get current status
         [[nodiscard]] std::string getStatus() const {
@@ -54,6 +54,7 @@ class Compiler {
 
     private:
         //Private variables
+        int m_numLines;
         //Data structures
         //Vector containing code lines
         std::vector<std::string> m_codeLines;

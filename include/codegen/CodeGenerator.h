@@ -2,11 +2,11 @@
 #define CODEGENERATOR_H
 
 #include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/Module.h>
 #include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/Verifier.h>
+#include <llvm/IR/Module.h>
 #include <memory>
 #include <iostream>
+#include <map>
 
 #include "ast/Visitor.h"
 #include "ast/AbstractSyntaxTree.h"
@@ -14,12 +14,27 @@
 class CodeGenerator : public AST::Visitor {
     public:
         CodeGenerator();
-        ~CodeGenerator() = default;
+        ~CodeGenerator();
         //Remove copy and assignment operator
         CodeGenerator(const CodeGenerator&) = delete;
         CodeGenerator& operator=(const CodeGenerator&) = delete;
-        void visit(AST::RootNode& node) override;
 
+        void generateCode(AST::ASTNode* AST);
+        void printIR();
+
+    private:
+        //LLVM Components
+        static std::unique_ptr<llvm::LLVMContext> TheContext;
+        static std::unique_ptr<llvm::IRBuilder<>> Builder;
+        static std::unique_ptr<llvm::Module> TheModule;
+        static std::map<std::string, llvm::Value *> NamedValues;
+
+        //LLVM Value Context
+        std::vector<std::vector<llvm::Value*>> OperandValues;
+        std::vector<llvm::Value*> InstructionValues;
+
+        //Root node visitor
+        void visit(AST::RootNode& node) override;
 
         // Specific visit methods for each instruction
         void visit(AST::MoveInstruction& node) override;
@@ -33,6 +48,7 @@ class CodeGenerator : public AST::Visitor {
         void visit(AST::DivideInstruction& node) override;
         void visit(AST::OrInstruction& node) override;
         void visit(AST::AndInstruction& node) override;
+        void visit(AST::NotInstruction& node) override;
         void visit(AST::ShiftInstruction& node) override;
         void visit(AST::CompareInstruction& node) override;
         void visit(AST::JumpInstruction& node) override;
@@ -60,13 +76,6 @@ class CodeGenerator : public AST::Visitor {
         void visit(AST::TypeConditionOperand& node) override;
         void visit(AST::ShiftConditionOperand& node) override;
         void visit(AST::JumpConditionOperand& node) override;
-
-        void printIR();
-
-    private:
-        llvm::LLVMContext context;
-        llvm::IRBuilder<> builder;
-        std::unique_ptr<llvm::Module> module;
 };
 
 #endif

@@ -22,8 +22,13 @@ if(APPLE)
     set(OpenMP_omp_LIBRARY "/usr/local/opt/llvm/lib/libomp.dylib")
 endif()
 
-# Find LLVM package
-find_package(LLVM REQUIRED CONFIG)
+if(UNIX AND NOT APPLE)
+    # Attempt to find LLVM on Linux
+    find_package(LLVM REQUIRED CONFIG)
+else()
+    # Find LLVM package
+    find_package(LLVM REQUIRED CONFIG)
+endif()
 
 # Include LLVM headers
 include_directories(${LLVM_INCLUDE_DIRS})
@@ -95,6 +100,10 @@ elseif(UNIX)
     # Linux-specific settings here
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -no-pie -lstdc++fs")
+
+    # Enable AddressSanitizer
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
 endif()
 
 # Ensure CMake RPATH settings for macOS

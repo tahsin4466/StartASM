@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
             case 3:
                 displayRandomJoke();
                 break;
-            case 4:
+            default:
                 activateSecretFeature();
                 break;
         }
