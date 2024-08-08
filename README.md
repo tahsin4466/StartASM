@@ -34,5 +34,7 @@ Note that the use of --silent or --truesilent will override output flags such as
 ```
 You can also check the `examples` folder for examples. Each code file contains a comment explaining its purpose. There are included testing scripts available in the `testing` folder, including benchmarking and AST testing.
 
-
 Also make sure to check out the `documentations` folder for more information about StartASM's features, syntax, and some examples! This is still very much a work-in-progress project, so updates will be continual.
+
+## License
+This project is licensed under the MIT license. Feel free to fork or contribute to this project or use it in any manner you like.
